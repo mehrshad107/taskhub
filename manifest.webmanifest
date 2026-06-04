@@ -1,0 +1,44 @@
+{
+  "name": "مدیریت تسک — TaskHub",
+  "short_name": "TaskHub",
+  "description": "مدیریت تسک، پلنر، تمرکز، مالی، عادت و تحلیل هوشمند — همه‌چیز یک‌جا",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./Task_Manager_v8_Responsive_T7.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#edf0f5",
+  "theme_color": "#0a5a6c",
+  "categories": ["productivity", "lifestyle", "finance"],
+  "icons": [
+    {
+      "src": "./icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ثبت سریع",
+      "short_name": "ثبت",
+      "description": "افزودن سریع به صندوق",
+      "url": "./Task_Manager_v8_Responsive_T7.html?action=quickCapture",
+      "icons": [{ "src": "./icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "بینش‌ها",
+      "short_name": "بینش",
+      "description": "تحلیل هوشمند",
+      "url": "./Task_Manager_v8_Responsive_T7.html?page=insight",
+      "icons": [{ "src": "./icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}
