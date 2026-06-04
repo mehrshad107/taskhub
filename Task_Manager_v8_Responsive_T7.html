@@ -2412,10 +2412,14 @@
     }
     .onb-dot {
       width: 32px; height: 4px; border-radius: 2px;
-      background: var(--color-border); transition: background .3s ease;
+      background: #d1d5db; /* visible gray in light mode */
+      transition: background .3s ease;
     }
+    [data-theme="dark"] .onb-dot { background: rgba(255,255,255,0.18); }
     .onb-dot.active { background: var(--color-primary); }
-    .onb-dot.done   { background: var(--color-primary-mid, var(--color-primary)); opacity: .6; }
+    [data-theme="dark"] .onb-dot.active { background: var(--color-primary); box-shadow: 0 0 8px var(--color-primary-glow); }
+    .onb-dot.done   { background: var(--color-primary); opacity: .55; }
+    [data-theme="dark"] .onb-dot.done { background: var(--color-primary); opacity: .7; }
     .onb-body { min-height: 280px; padding: var(--space-3) var(--space-2); text-align: center; }
     .onb-body .onb-emoji {
       font-size: 4rem; line-height: 1; display: block; margin-bottom: var(--space-3);
@@ -2436,9 +2440,18 @@
     .onb-body .onb-feat {
       padding: var(--space-3) var(--space-2); border: 1px solid var(--color-border);
       border-radius: 12px; background: var(--color-surface-2, var(--color-surface));
-      font-size: .72rem; line-height: 1.5;
+      color: var(--color-text);
+      font-size: .72rem; font-weight: 600; line-height: 1.5;
+    }
+    [data-theme="dark"] .onb-body .onb-feat {
+      background: rgba(255,255,255,0.06);
+      color: #f5f5f5;
+      border-color: rgba(255,255,255,0.12);
     }
     .onb-body .onb-feat-emoji { font-size: 1.5rem; line-height: 1; margin-bottom: 4px; }
+    /* Onboarding body text in dark mode */
+    [data-theme="dark"] .onb-body h2 { color: #f5f5f5; }
+    [data-theme="dark"] .onb-body p { color: #cbd5e1; }
     @keyframes onb-pop {
       0%   { transform: scale(.6) rotate(-10deg); opacity: 0; }
       100% { transform: scale(1) rotate(0); opacity: 1; }
@@ -4171,8 +4184,11 @@
   <form method="dialog" class="ai-modal-bar" style="margin:0;display:flex;align-items:center;gap:var(--space-3);padding:0">
     <h3 style="flex:1;margin:0">🤖 دستیار هوشمند</h3>
     <span class="ai-mode-badge" id="aiModeBadge">حالت تست</span>
-    <!-- Native dialog close: form[method=dialog] + button[type=submit] always closes -->
-    <button type="submit" class="ghost-btn" id="aiModalClose" aria-label="بستن" formnovalidate style="min-height:36px;min-width:40px;padding:0 var(--space-3);font-size:1.1rem;font-weight:700">✕</button>
+    <!-- Triple-redundant close: inline onclick + form[method=dialog] submit + JS listener -->
+    <button type="submit" class="ghost-btn" id="aiModalClose"
+            aria-label="بستن" formnovalidate
+            onclick="this.closest('dialog').close(); event.preventDefault?.(); return false;"
+            style="min-height:36px;min-width:40px;padding:0 var(--space-3);font-size:1.1rem;font-weight:700;cursor:pointer">✕</button>
   </form>
   <div class="ai-presets">
     <button type="button" class="ai-preset" data-preset="summary">📊 خلاصه هفته</button>
