@@ -4181,15 +4181,15 @@
 
 <!-- 🤖 AI Assistant Modal -->
 <dialog id="aiModal">
-  <form method="dialog" class="ai-modal-bar" style="margin:0;display:flex;align-items:center;gap:var(--space-3);padding:0">
+  <div class="ai-modal-bar">
     <h3 style="flex:1;margin:0">🤖 دستیار هوشمند</h3>
     <span class="ai-mode-badge" id="aiModeBadge">حالت تست</span>
-    <!-- Triple-redundant close: inline onclick + form[method=dialog] submit + JS listener -->
-    <button type="submit" class="ghost-btn" id="aiModalClose"
-            aria-label="بستن" formnovalidate
-            onclick="this.closest('dialog').close(); event.preventDefault?.(); return false;"
-            style="min-height:36px;min-width:40px;padding:0 var(--space-3);font-size:1.1rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <!-- Close: pure inline onclick — no form, no JS handler dependency, can't be intercepted -->
+    <button type="button" class="ghost-btn" id="aiModalClose"
+            aria-label="بستن"
+            onclick="(function(b){var d=b.closest('dialog');if(d){try{d.close();}catch(e){}d.removeAttribute('open');document.documentElement.style.overflow='';document.body.style.overflow='';}})(this);return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer;z-index:9999;position:relative">✕</button>
+  </div>
   <div class="ai-presets">
     <button type="button" class="ai-preset" data-preset="summary">📊 خلاصه هفته</button>
     <button type="button" class="ai-preset" data-preset="routine">🌱 پیشنهاد روتین</button>
@@ -11303,40 +11303,40 @@ function openAIModal() {
 }
 document.getElementById('aiFab')?.addEventListener('click', openAIModal);
 
-// ── Robust close handlers for AI modal ──
-// Uses event delegation so re-renders or DOM swaps don't break the handlers.
-// Listens on the dialog itself; matches close-button by id OR data attribute.
+// ── AI modal close: layered guarantee ──
+// The inline onclick on the button is the primary path. These listeners
+// are belt-and-suspenders for backdrop click, touch fallback, and scroll-unlock.
 (function setupAIModalClose() {
   const modal = document.getElementById('aiModal');
   if (!modal) return;
-  function doClose(ev) {
-    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-    try { modal.close(); } catch (e) { console.warn('[ai-modal] close failed', e); }
-    // Belt-and-suspenders: also clear `open` attribute and unlock scroll
+  function doClose() {
+    try { modal.close(); } catch (e) {}
     if (modal.hasAttribute('open')) modal.removeAttribute('open');
-    if (document.documentElement.style.overflow === 'hidden') document.documentElement.style.overflow = '';
-    if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
   }
-  // 1) Click on close button (via delegation, works even if button re-rendered)
-  modal.addEventListener('click', (ev) => {
+  // Window-level capture: catches the close-button click even if anything
+  // downstream tries to stop propagation. Runs in capture phase (first).
+  window.addEventListener('click', (ev) => {
     const t = ev.target;
     if (!t) return;
-    if (t.id === 'aiModalClose' || t.closest('#aiModalClose')) {
-      doClose(ev);
-      return;
+    if (t.id === 'aiModalClose' || (t.closest && t.closest('#aiModalClose'))) {
+      doClose();
     }
-    // 2) Backdrop click — when target is the dialog itself
-    if (t === modal) doClose(ev);
+  }, true);
+  // Backdrop click
+  modal.addEventListener('click', (ev) => {
+    if (ev.target === modal) doClose();
   });
-  // 3) Touch fallback (some mobile browsers consume click on overlapping fixed elements)
+  // Touch fallback
   modal.addEventListener('touchend', (ev) => {
     const t = ev.target;
-    if (t && (t.id === 'aiModalClose' || t.closest?.('#aiModalClose'))) doClose(ev);
-  }, { passive: false });
-  // 4) Esc key — native <dialog> handles this but ensure scroll-unlock fires too
+    if (t && (t.id === 'aiModalClose' || t.closest?.('#aiModalClose'))) doClose();
+  }, { passive: true });
+  // Esc → unlock scroll
   modal.addEventListener('close', () => {
-    if (document.documentElement.style.overflow === 'hidden') document.documentElement.style.overflow = '';
-    if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
   });
 })();
 document.querySelectorAll('#aiModal .ai-preset').forEach(btn => {
