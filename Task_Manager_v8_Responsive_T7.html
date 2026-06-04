@@ -279,7 +279,12 @@
     /* ══════════════════════════════════════════════
        APP SHELL
     ══════════════════════════════════════════════ */
-    .app { display: grid; grid-template-rows: var(--topbar-h) 1fr; min-height: 100vh; }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr); /* prevents children with intrinsic min-content from overflowing */
+      grid-template-rows: var(--topbar-h) 1fr;
+      min-height: 100vh; max-width: 100vw; overflow-x: clip;
+    }
 
     /* ══════════════════════════════════════════════
        TOPBAR
@@ -296,7 +301,13 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      width: 100%;
+      min-width: 0;
+      max-width: 100vw;
+      box-sizing: border-box;
     }
+    /* Allow grid children to shrink instead of overflowing */
+    .topbar > * { min-width: 0; }
 
     /* ستون اول (راست در RTL): لوگو + پروفایل */
     .brand-group {
