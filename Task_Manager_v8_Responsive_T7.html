@@ -2604,119 +2604,7 @@
     .legend-item { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-muted); }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-    /* ── 🤖 AI Assistant ── */
-    .ai-fab {
-      position: fixed; bottom: 84px; inset-inline-start: 16px; z-index: 95;
-      width: 52px; height: 52px; border-radius: 50%;
-      background: linear-gradient(135deg, #8b5cf6, #ec4899);
-      color: white; border: none; cursor: pointer;
-      box-shadow: 0 8px 24px rgba(139,92,246,0.45);
-      display: grid; place-items: center; font-size: 22px;
-      transition: transform .15s ease, box-shadow .2s ease;
-    }
-    .ai-fab:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 12px 32px rgba(139,92,246,0.6); }
-    @media (max-width: 768px) {
-      .ai-fab { bottom: 104px; inset-inline-start: 12px; width: 46px; height: 46px; font-size: 19px; }
-    }
-
-    dialog#aiModal {
-      max-width: 640px; width: 92vw; max-height: 88vh;
-      padding: 0; border: none; border-radius: 16px;
-      background: var(--color-surface);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-      overflow: hidden;
-      display: flex; flex-direction: column;
-    }
-    dialog#aiModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
-    @media (max-width: 768px) {
-      dialog#aiModal {
-        position: fixed; inset: auto 0 0 0; width: 100%; max-width: 100%;
-        max-height: 88vh; border-radius: 16px 16px 0 0;
-        animation: sheet-up .3s var(--ease-out) forwards;
-      }
-    }
-    .ai-modal-bar {
-      display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4);
-      background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.08));
-      border-bottom: 1px solid var(--color-border); flex-shrink: 0;
-    }
-    [data-theme="dark"] .ai-modal-bar { background: linear-gradient(135deg, rgba(139,92,246,0.22), rgba(236,72,153,0.15)); }
-    .ai-modal-bar h3 { margin: 0; font-size: 1rem; color: var(--color-text); flex: 1; font-weight: 700; }
-    [data-theme="dark"] .ai-modal-bar h3 { color: #f5f5f5; }
-    .ai-mode-badge {
-      font-size: .65rem; padding: 3px 8px; border-radius: 6px;
-      background: rgba(139,92,246,0.15); color: #8b5cf6; font-weight: 700;
-    }
-    [data-theme="dark"] .ai-mode-badge { background: rgba(139,92,246,0.25); color: #c4b5fd; }
-    .ai-mode-badge.real { background: rgba(34,197,94,0.15); color: #16a34a; }
-    [data-theme="dark"] .ai-mode-badge.real { background: rgba(34,197,94,0.22); color: #86efac; }
-    /* Close button: extra-strong tap target + always-visible color */
-    #aiModalClose { background: rgba(0,0,0,0.05); color: var(--color-text); border: 1px solid var(--color-border); }
-    [data-theme="dark"] #aiModalClose { background: rgba(255,255,255,0.08); color: #f5f5f5; border-color: rgba(255,255,255,0.15); }
-    #aiModalClose:hover { background: rgba(239,68,68,0.15); border-color: #ef4444; color: #ef4444; }
-
-    .ai-presets {
-      padding: var(--space-3) var(--space-4); display: flex; gap: var(--space-2);
-      overflow-x: auto; border-bottom: 1px solid var(--color-border); flex-shrink: 0;
-    }
-    .ai-preset {
-      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--color-border);
-      background: var(--color-surface); color: var(--color-text);
-      font-size: .78rem; font-weight: 600; cursor: pointer; white-space: nowrap;
-      transition: all .15s ease;
-    }
-    [data-theme="dark"] .ai-preset { background: rgba(255,255,255,0.06); color: #f5f5f5; }
-    .ai-preset:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139,92,246,0.06); }
-    [data-theme="dark"] .ai-preset:hover { color: #c4b5fd; background: rgba(139,92,246,0.18); }
-
-    .ai-chat {
-      flex: 1; overflow-y: auto; padding: var(--space-4);
-      display: flex; flex-direction: column; gap: var(--space-3);
-      min-height: 180px;
-    }
-    .ai-msg {
-      max-width: 88%; padding: 10px 14px; border-radius: 12px;
-      font-size: .9rem; line-height: 1.7; white-space: pre-wrap; word-wrap: break-word;
-    }
-    .ai-msg.user {
-      align-self: flex-end; background: var(--color-primary); color: white;
-      border-bottom-right-radius: 4px;
-    }
-    .ai-msg.assistant {
-      align-self: flex-start; background: var(--color-surface-2, var(--color-surface));
-      border: 1px solid var(--color-border); color: var(--color-text);
-      border-bottom-left-radius: 4px;
-    }
-    [data-theme="dark"] .ai-msg.assistant { background: rgba(255,255,255,0.06); color: #f5f5f5; border-color: rgba(255,255,255,0.1); }
-    [data-theme="dark"] .ai-msg .ai-mock-tag { color: #a8b5c8; opacity: .85; }
-    .ai-msg.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-    .ai-msg.loading { opacity: .6; }
-    .ai-msg .ai-mock-tag { font-size: .65rem; opacity: .6; margin-top: 4px; display: block; }
-
-    .ai-input-row {
-      padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-border);
-      display: flex; gap: var(--space-2); flex-shrink: 0;
-    }
-    .ai-input-row textarea {
-      flex: 1; min-height: 44px; max-height: 120px; resize: vertical;
-      padding: 10px var(--space-3); border-radius: var(--radius-md);
-      border: 1px solid var(--color-border); background: var(--color-surface);
-      color: var(--color-text); font-family: inherit; font-size: var(--text-sm); line-height: 1.5;
-    }
-    [data-theme="dark"] .ai-input-row textarea { background: rgba(255,255,255,0.05); color: #f5f5f5; border-color: rgba(255,255,255,0.15); }
-    .ai-input-row textarea::placeholder { color: var(--color-text-muted); opacity: .7; }
-    [data-theme="dark"] .ai-input-row textarea::placeholder { color: #a0aec0; opacity: .85; }
-    .ai-input-row textarea:focus { outline: 2px solid var(--color-primary); outline-offset: -1px; }
-    .ai-send-btn {
-      align-self: flex-end; min-height: 44px; padding: 0 var(--space-4);
-      background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white;
-      border: none; border-radius: var(--radius-md); font-weight: 700; cursor: pointer;
-      transition: transform .15s ease;
-    }
-    .ai-send-btn:hover { transform: translateY(-1px); }
-    .ai-send-btn:disabled { opacity: .5; cursor: wait; transform: none; }
-    .ai-welcome { color: var(--color-text); opacity: .85; }
-    [data-theme="dark"] .ai-welcome { color: #f5f5f5; opacity: .95; }
+    /* ── 🤖 AI Assistant: REMOVED (will be re-added later with a cleaner architecture) ── */
 
     /* Level-up celebration toast */
     .toast-levelup {
@@ -4187,32 +4075,7 @@
 <!-- Floating Quick Capture button (visible on all pages) -->
 <button id="quickCaptureFab" aria-label="ثبت سریع" title="ثبت سریع">⚡</button>
 
-<!-- 🤖 AI Assistant FAB -->
-<button id="aiFab" class="ai-fab" aria-label="دستیار هوشمند" title="دستیار هوشمند (AI)">🤖</button>
-
-<!-- 🤖 AI Assistant Modal -->
-<dialog id="aiModal">
-  <div class="ai-modal-bar">
-    <h3 style="flex:1;margin:0">🤖 دستیار هوشمند</h3>
-    <span class="ai-mode-badge" id="aiModeBadge">حالت تست</span>
-    <!-- Close: pure inline onclick — no form, no JS handler dependency, can't be intercepted -->
-    <button type="button" class="ghost-btn" id="aiModalClose"
-            aria-label="بستن"
-            onclick="(function(b){var d=b.closest('dialog');if(d){try{d.close();}catch(e){}d.removeAttribute('open');document.documentElement.style.overflow='';document.body.style.overflow='';}})(this);return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer;z-index:9999;position:relative">✕</button>
-  </div>
-  <div class="ai-presets">
-    <button type="button" class="ai-preset" data-preset="summary">📊 خلاصه هفته</button>
-    <button type="button" class="ai-preset" data-preset="routine">🌱 پیشنهاد روتین</button>
-    <button type="button" class="ai-preset" data-preset="motivation">💪 یه جمله انگیزه‌بخش</button>
-    <button type="button" class="ai-preset" data-preset="clear">🗑 پاک کردن چت</button>
-  </div>
-  <div class="ai-chat" id="aiChatBody"></div>
-  <div class="ai-input-row">
-    <textarea id="aiInput" placeholder="سوالت رو بپرس... (Shift+Enter برای خط جدید)" rows="1"></textarea>
-    <button class="ai-send-btn" id="aiSendBtn">ارسال</button>
-  </div>
-</dialog>
+<!-- 🤖 AI Assistant: REMOVED (will be re-added later with a cleaner architecture) -->
 
 <!-- Command Palette — Ctrl/Cmd+K -->
 <div id="cmdPalette" hidden>
@@ -4660,14 +4523,8 @@ const DEFAULT = {
   xp: 0,
   xpHistory: {},         /* { 'YYYY-MM-DD': xpGainedThatDay } */
   badges: {},            /* { badgeId: { unlocked: true, unlockedAt: ISO } } */
-  /* ── AI Assistant (offline-first, optional Iranian provider) ── */
-  aiConfig: {
-    provider: 'mock',    /* 'mock' | 'avalai' */
-    apiKey: '',          /* leave empty in code; user sets via UI */
-    model: 'gpt-4o-mini',/* avalai-compatible model name */
-    endpoint: 'https://api.avalai.ir/v1/chat/completions',
-  },
-  aiChatHistory: [],     /* { role:'user'|'assistant', content, ts } */
+  /* ── AI Assistant: REMOVED. aiConfig/aiChatHistory kept off the default
+        so old saved states don't carry orphaned keys forward. ── */
   /* ── Onboarding ── */
   onboardingDone: false, /* true after user finishes or skips first-run tour */
   /* ── Behavior analytics (privacy: local only, never sent anywhere) ── */
@@ -5164,30 +5021,7 @@ function renderProfilePanel() {
       </div>
     </div>
 
-    <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-border)">
-      <div style="font-size:var(--text-xs);font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-2)">🤖 دستیار هوشمند</div>
-      <div style="font-size:.75rem;color:var(--color-text);margin-bottom:var(--space-2)">
-        وضعیت فعلی: <strong id="aiProviderStatus" style="color:var(--color-primary)">حالت تست (آفلاین)</strong>
-      </div>
-      <input type="password" id="aiApiKeyInput" class="input-field" placeholder="کلید API آوا (avalai.ir) — اختیاری" autocomplete="off" style="height:36px;font-size:var(--text-xs);margin-bottom:var(--space-2)" />
-      <select id="aiModelSelect" class="input-field" style="height:36px;font-size:var(--text-xs);margin-bottom:var(--space-2);padding:0 var(--space-3)">
-        <option value="gpt-4o-mini">gpt-4o-mini (سریع و ارزون — پیشنهادی)</option>
-        <option value="gpt-4o">gpt-4o (قوی‌تر، گرون‌تر)</option>
-        <option value="gpt-4-turbo">gpt-4-turbo</option>
-        <option value="gpt-3.5-turbo">gpt-3.5-turbo (ارزون‌ترین)</option>
-        <option value="claude-3-5-sonnet-20241022">claude-3.5-sonnet (Anthropic)</option>
-        <option value="claude-3-5-haiku-20241022">claude-3.5-haiku (سریع)</option>
-      </select>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-2)">
-        <button class="primary-btn" id="aiKeySave" type="button" style="justify-content:center;min-height:36px;font-size:var(--text-xs)">💾 ذخیره و فعال</button>
-        <button class="ghost-btn" id="aiKeyClear" type="button" style="justify-content:center;min-height:36px;font-size:var(--text-xs)">🔌 قطع</button>
-      </div>
-      <button class="ghost-btn" id="aiTestBtn" type="button" style="width:100%;justify-content:center;min-height:34px;font-size:var(--text-xs)">🧪 تست اتصال</button>
-      <div id="aiTestResult" style="font-size:.7rem;margin-top:6px;line-height:1.5"></div>
-      <div style="font-size:.62rem;color:var(--color-text-faint);margin-top:6px;line-height:1.6">
-        کلید روی مرورگرت ذخیره میشه و هیچ‌جا فرستاده نمیشه (به‌جز خود آوا). برای دریافت کلید رایگان به <a href="https://avalai.ir" target="_blank" style="color:var(--color-primary)">avalai.ir</a> برو. بدون کلید، حالت تست با پاسخ‌های نمونه کار می‌کنه.
-      </div>
-    </div>
+    <!-- 🤖 AI Assistant settings: REMOVED (feature pulled until rebuild) -->
 
     <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-border)">
       <div style="font-size:var(--text-xs);font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-2)">🎮 ویجت مرورگر</div>
@@ -5317,69 +5151,7 @@ function renderProfilePanel() {
     }
   })();
 
-  // ── AI Settings ──
-  (function setupAISettings() {
-    ensureAiConfig();
-    const statusEl = panel.querySelector('#aiProviderStatus');
-    const keyInput = panel.querySelector('#aiApiKeyInput');
-    const modelSelect = panel.querySelector('#aiModelSelect');
-    const testBtn = panel.querySelector('#aiTestBtn');
-    const testResult = panel.querySelector('#aiTestResult');
-    if (statusEl) {
-      if (state.aiConfig.provider === 'avalai' && state.aiConfig.apiKey) {
-        statusEl.textContent = `✅ آوا AI · ${state.aiConfig.model || 'gpt-4o-mini'}`;
-        statusEl.style.color = '#22c55e';
-      } else {
-        statusEl.textContent = 'حالت تست (آفلاین)';
-      }
-    }
-    if (keyInput && state.aiConfig.apiKey) keyInput.placeholder = '••••••••• (کلید ذخیره شده — تغییر اختیاری)';
-    if (modelSelect) modelSelect.value = state.aiConfig.model || 'gpt-4o-mini';
-
-    panel.querySelector('#aiKeySave')?.addEventListener('click', () => {
-      const key = keyInput.value.trim();
-      const model = modelSelect.value || 'gpt-4o-mini';
-      // Allow re-saving just the model if key already present
-      if (!key && !state.aiConfig.apiKey) { showToast('⚠ کلید رو وارد کن', { duration: 2500 }); return; }
-      state.aiConfig.provider = 'avalai';
-      if (key) state.aiConfig.apiKey = key;
-      state.aiConfig.model = model;
-      save();
-      showToast(`✅ آوا AI با مدل ${model} فعال شد`, { variant:'money', duration: 3000 });
-      _aiRefreshBadge();
-      renderProfilePanel();
-    });
-    panel.querySelector('#aiKeyClear')?.addEventListener('click', () => {
-      if (!confirm('کلید پاک شه و برگرده به حالت تست؟')) return;
-      state.aiConfig.provider = 'mock';
-      state.aiConfig.apiKey = '';
-      save();
-      showToast('🔌 برگشت به حالت تست', { duration: 2200 });
-      _aiRefreshBadge();
-      renderProfilePanel();
-    });
-
-    testBtn?.addEventListener('click', async () => {
-      testResult.innerHTML = '⏳ در حال تست...';
-      testResult.style.color = 'var(--color-text-muted)';
-      testBtn.disabled = true;
-      try {
-        const r = await aiTestConnection();
-        if (r.ok) {
-          let msg = `✅ اتصال موفق! پاسخ: «${r.text.slice(0, 60)}»`;
-          if (r.usage) msg += `<br>📊 ${r.usage.total_tokens || '—'} توکن`;
-          if (r.estCost?.amount_irt) msg += ` · 💰 ${Math.round(r.estCost.amount_irt)} ریال`;
-          testResult.innerHTML = msg;
-          testResult.style.color = '#22c55e';
-        } else {
-          testResult.textContent = `⛔ ${r.error}`;
-          testResult.style.color = 'var(--color-danger)';
-        }
-      } finally {
-        testBtn.disabled = false;
-      }
-    });
-  })();
+  // ── AI Settings: REMOVED with the feature ──
 
 
   panel.querySelector('#exportDataBtn')?.addEventListener('click', exportStateAsJSON);
@@ -7970,7 +7742,6 @@ const CMD_STATIC_COMMANDS = [
   { id:'notif-on',   title:'فعال‌سازی یادآوری‌ها',     icon:'🔔', kind:'command', sub:'دسترسی Notification', run: () => requestNotificationPermission(true) },
   { id:'notif-test', title:'ارسال یادآوری تست',       icon:'🧪', kind:'command', run: () => fireReminder('🔔 تست یادآوری TaskHub', 'اگر این پیام رو دیدی، یادآوری‌ها کار می‌کنن!', 'test-' + Date.now()) },
   { id:'hof',        title:'تالار افتخار',             icon:'🏛', kind:'command', sub:'رکوردها و نشان‌های شخصی', run: () => openHallOfFame() },
-  { id:'ai-assist',  title:'دستیار هوشمند',           icon:'🤖', kind:'command', sub:'چت + خلاصه + پیشنهاد روتین', run: () => openAIModal() },
   { id:'excel',      title:'خروجی Excel',              icon:'📊', kind:'command', sub:'xlsx با ۴ شیت', run: () => exportToExcel() },
   { id:'theme',      title:'تغییر تم رنگی',          icon:'🎨', kind:'command', run: () => document.getElementById('themePickerBtn')?.click() },
   { id:'dark',       title:'تغییر حالت روشن/تاریک',  icon:'🌙', kind:'command', run: () => document.getElementById('darkToggle')?.click() },
@@ -9435,11 +9206,11 @@ const ONB_STEPS = [
   {
     emoji: '🎨',
     title: 'به سلیقه‌ات شخصی‌سازی کن',
-    body: 'از نوار بالا تم رنگی (۱۰ تا)، حالت روشن/تاریک، تصویر زمینه، اندازه فونت و موسیقی پس‌زمینه رو تنظیم کن. در پروفایل پشتیبان بگیر و دستیار AI رو فعال کن.',
+    body: 'از نوار بالا تم رنگی (۱۰ تا)، حالت روشن/تاریک، تصویر زمینه، اندازه فونت و موسیقی پس‌زمینه رو تنظیم کن. در پروفایل پشتیبان بگیر و خروجی Excel دانلود کن.',
     features: [
       { e:'🎨', t:'۱۰ تم' },
       { e:'🌗', t:'روشن/تاریک' },
-      { e:'🤖', t:'دستیار AI' },
+      { e:'📊', t:'خروجی Excel' },
       { e:'💾', t:'پشتیبان' },
     ],
   },
@@ -9689,148 +9460,13 @@ function renderMoneyChart() {
 }
 
 /* ════════════════════════════════════════════════
-   🤖 AI ASSISTANT — adapter pattern
-   - 'mock' provider: works offline, gives canned helpful responses
-   - 'avalai' provider: calls Avalai (Iranian LLM proxy, OpenAI-compatible)
-   - No data stored on remote, no analytics
+   🤖 AI ASSISTANT — REMOVED
+   The feature is gone for now (close-bug couldn't be reproduced
+   reliably enough to fix). Will be re-added later with a clean
+   architecture: maybe a slide-over panel instead of <dialog>,
+   maybe a different provider abstraction. Until then, keep the
+   ground clear so nothing dangling can re-trigger the bug.
 ════════════════════════════════════════════════ */
-function ensureAiConfig() {
-  if (!state.aiConfig || typeof state.aiConfig !== 'object') {
-    state.aiConfig = { provider:'mock', apiKey:'', model:'gpt-4o-mini', endpoint:'https://api.avalai.ir/v1/chat/completions' };
-  }
-  if (!state.aiChatHistory) state.aiChatHistory = [];
-}
-
-const AI_SYSTEM_PROMPT = `تو یه دستیار شخصی هوشمند فارسی توی اپ TaskHub هستی. کاربر فارسی‌زبانه و تو هم باید فارسی و دوستانه جواب بدی. لحنت گرم، خلاصه، و کاربردی باشه. هرگز اطلاعات کاربر رو به جای دیگه نفرست. اگه کاربر داده‌های اپ رو شیر کرد (تسک، مالی، عادت)، تحلیل کن و پیشنهاد عملی بده.`;
-
-/* ── Mock responses for offline / testing ── */
-const MOCK_RESPONSES = {
-  summary: (data) =>
-    `📊 خلاصهٔ هفتهٔ تو:\n\n` +
-    `✅ ${toFaDigits(data.tasksThisWeek||0)} تسک تموم کردی\n` +
-    `⏱ ${toFaDigits(data.focusMinutes||0)} دقیقه روی تمرکز بودی\n` +
-    `🔥 طولانی‌ترین استریک: ${toFaDigits(data.streak||0)} روز\n\n` +
-    `💡 پیشنهاد: ${data.tasksThisWeek > 10 ? 'هفتهٔ بسیار پربازده‌ای داشتی! یه استراحت بده.' : 'با تنظیم چند هدف کوچک‌تر می‌تونی شتاب بگیری.'}`,
-  routine: (data) =>
-    `🌱 پیشنهاد روتین:\n\n` +
-    `بر اساس الگوهای تو، بهترین ساعت شروع کار حوالی ${data.peakHour || '۱۰ صبح'} هست.\n\n` +
-    `صبح‌ها (۹-۱۲): تسک‌های سنگین و خلاقانه\n` +
-    `بعدازظهر (۱۴-۱۷): جلسات و کارهای اداری\n` +
-    `عصر (۱۸-۲۰): ورزش، عادت‌ها، و مرور روز\n\n` +
-    `🔔 یه یادآور برای ۹ صبح بذار تا روز رو با هدف شروع کنی.`,
-  default: (q) =>
-    `🤖 (حالت تست — بدون API): پیام تو دریافت شد: "${q.slice(0, 50)}${q.length > 50 ? '…' : ''}"\n\n` +
-    `برای فعال کردن دستیار واقعی، از پنل پروفایل کلید Avalai رو وارد کن. ` +
-    `می‌تونی از avalai.ir یه API key بگیری.`,
-};
-
-async function callAI(messages, opts = {}) {
-  ensureAiConfig();
-  const cfg = state.aiConfig;
-
-  // Mock mode — instant local response
-  if (cfg.provider === 'mock' || !cfg.apiKey) {
-    await new Promise(r => setTimeout(r, 600)); // simulate latency
-    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || '';
-    let responseText;
-    if (opts.kind === 'summary') responseText = MOCK_RESPONSES.summary(opts.data || {});
-    else if (opts.kind === 'routine') responseText = MOCK_RESPONSES.routine(opts.data || {});
-    else responseText = MOCK_RESPONSES.default(lastUserMsg);
-    return { ok: true, text: responseText, isMock: true };
-  }
-
-  // Real provider (Avalai-compatible, OpenAI format)
-  try {
-    const resp = await fetch(cfg.endpoint || 'https://api.avalai.ir/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${cfg.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: cfg.model || 'gpt-4o-mini',
-        messages: [{ role:'system', content: AI_SYSTEM_PROMPT }, ...messages],
-        temperature: 0.7,
-        max_tokens: 800,
-      }),
-    });
-    if (!resp.ok) {
-      const errText = await resp.text().catch(() => '');
-      // Try to parse Avalai's structured error
-      let parsedCode = null, parsedMsg = '';
-      try { const j = JSON.parse(errText); parsedCode = j?.error?.code; parsedMsg = j?.error?.message || ''; } catch {}
-      // Persian-friendly error messages
-      let friendly = `HTTP ${resp.status}`;
-      if (parsedCode === 'endpoint_restricted') {
-        friendly = '⛔ کلیدت به chat completions دسترسی نداره — برو ava.al/keys و permission‌ها رو چک کن';
-      } else if (parsedCode === 'insufficient_quota') {
-        friendly = '💸 اعتبار حسابت تموم شده — از آوا credit بخر';
-      } else if (resp.status === 401) friendly = '🔑 کلید API نامعتبر یا منقضی شده';
-      else if (resp.status === 402 || resp.status === 429) friendly = '💸 اعتبار حسابت تموم شده یا rate limit زدی';
-      else if (resp.status === 403) friendly = '⛔ دسترسی رد شد — پلنت این مدل/endpoint رو پشتیبانی نمی‌کنه';
-      else if (resp.status === 404) friendly = '🤖 مدل انتخابی پشتیبانی نمی‌شه';
-      else if (resp.status >= 500) friendly = '🔌 سرور آوا در دسترس نیست — یه دقیقه دیگه امتحان کن';
-      return { ok:false, error: friendly + (parsedMsg ? ` (${parsedMsg.slice(0,100)})` : '') };
-    }
-    const data = await resp.json();
-    const text = data?.choices?.[0]?.message?.content || '';
-    const usage = data?.usage || {};
-    const estCost = data?.estimated_cost || null; // avalai-specific (in IRT)
-    return { ok: true, text, usage, estCost };
-  } catch (err) {
-    const msg = String(err.message || err);
-    // CORS / network errors
-    if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-      return { ok:false, error: '🌐 خطای شبکه — اتصال اینترنت یا CORS رو چک کن' };
-    }
-    return { ok:false, error: msg };
-  }
-}
-
-/* Test connection: ping with a trivial request to validate the key */
-async function aiTestConnection() {
-  ensureAiConfig();
-  const cfg = state.aiConfig;
-  if (cfg.provider !== 'avalai' || !cfg.apiKey) {
-    return { ok:false, error:'هیچ کلیدی تنظیم نشده' };
-  }
-  const result = await callAI([{ role:'user', content:'فقط بگو سلام' }]);
-  return result;
-}
-
-/* ── 3 AI features: Summary, Routine, Free chat ── */
-function _collectAIDataSnapshot() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 6);
-  const inRange = (k) => { const d = new Date(k+'T00:00:00'); return d >= weekAgo && d <= today; };
-  const focusMinutes = Object.entries(state.focusHistory || {}).reduce((s,[k,v]) => inRange(k) ? s+v : s, Math.round((state.todayFocusSec||0)/60));
-  const tasksThisWeek = Object.entries(state.tasksHistory || {}).reduce((s,[k,v]) => inRange(k) ? s+v : s, state.todayDoneCount||0);
-  let streak = 0;
-  (state.habits || []).forEach(h => { const s = habitCurrentStreak(h); if (s > streak) streak = s; });
-  let peakHour = '۱۰ صبح';
-  try { const a = analyzeBehavior(); if (a.peakHour != null) peakHour = _formatHour(a.peakHour); } catch {}
-  return { focusMinutes, tasksThisWeek, streak, peakHour };
-}
-
-async function aiGenerateWeeklySummary() {
-  const data = _collectAIDataSnapshot();
-  const userMsg = `دادهٔ هفتگیم: ${data.tasksThisWeek} تسک تموم شده، ${data.focusMinutes} دقیقه تمرکز، طولانی‌ترین استریک ${data.streak} روز. یه خلاصهٔ صمیمی و سه پیشنهاد عملی بده.`;
-  return callAI([{ role:'user', content: userMsg }], { kind:'summary', data });
-}
-
-async function aiSuggestRoutine() {
-  const data = _collectAIDataSnapshot();
-  const userMsg = `بر اساس داده‌های من (ساعت اوج فعالیت ${data.peakHour})، یه روتین روزانه پیشنهاد بده که با ریتم طبیعیم بسازه.`;
-  return callAI([{ role:'user', content: userMsg }], { kind:'routine', data });
-}
-
-async function aiChat(userText) {
-  ensureAiConfig();
-  // Keep last 8 messages as context to control token cost
-  const history = (state.aiChatHistory || []).slice(-8);
-  const messages = [...history, { role:'user', content: userText }];
-  return callAI(messages);
-}
 
 function renderAchievements() {
   ensureGameState();
@@ -11199,171 +10835,10 @@ try {
 } catch {}
 
 /* ────────────────────────────────────────────────
-   🤖 AI MODAL — chat-style assistant with presets
+   🤖 AI MODAL — REMOVED (along with its FAB, dialog HTML, CSS, and
+   profile-panel settings). Will be re-introduced later with a
+   slide-over/sheet pattern instead of <dialog>.
 ──────────────────────────────────────────────── */
-function _aiRefreshBadge() {
-  ensureAiConfig();
-  const badge = document.getElementById('aiModeBadge');
-  if (!badge) return;
-  if (state.aiConfig.provider === 'avalai' && state.aiConfig.apiKey) {
-    badge.textContent = '🟢 آوا AI';
-    badge.classList.add('real');
-  } else {
-    badge.textContent = 'حالت تست';
-    badge.classList.remove('real');
-  }
-}
-function _aiRenderChat() {
-  ensureAiConfig();
-  const body = document.getElementById('aiChatBody');
-  if (!body) return;
-  if (!state.aiChatHistory.length) {
-    body.innerHTML = `<div class="ai-welcome" style="text-align:center;padding:var(--space-5) var(--space-3);font-size:.9rem;line-height:1.8">
-      👋 سلام! یکی از دکمه‌های بالا رو بزن یا سوالت رو تایپ کن.<br>
-      می‌تونم خلاصه هفته‌ت بدم، پیشنهاد روتین کنم، یا هر سوالی داشتی جواب بدم.
-    </div>`;
-    return;
-  }
-  body.innerHTML = state.aiChatHistory.map(m => {
-    if (m.role === 'user') return `<div class="ai-msg user">${e(m.content)}</div>`;
-    let tag = '';
-    if (m.isMock) {
-      tag = `<span class="ai-mock-tag">پاسخ نمونه (mock) — برای پاسخ واقعی، کلید آوا رو در پروفایل وارد کن.</span>`;
-    } else if (m.usage) {
-      const parts = [`${m.usage.total_tokens || 0} توکن`];
-      if (m.estCost?.amount_irt) parts.push(`${Math.round(m.estCost.amount_irt).toLocaleString('fa-IR')} ریال`);
-      tag = `<span class="ai-mock-tag">📊 ${parts.join(' · ')}</span>`;
-    }
-    return `<div class="ai-msg assistant">${e(m.content)}${tag}</div>`;
-  }).join('');
-  body.scrollTop = body.scrollHeight;
-}
-function _aiPushMessage(role, content, extra = {}) {
-  ensureAiConfig();
-  state.aiChatHistory.push({ role, content, ts: new Date().toISOString(), ...extra });
-  // Keep last 30 messages
-  if (state.aiChatHistory.length > 30) state.aiChatHistory.splice(0, state.aiChatHistory.length - 30);
-  save();
-  _aiRenderChat();
-}
-async function _aiHandleSend(userText) {
-  if (!userText) return;
-  const sendBtn = document.getElementById('aiSendBtn');
-  const input = document.getElementById('aiInput');
-  _aiPushMessage('user', userText);
-  input.value = '';
-  // Show loading
-  const body = document.getElementById('aiChatBody');
-  const loadingId = 'loading-' + Date.now();
-  body.insertAdjacentHTML('beforeend', `<div class="ai-msg assistant loading" id="${loadingId}">⏳ در حال فکر کردن…</div>`);
-  body.scrollTop = body.scrollHeight;
-  sendBtn.disabled = true;
-  try {
-    const result = await aiChat(userText);
-    document.getElementById(loadingId)?.remove();
-    if (result.ok) {
-      _aiPushMessage('assistant', result.text, { isMock: !!result.isMock, usage: result.usage, estCost: result.estCost });
-    } else {
-      _aiPushMessage('assistant', `⚠ خطا: ${result.error}`);
-    }
-  } finally {
-    sendBtn.disabled = false;
-    input.focus();
-  }
-}
-async function _aiRunPreset(preset) {
-  if (preset === 'clear') {
-    if (!confirm('تاریخچهٔ چت پاک شه؟')) return;
-    state.aiChatHistory = []; save(); _aiRenderChat(); return;
-  }
-  const sendBtn = document.getElementById('aiSendBtn');
-  const body = document.getElementById('aiChatBody');
-  let prompt = '';
-  let resultPromise;
-  if (preset === 'summary') {
-    prompt = 'خلاصهٔ هفته‌م رو بده.';
-    _aiPushMessage('user', prompt);
-    resultPromise = aiGenerateWeeklySummary();
-  } else if (preset === 'routine') {
-    prompt = 'یه روتین روزانه برام پیشنهاد بده.';
-    _aiPushMessage('user', prompt);
-    resultPromise = aiSuggestRoutine();
-  } else if (preset === 'motivation') {
-    prompt = 'یه جمله انگیزشی کوتاه برام بگو.';
-    _aiPushMessage('user', prompt);
-    resultPromise = aiChat(prompt);
-  } else return;
-
-  const loadingId = 'loading-' + Date.now();
-  body.insertAdjacentHTML('beforeend', `<div class="ai-msg assistant loading" id="${loadingId}">⏳ در حال آماده‌سازی…</div>`);
-  body.scrollTop = body.scrollHeight;
-  sendBtn.disabled = true;
-  try {
-    const result = await resultPromise;
-    document.getElementById(loadingId)?.remove();
-    if (result.ok) _aiPushMessage('assistant', result.text, { isMock: !!result.isMock, usage: result.usage, estCost: result.estCost });
-    else _aiPushMessage('assistant', `⚠ خطا: ${result.error}`);
-  } finally { sendBtn.disabled = false; }
-}
-function openAIModal() {
-  ensureAiConfig();
-  _aiRefreshBadge();
-  _aiRenderChat();
-  document.getElementById('aiModal').showModal();
-  setTimeout(() => document.getElementById('aiInput').focus(), 80);
-}
-document.getElementById('aiFab')?.addEventListener('click', openAIModal);
-
-// ── AI modal close: layered guarantee ──
-// The inline onclick on the button is the primary path. These listeners
-// are belt-and-suspenders for backdrop click, touch fallback, and scroll-unlock.
-(function setupAIModalClose() {
-  const modal = document.getElementById('aiModal');
-  if (!modal) return;
-  function doClose() {
-    try { modal.close(); } catch (e) {}
-    if (modal.hasAttribute('open')) modal.removeAttribute('open');
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-  }
-  // Window-level capture: catches the close-button click even if anything
-  // downstream tries to stop propagation. Runs in capture phase (first).
-  window.addEventListener('click', (ev) => {
-    const t = ev.target;
-    if (!t) return;
-    if (t.id === 'aiModalClose' || (t.closest && t.closest('#aiModalClose'))) {
-      doClose();
-    }
-  }, true);
-  // Backdrop click
-  modal.addEventListener('click', (ev) => {
-    if (ev.target === modal) doClose();
-  });
-  // Touch fallback
-  modal.addEventListener('touchend', (ev) => {
-    const t = ev.target;
-    if (t && (t.id === 'aiModalClose' || t.closest?.('#aiModalClose'))) doClose();
-  }, { passive: true });
-  // Esc → unlock scroll
-  modal.addEventListener('close', () => {
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-  });
-})();
-document.querySelectorAll('#aiModal .ai-preset').forEach(btn => {
-  btn.addEventListener('click', () => _aiRunPreset(btn.dataset.preset));
-});
-document.getElementById('aiSendBtn')?.addEventListener('click', () => {
-  const txt = document.getElementById('aiInput').value.trim();
-  if (txt) _aiHandleSend(txt);
-});
-document.getElementById('aiInput')?.addEventListener('keydown', ev => {
-  if (ev.key === 'Enter' && !ev.shiftKey) {
-    ev.preventDefault();
-    const txt = ev.target.value.trim();
-    if (txt) _aiHandleSend(txt);
-  }
-});
 // Hall of Fame close handlers
 document.getElementById('hofModalClose')?.addEventListener('click', () => document.getElementById('hofModal').close());
 document.getElementById('hofModal')?.addEventListener('click', ev => {
