@@ -2293,14 +2293,15 @@
       font-style: italic; padding: var(--space-2) 0 0; line-height: 1.5;
     }
 
-    /* 5-tab page-tabs — page-tab labels need slight shrink to fit 5 across */
-    @media (max-width: 480px) {
-      .page-tab .pt-label { font-size: 0.62rem; }
+    /* 6-tab page-tabs — labels shrink/hide as viewport narrows */
+    @media (max-width: 560px) {
+      .page-tab { padding: 0 2px; gap: 1px; }
+      .page-tab .pt-label { font-size: 0.6rem; }
       .page-tab .pt-emoji { font-size: 1rem; }
     }
-    @media (max-width: 380px) {
+    @media (max-width: 430px) {
       .page-tab .pt-label { display: none; }
-      .page-tab .pt-emoji { font-size: 1.2rem; }
+      .page-tab .pt-emoji { font-size: 1.18rem; }
     }
     @media (max-width: 768px) {
       .insight-today-grid { grid-template-columns: 1fr 1fr; gap: var(--space-2); }
@@ -2605,6 +2606,205 @@
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
     /* ── 🤖 AI Assistant: REMOVED (will be re-added later with a cleaner architecture) ── */
+
+    /* ════════════════════════════════════════════════
+       📅 CALENDAR (Persian Jalali — month view)
+    ════════════════════════════════════════════════ */
+    #page-calendar { padding: var(--space-3) var(--space-4) var(--space-6); }
+    .cal-head {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: var(--space-3); margin-bottom: var(--space-3);
+    }
+    .cal-nav { display: flex; align-items: center; gap: var(--space-2); }
+    .cal-nav-btn {
+      width: 36px; height: 36px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border); background: var(--color-surface);
+      color: var(--color-text); font-size: 1.4rem; font-weight: 700;
+      cursor: pointer; display: grid; place-items: center;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .cal-nav-btn:hover { background: var(--color-primary-soft); border-color: var(--color-primary); color: var(--color-primary); }
+    [data-theme="dark"] .cal-nav-btn { background: rgba(255,255,255,0.04); color: #f5f5f5; border-color: rgba(255,255,255,0.12); }
+    .cal-title-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .cal-title {
+      font-size: 1.15rem; font-weight: 800; color: var(--color-text);
+      background: transparent; border: none; cursor: pointer; padding: 4px 12px;
+      border-radius: var(--radius-sm); transition: background .15s;
+    }
+    .cal-title:hover { background: var(--color-primary-soft); color: var(--color-primary); }
+    [data-theme="dark"] .cal-title { color: #f5f5f5; }
+    .cal-today-btn {
+      font-size: .65rem; padding: 2px 10px; border-radius: 999px;
+      background: var(--color-primary-soft); color: var(--color-primary);
+      border: 1px solid transparent; font-weight: 700; cursor: pointer;
+    }
+    .cal-today-btn:hover { background: var(--color-primary); color: white; }
+    .cal-tools { display: flex; align-items: center; gap: var(--space-2); }
+    .cal-mode-btn {
+      padding: 6px 12px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border); background: var(--color-surface);
+      color: var(--color-text); font-size: .75rem; font-weight: 600; cursor: pointer;
+      transition: all .15s ease;
+    }
+    .cal-mode-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    [data-theme="dark"] .cal-mode-btn { background: rgba(255,255,255,0.04); color: #f5f5f5; border-color: rgba(255,255,255,0.12); }
+
+    .cal-weekrow {
+      display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px; margin-bottom: 4px;
+    }
+    .cal-weekcell {
+      text-align: center; padding: 6px 0; font-size: .78rem; font-weight: 700;
+      color: var(--color-text-muted); background: transparent;
+    }
+    .cal-weekcell.cal-friday { color: #ef4444; }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-auto-rows: minmax(72px, 1fr);
+      gap: 4px;
+    }
+    .cal-cell {
+      position: relative; display: flex; flex-direction: column;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 4px;
+      cursor: pointer; overflow: hidden; min-width: 0;
+      transition: transform .12s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .cal-cell:hover { border-color: var(--color-primary); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    [data-theme="dark"] .cal-cell { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+    [data-theme="dark"] .cal-cell:hover { background: rgba(139,92,246,0.12); border-color: var(--color-primary); }
+    .cal-cell.cal-other { opacity: .42; cursor: pointer; }
+    .cal-cell.cal-other .cal-daynum { color: var(--color-text-faint); }
+    .cal-cell.cal-today { border-color: var(--color-primary); border-width: 2px; box-shadow: 0 0 0 2px var(--color-primary-soft); }
+    .cal-cell.cal-today .cal-daynum { color: var(--color-primary); font-weight: 800; }
+    .cal-cell.cal-friday-cell .cal-daynum { color: #ef4444; }
+    .cal-cell.cal-friday-cell.cal-today .cal-daynum { color: var(--color-primary); }
+    .cal-daynum {
+      font-size: .85rem; font-weight: 700; color: var(--color-text);
+      text-align: end; line-height: 1.1; padding: 2px 4px 0;
+    }
+    [data-theme="dark"] .cal-daynum { color: #f5f5f5; }
+
+    .cal-events {
+      display: flex; flex-direction: column; gap: 2px;
+      margin-top: 4px; overflow: hidden; flex: 1; min-height: 0;
+    }
+    .cal-event {
+      font-size: .62rem; line-height: 1.3; padding: 2px 5px;
+      border-radius: 4px; background: var(--color-primary-soft); color: var(--color-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      border-inline-start: 3px solid var(--color-primary);
+    }
+    .cal-event.t-task   { background: rgba(59,130,246,0.12); color: #3b82f6; border-inline-start-color: #3b82f6; }
+    .cal-event.t-income { background: rgba(34,197,94,0.12); color: #22c55e; border-inline-start-color: #22c55e; }
+    .cal-event.t-expense{ background: rgba(239,68,68,0.12); color: #ef4444; border-inline-start-color: #ef4444; }
+    .cal-event.t-habit  { background: rgba(139,92,246,0.12); color: #8b5cf6; border-inline-start-color: #8b5cf6; }
+    .cal-event.t-rem    { background: rgba(245,158,11,0.12); color: #f59e0b; border-inline-start-color: #f59e0b; }
+    [data-theme="dark"] .cal-event.t-task   { background: rgba(59,130,246,0.22); color: #93c5fd; }
+    [data-theme="dark"] .cal-event.t-income { background: rgba(34,197,94,0.22); color: #86efac; }
+    [data-theme="dark"] .cal-event.t-expense{ background: rgba(239,68,68,0.22); color: #fca5a5; }
+    [data-theme="dark"] .cal-event.t-habit  { background: rgba(139,92,246,0.25); color: #c4b5fd; }
+    [data-theme="dark"] .cal-event.t-rem    { background: rgba(245,158,11,0.22); color: #fcd34d; }
+
+    .cal-more {
+      font-size: .58rem; color: var(--color-text-muted); padding: 1px 5px;
+      font-weight: 700;
+    }
+    .cal-dots-row {
+      display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; padding: 0 4px;
+    }
+    .cal-dot {
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* Heatmap mode: cells shaded by activity count */
+    .cal-grid.heatmap .cal-event,
+    .cal-grid.heatmap .cal-more { display: none; }
+    .cal-grid.heatmap .cal-cell { background: var(--color-surface); }
+    .cal-grid.heatmap .cal-cell[data-heat="1"] { background: rgba(139,92,246,0.10); }
+    .cal-grid.heatmap .cal-cell[data-heat="2"] { background: rgba(139,92,246,0.22); }
+    .cal-grid.heatmap .cal-cell[data-heat="3"] { background: rgba(139,92,246,0.40); }
+    .cal-grid.heatmap .cal-cell[data-heat="4"] { background: rgba(139,92,246,0.62); }
+    .cal-grid.heatmap .cal-cell[data-heat="4"] .cal-daynum { color: white; }
+    [data-theme="dark"] .cal-grid.heatmap .cal-cell { background: rgba(255,255,255,0.03); }
+    [data-theme="dark"] .cal-grid.heatmap .cal-cell[data-heat="1"] { background: rgba(139,92,246,0.18); }
+    [data-theme="dark"] .cal-grid.heatmap .cal-cell[data-heat="2"] { background: rgba(139,92,246,0.32); }
+    [data-theme="dark"] .cal-grid.heatmap .cal-cell[data-heat="3"] { background: rgba(139,92,246,0.50); }
+    [data-theme="dark"] .cal-grid.heatmap .cal-cell[data-heat="4"] { background: rgba(139,92,246,0.72); }
+
+    .cal-legend {
+      display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center;
+      margin-top: var(--space-4); font-size: .7rem; color: var(--color-text-muted);
+    }
+    .cal-leg { display: inline-flex; align-items: center; gap: 4px; }
+
+    /* Day-click modal */
+    dialog#calDayModal {
+      max-width: 540px; width: 92vw; max-height: 86vh;
+      padding: 0; border: none; border-radius: 16px;
+      background: var(--color-surface);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    dialog#calDayModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
+    .caldm-head {
+      display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4);
+      background: linear-gradient(135deg, rgba(139,92,246,0.10), rgba(59,130,246,0.06));
+      border-bottom: 1px solid var(--color-border); flex-shrink: 0;
+    }
+    [data-theme="dark"] .caldm-head { background: linear-gradient(135deg, rgba(139,92,246,0.22), rgba(59,130,246,0.15)); }
+    .caldm-title { flex: 1; font-size: 1rem; font-weight: 800; color: var(--color-text); margin: 0; }
+    [data-theme="dark"] .caldm-title { color: #f5f5f5; }
+    .caldm-body { padding: var(--space-3) var(--space-4); overflow-y: auto; flex: 1; min-height: 200px; }
+    .caldm-group { margin-bottom: var(--space-4); }
+    .caldm-group-title {
+      font-size: .72rem; font-weight: 700; color: var(--color-text-muted);
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: var(--space-2);
+    }
+    .caldm-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      border-radius: var(--radius-sm); background: var(--color-bg);
+      margin-bottom: 4px; font-size: .85rem; color: var(--color-text);
+      border-inline-start: 3px solid var(--color-primary);
+    }
+    [data-theme="dark"] .caldm-item { background: rgba(255,255,255,0.04); color: #f5f5f5; }
+    .caldm-empty {
+      text-align: center; padding: var(--space-5) var(--space-3);
+      color: var(--color-text-muted); font-size: .85rem;
+    }
+    .caldm-foot {
+      padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-border);
+      display: flex; flex-wrap: wrap; gap: var(--space-2); flex-shrink: 0;
+    }
+    .caldm-foot button {
+      flex: 1; min-width: 110px; min-height: 38px;
+      border-radius: var(--radius-md); border: 1px solid var(--color-border);
+      background: var(--color-surface); color: var(--color-text); font-size: .78rem;
+      font-weight: 700; cursor: pointer;
+    }
+    .caldm-foot button:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    [data-theme="dark"] .caldm-foot button { background: rgba(255,255,255,0.04); color: #f5f5f5; border-color: rgba(255,255,255,0.12); }
+
+    /* Mobile: tighter cells */
+    @media (max-width: 768px) {
+      #page-calendar { padding: var(--space-2) var(--space-2) var(--space-6); }
+      .cal-head { gap: var(--space-2); margin-bottom: var(--space-2); }
+      .cal-title { font-size: 1rem; padding: 2px 8px; }
+      .cal-grid { gap: 3px; grid-auto-rows: minmax(54px, 1fr); }
+      .cal-cell { padding: 2px; border-radius: 8px; }
+      .cal-daynum { font-size: .72rem; padding: 1px 3px 0; }
+      .cal-event { font-size: .54rem; padding: 1px 3px; }
+      .cal-weekcell { font-size: .7rem; padding: 4px 0; }
+      .cal-legend { font-size: .62rem; gap: var(--space-2); }
+      dialog#calDayModal {
+        position: fixed; inset: auto 0 0 0; width: 100%; max-width: 100%;
+        max-height: 86vh; border-radius: 16px 16px 0 0;
+        animation: sheet-up .3s var(--ease-out) forwards;
+      }
+    }
 
     /* Level-up celebration toast */
     .toast-levelup {
@@ -3469,6 +3669,7 @@
     <nav class="page-tabs" aria-label="صفحات">
       <button class="page-tab active" type="button" data-page="plan"><span class="pt-emoji">📋</span><span class="pt-label">ساخت تسک</span></button>
       <button class="page-tab" type="button" data-page="planner"><span class="pt-emoji">🗓</span><span class="pt-label">پلنر</span></button>
+      <button class="page-tab" type="button" data-page="calendar"><span class="pt-emoji">📅</span><span class="pt-label">تقویم</span></button>
       <button class="page-tab" type="button" data-page="track"><span class="pt-emoji">📊</span><span class="pt-label">پیگیری</span></button>
       <button class="page-tab" type="button" data-page="money"><span class="pt-emoji">💰</span><span class="pt-label">مالی</span></button>
       <button class="page-tab" type="button" data-page="insight"><span class="pt-emoji">🧠</span><span class="pt-label">بینش</span></button>
@@ -3715,6 +3916,42 @@
       <div class="emp-title">هیچ تسکی در این فیلتر نیست</div>
       <div class="emp-sub">فیلتر دیگه‌ای امتحان کن یا اولین تسک رو از تب «ساخت تسک» بساز.</div>
       <button class="emp-cta" type="button" onclick="switchPage('plan')">📋 برو ساخت تسک</button>
+    </div>
+  </div>
+
+  <!-- PAGE: CALENDAR (Persian Jalali) -->
+  <div class="page" id="page-calendar">
+    <div class="cal-head">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="calPrev" type="button" aria-label="ماه قبل">‹</button>
+        <div class="cal-title-wrap">
+          <button class="cal-title" id="calTitle" type="button" title="برو به امروز">خرداد ۱۴۰۵</button>
+          <button class="cal-today-btn" id="calToday" type="button" title="برو به امروز">امروز</button>
+        </div>
+        <button class="cal-nav-btn" id="calNext" type="button" aria-label="ماه بعد">›</button>
+      </div>
+      <div class="cal-tools">
+        <button class="cal-mode-btn" id="calModeBtn" type="button" data-mode="dots" title="حالت نمایش">
+          <span class="cal-mode-label">⬤ نقطه‌ها</span>
+        </button>
+      </div>
+    </div>
+    <div class="cal-weekrow" aria-hidden="true">
+      <div class="cal-weekcell">ش</div>
+      <div class="cal-weekcell">ی</div>
+      <div class="cal-weekcell">د</div>
+      <div class="cal-weekcell">س</div>
+      <div class="cal-weekcell">چ</div>
+      <div class="cal-weekcell">پ</div>
+      <div class="cal-weekcell cal-friday">ج</div>
+    </div>
+    <div class="cal-grid" id="calGrid" role="grid" aria-label="تقویم ماهانه شمسی"></div>
+    <div class="cal-legend">
+      <span class="cal-leg"><span class="cal-dot" style="background:#3b82f6"></span> تسک</span>
+      <span class="cal-leg"><span class="cal-dot" style="background:#22c55e"></span> درآمد</span>
+      <span class="cal-leg"><span class="cal-dot" style="background:#ef4444"></span> هزینه</span>
+      <span class="cal-leg"><span class="cal-dot" style="background:#8b5cf6"></span> عادت</span>
+      <span class="cal-leg"><span class="cal-dot" style="background:#f59e0b"></span> یادآور</span>
     </div>
   </div>
 
@@ -4021,6 +4258,21 @@
       <button type="button" class="ghost-btn" id="onbPrev">→ قبلی</button>
       <button type="button" class="primary-btn" id="onbNext">بعدی ←</button>
     </div>
+  </div>
+</dialog>
+
+<!-- 📅 Calendar — Day-click modal -->
+<dialog id="calDayModal">
+  <form method="dialog" class="caldm-head">
+    <h3 class="caldm-title" id="calDayTitle">روز انتخاب‌شده</h3>
+    <button type="submit" class="ghost-btn" id="calDayClose" aria-label="بستن"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </form>
+  <div class="caldm-body" id="calDayBody"></div>
+  <div class="caldm-foot">
+    <button type="button" id="calDayAddTask">📋 تسک جدید</button>
+    <button type="button" id="calDayAddTx">💰 تراکنش جدید</button>
+    <button type="button" id="calDayAddHabit">✅ ثبت عادت</button>
   </div>
 </dialog>
 
@@ -6058,6 +6310,7 @@ function render() {
   if (state.currentPage==='plan') renderPlan();
   if (state.currentPage==='track') renderTrack();
   if (state.currentPage==='planner') renderPlanner();
+  if (state.currentPage==='calendar') renderCalendar();
   if (state.currentPage==='money') renderMoney();
   if (state.currentPage==='insight') renderInsight();
   document.getElementById('pomodoroToggle').style.borderColor = state.pomodoroEnabled?'var(--color-primary)':'transparent';
@@ -6538,6 +6791,135 @@ const FA_MONTHS   = ['ژانویه','فوریه','مارس','آوریل','مه',
 
 function toFaDigits(n) {
   return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+/* ════════════════════════════════════════════════
+   📅 JALALI (Persian) CALENDAR UTILITY
+   - Pure functions, no external deps, no Date.now() in the math itself.
+   - Algorithm: standard 33-year cycle (jalaali-js style, MIT origin),
+     re-implemented small and self-contained.
+   - Public API:
+       gToJ(gy, gm, gd)         → {jy, jm, jd}
+       jToG(jy, jm, jd)         → {gy, gm, gd}
+       jDaysInMonth(jy, jm)     → number
+       jIsLeap(jy)              → bool
+       jWeekday(jy, jm, jd)     → 0..6  (0=شنبه ... 6=جمعه, matching FA_JWEEKDAYS order)
+       jMonthName(jm)           → 'فروردین' ...
+       todayJalali()            → {jy, jm, jd}  (from local clock)
+       dateKeyFromJ(jy,jm,jd)   → 'YYYY-MM-DD' Gregorian key (matches existing state keys)
+       jKey(jy,jm,jd)           → 'jYYYY-MM-DD' Jalali key (for new calendar-only state)
+════════════════════════════════════════════════ */
+const FA_JMONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور',
+                    'مهر','آبان','آذر','دی','بهمن','اسفند'];
+// Saturday-first to match Iranian week layout.
+const FA_JWEEKDAYS_SHORT = ['ش','ی','د','س','چ','پ','ج'];
+const FA_JWEEKDAYS_LONG  = ['شنبه','یک‌شنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه'];
+
+/* Implementation: jalaali-js by Behdad Esfahbod, MIT.
+   Source: https://github.com/jalaali/jalaali-js
+   Re-implemented inline so we have no external dep. */
+function _jDiv(a, b) { return ~~(a / b); }
+function _jMod(a, b) { return a - ~~(a / b) * b; }
+
+function _jalCal(jy) {
+  const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181,
+                  1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+  const bl = breaks.length;
+  const gy = jy + 621;
+  let leapJ = -14, jp = breaks[0], jump = 0;
+  for (let i = 1; i < bl; i++) {
+    const jm = breaks[i];
+    jump = jm - jp;
+    if (jy < jm) break;
+    leapJ = leapJ + _jDiv(jump, 33) * 8 + _jDiv(_jMod(jump, 33), 4);
+    jp = jm;
+  }
+  let n = jy - jp;
+  leapJ = leapJ + _jDiv(n, 33) * 8 + _jDiv(_jMod(n, 33) + 3, 4);
+  if (_jMod(jump, 33) === 4 && jump - n === 4) leapJ += 1;
+  const leapG = _jDiv(gy, 4) - _jDiv((_jDiv(gy, 100) + 1) * 3, 4) - 150;
+  const march = 20 + leapJ - leapG;
+  if (jump - n < 6) n = n - jump + _jDiv(jump + 4, 33) * 33;
+  let leap = _jMod(_jMod(n + 1, 33) - 1, 4);
+  if (leap === -1) leap = 4;
+  return { leap, gy, march };
+}
+
+function jIsLeap(jy) { return _jalCal(jy).leap === 0; }
+function jDaysInMonth(jy, jm) {
+  if (jm <= 6) return 31;
+  if (jm <= 11) return 30;
+  return jIsLeap(jy) ? 30 : 29;
+}
+function jMonthName(jm) { return FA_JMONTHS[jm - 1] || ''; }
+
+function _g2d(gy, gm, gd) {
+  let d = _jDiv((gy + _jDiv(gm - 8, 6) + 100100) * 1461, 4)
+        + _jDiv(153 * _jMod(gm + 9, 12) + 2, 5)
+        + gd - 34840408;
+  d = d - _jDiv(_jDiv(gy + 100100 + _jDiv(gm - 8, 6), 100) * 3, 4) + 752;
+  return d;
+}
+function _d2g(jdn) {
+  let j = 4 * jdn + 139361631;
+  j = j + _jDiv(_jDiv(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908;
+  const i = _jDiv(_jMod(j, 1461), 4) * 5 + 308;
+  const gd = _jDiv(_jMod(i, 153), 5) + 1;
+  const gm = _jMod(_jDiv(i, 153), 12) + 1;
+  const gy = _jDiv(j, 1461) - 100100 + _jDiv(8 - gm, 6);
+  return { gy, gm, gd };
+}
+function _j2d(jy, jm, jd) {
+  const r = _jalCal(jy);
+  return _g2d(r.gy, 3, r.march) + (jm - 1) * 31 - _jDiv(jm, 7) * (jm - 7) + jd - 1;
+}
+function _d2j(jdn) {
+  const gy = _d2g(jdn).gy;
+  let jy = gy - 621;
+  const r = _jalCal(jy);
+  const jdn1f = _g2d(gy, 3, r.march);
+  let k = jdn - jdn1f;
+  if (k >= 0) {
+    if (k <= 185) {
+      const jm = 1 + _jDiv(k, 31);
+      const jd = _jMod(k, 31) + 1;
+      return { jy, jm, jd };
+    }
+    k -= 186;
+  } else {
+    jy -= 1;
+    k += 179;
+    if (r.leap === 1) k += 1;
+  }
+  const jm = 7 + _jDiv(k, 30);
+  const jd = _jMod(k, 30) + 1;
+  return { jy, jm, jd };
+}
+
+function gToJ(gy, gm, gd) { return _d2j(_g2d(gy, gm, gd)); }
+function jToG(jy, jm, jd) { return _d2g(_j2d(jy, jm, jd)); }
+
+/* 0=Saturday, 6=Friday — matches FA_JWEEKDAYS_SHORT order. */
+function jWeekday(jy, jm, jd) {
+  const g = jToG(jy, jm, jd);
+  // JS getDay(): 0=Sun, 1=Mon, ... 6=Sat
+  const dow = new Date(g.gy, g.gm - 1, g.gd).getDay();
+  // Convert to Sat-first: Sat=0, Sun=1, Mon=2, ..., Fri=6
+  return (dow + 1) % 7;
+}
+
+function todayJalali() {
+  const now = new Date();
+  return gToJ(now.getFullYear(), now.getMonth() + 1, now.getDate());
+}
+function dateKeyFromJ(jy, jm, jd) {
+  const g = jToG(jy, jm, jd);
+  const mm = String(g.gm).padStart(2, '0');
+  const dd = String(g.gd).padStart(2, '0');
+  return `${g.gy}-${mm}-${dd}`;
+}
+function jKey(jy, jm, jd) {
+  return `j${jy}-${String(jm).padStart(2,'0')}-${String(jd).padStart(2,'0')}`;
 }
 
 function ensurePlannerState() {
@@ -7742,6 +8124,8 @@ const CMD_STATIC_COMMANDS = [
   { id:'notif-on',   title:'فعال‌سازی یادآوری‌ها',     icon:'🔔', kind:'command', sub:'دسترسی Notification', run: () => requestNotificationPermission(true) },
   { id:'notif-test', title:'ارسال یادآوری تست',       icon:'🧪', kind:'command', run: () => fireReminder('🔔 تست یادآوری TaskHub', 'اگر این پیام رو دیدی، یادآوری‌ها کار می‌کنن!', 'test-' + Date.now()) },
   { id:'hof',        title:'تالار افتخار',             icon:'🏛', kind:'command', sub:'رکوردها و نشان‌های شخصی', run: () => openHallOfFame() },
+  { id:'calendar',   title:'تقویم ماهانه',             icon:'📅', kind:'command', sub:'نمای ماه شمسی با همهٔ رویدادها', run: () => { if (typeof switchPage==='function') switchPage('calendar'); } },
+  { id:'cal-today',  title:'تقویم — برو به امروز',     icon:'📍', kind:'command', sub:'پرش به ماه جاری', run: () => { if (typeof switchPage==='function') switchPage('calendar'); setTimeout(()=>document.getElementById('calToday')?.click(),100); } },
   { id:'excel',      title:'خروجی Excel',              icon:'📊', kind:'command', sub:'xlsx با ۴ شیت', run: () => exportToExcel() },
   { id:'theme',      title:'تغییر تم رنگی',          icon:'🎨', kind:'command', run: () => document.getElementById('themePickerBtn')?.click() },
   { id:'dark',       title:'تغییر حالت روشن/تاریک',  icon:'🌙', kind:'command', run: () => document.getElementById('darkToggle')?.click() },
@@ -9468,6 +9852,265 @@ function renderMoneyChart() {
    ground clear so nothing dangling can re-trigger the bug.
 ════════════════════════════════════════════════ */
 
+
+/* ════════════════════════════════════════════════
+   📅 CALENDAR (Persian Jalali, month view)
+   - Pulls events from existing state: tasks (subtask.reminderAt/dueDate),
+     transactions, habits.completions, recurringTx, reminders.
+   - Two view modes: 'dots' (default — colored event chips), 'heatmap' (shaded).
+   - State: state.calView = { jy, jm, mode } persisted via save().
+════════════════════════════════════════════════ */
+function ensureCalState() {
+  if (!state.calView || typeof state.calView !== 'object') {
+    const t = todayJalali();
+    state.calView = { jy: t.jy, jm: t.jm, mode: 'dots' };
+  }
+  if (!['dots','heatmap'].includes(state.calView.mode)) state.calView.mode = 'dots';
+}
+
+/* Collect events for a single Gregorian date key 'YYYY-MM-DD'. */
+function calEventsForDateKey(dateKey) {
+  const ev = { tasks: [], txIncome: [], txExpense: [], habits: [], reminders: [] };
+  // Tasks: scan all operations → subtasks with dueDate (or reminderAt date part)
+  try {
+    (state.operations || []).forEach(op => {
+      (op.subtasks || []).forEach(st => {
+        let key = null;
+        if (st.dueDate) key = String(st.dueDate).slice(0, 10);
+        else if (st.reminderAt) key = String(st.reminderAt).slice(0, 10);
+        if (key === dateKey && !st.done) ev.tasks.push({ title: st.text || st.title || 'تسک', opTitle: op.title });
+      });
+    });
+  } catch {}
+  // Transactions
+  try {
+    (state.moneyTxs || []).forEach(tx => {
+      const key = (tx.date || '').slice(0, 10);
+      if (key !== dateKey) return;
+      if (tx.type === 'income')      ev.txIncome.push(tx);
+      else if (tx.type === 'expense') ev.txExpense.push(tx);
+    });
+  } catch {}
+  // Habits: each habit whose completions[dateKey] === true
+  try {
+    (state.habits || []).forEach(h => {
+      if (h.completions && h.completions[dateKey]) ev.habits.push(h);
+    });
+  } catch {}
+  // Reminders: state.reminders entries scheduled this day
+  try {
+    const remList = state.reminders || [];
+    remList.forEach(r => {
+      const key = (r.fireAt || '').slice(0, 10);
+      if (key === dateKey) ev.reminders.push(r);
+    });
+  } catch {}
+  return ev;
+}
+
+function calEventCount(ev) {
+  return ev.tasks.length + ev.txIncome.length + ev.txExpense.length
+       + ev.habits.length + ev.reminders.length;
+}
+
+function renderCalendar() {
+  ensureCalState();
+  const grid = document.getElementById('calGrid');
+  if (!grid) return;
+  const { jy, jm, mode } = state.calView;
+  // Header title
+  const titleEl = document.getElementById('calTitle');
+  if (titleEl) titleEl.textContent = `${jMonthName(jm)} ${toFaDigits(jy)}`;
+  // Mode toggle label
+  const modeBtn = document.getElementById('calModeBtn');
+  if (modeBtn) {
+    modeBtn.dataset.mode = mode;
+    modeBtn.querySelector('.cal-mode-label').textContent = mode === 'heatmap' ? '🔥 هیت‌مپ' : '⬤ نقطه‌ها';
+  }
+  grid.classList.toggle('heatmap', mode === 'heatmap');
+
+  // Today for highlight
+  const tj = todayJalali();
+  const todayKey = `${tj.jy}-${tj.jm}-${tj.jd}`;
+
+  // Compute first day of month + leading other-month days
+  const firstWeekday = jWeekday(jy, jm, 1);     // 0=Sat..6=Fri
+  const daysInThis   = jDaysInMonth(jy, jm);
+  const prevMonth    = jm === 1 ? { jy: jy - 1, jm: 12 } : { jy, jm: jm - 1 };
+  const nextMonth    = jm === 12 ? { jy: jy + 1, jm: 1 } : { jy, jm: jm + 1 };
+  const daysInPrev   = jDaysInMonth(prevMonth.jy, prevMonth.jm);
+
+  // Build 42 cells (6 weeks × 7)
+  const cells = [];
+  // Leading days from previous month
+  for (let i = firstWeekday - 1; i >= 0; i--) {
+    cells.push({ jy: prevMonth.jy, jm: prevMonth.jm, jd: daysInPrev - i, other: true });
+  }
+  // This month
+  for (let d = 1; d <= daysInThis; d++) {
+    cells.push({ jy, jm, jd: d, other: false });
+  }
+  // Trailing days from next month to fill 42
+  let nd = 1;
+  while (cells.length < 42) {
+    cells.push({ jy: nextMonth.jy, jm: nextMonth.jm, jd: nd++, other: true });
+  }
+
+  const html = cells.map(c => {
+    const isToday = !c.other && c.jy === tj.jy && c.jm === tj.jm && c.jd === tj.jd;
+    const isFriday = jWeekday(c.jy, c.jm, c.jd) === 6;
+    const dateKey = dateKeyFromJ(c.jy, c.jm, c.jd);
+    const ev = calEventsForDateKey(dateKey);
+    const count = calEventCount(ev);
+    const heat = Math.min(4, count); // 0..4 buckets
+    const classes = ['cal-cell'];
+    if (c.other) classes.push('cal-other');
+    if (isToday) classes.push('cal-today');
+    if (isFriday) classes.push('cal-friday-cell');
+
+    // Build event chips (max 3 visible, then "+N")
+    const chips = [];
+    ev.tasks.slice(0, 3).forEach(t => chips.push({ cls: 't-task', text: t.title }));
+    ev.txIncome.slice(0, 2).forEach(t => chips.push({ cls: 't-income', text: '+' + formatMoneyShort(t.amount) }));
+    ev.txExpense.slice(0, 2).forEach(t => chips.push({ cls: 't-expense', text: '−' + formatMoneyShort(t.amount) }));
+    ev.habits.slice(0, 2).forEach(h => chips.push({ cls: 't-habit', text: (h.emoji || '✅') + ' ' + (h.name || '') }));
+    ev.reminders.slice(0, 1).forEach(r => chips.push({ cls: 't-rem', text: '⏰ ' + (r.title || '') }));
+    const visible = chips.slice(0, 3);
+    const remaining = count - visible.length;
+
+    const chipsHtml = visible.map(ch =>
+      `<div class="cal-event ${ch.cls}" title="${escapeAttr(ch.text)}">${e(ch.text)}</div>`
+    ).join('');
+    const moreHtml = remaining > 0 ? `<div class="cal-more">+${toFaDigits(remaining)} مورد</div>` : '';
+
+    return `<div class="${classes.join(' ')}" data-jy="${c.jy}" data-jm="${c.jm}" data-jd="${c.jd}" data-heat="${heat}" role="gridcell" tabindex="0">
+      <div class="cal-daynum">${toFaDigits(c.jd)}</div>
+      <div class="cal-events">${chipsHtml}${moreHtml}</div>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML = html;
+}
+
+/* Small helper: short money format for tight cells.
+   1234567 → '۱.۲م'  (م=million, ه=thousand). Fall back to formatMoney for small. */
+function formatMoneyShort(amount) {
+  const n = Number(amount) || 0;
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return toFaDigits((n / 1e9).toFixed(1)) + 'میلیارد';
+  if (abs >= 1e6) return toFaDigits((n / 1e6).toFixed(1)) + 'م';
+  if (abs >= 1e3) return toFaDigits(Math.round(n / 1e3)) + 'ه';
+  return toFaDigits(n);
+}
+function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+
+/* ── Day modal: show all events of a given Jalali date ── */
+let _calDayCur = null; // {jy, jm, jd}
+function openCalDayModal(jy, jm, jd) {
+  _calDayCur = { jy, jm, jd };
+  const dateKey = dateKeyFromJ(jy, jm, jd);
+  const ev = calEventsForDateKey(dateKey);
+  const wname = FA_JWEEKDAYS_LONG[jWeekday(jy, jm, jd)];
+  document.getElementById('calDayTitle').textContent =
+    `${wname} ${toFaDigits(jd)} ${jMonthName(jm)} ${toFaDigits(jy)}`;
+  const body = document.getElementById('calDayBody');
+  let html = '';
+  function group(title, items, renderItem) {
+    if (!items.length) return '';
+    return `<div class="caldm-group">
+      <div class="caldm-group-title">${title} (${toFaDigits(items.length)})</div>
+      ${items.map(renderItem).join('')}
+    </div>`;
+  }
+  html += group('📋 تسک‌ها', ev.tasks, t =>
+    `<div class="caldm-item" style="border-inline-start-color:#3b82f6">📌 ${e(t.title)}${t.opTitle ? ` <span style="opacity:.6;font-size:.75rem;margin-inline-start:6px">(${e(t.opTitle)})</span>` : ''}</div>`);
+  html += group('💰 درآمد', ev.txIncome, t =>
+    `<div class="caldm-item" style="border-inline-start-color:#22c55e">⬆ ${e(t.note || 'درآمد')} — <b>${toFaDigits(formatMoney(t.amount))}</b></div>`);
+  html += group('💸 هزینه', ev.txExpense, t =>
+    `<div class="caldm-item" style="border-inline-start-color:#ef4444">⬇ ${e(t.note || 'هزینه')} — <b>${toFaDigits(formatMoney(t.amount))}</b></div>`);
+  html += group('✅ عادت‌ها', ev.habits, h =>
+    `<div class="caldm-item" style="border-inline-start-color:#8b5cf6">${h.emoji || '✅'} ${e(h.name || 'عادت')}</div>`);
+  html += group('⏰ یادآوری‌ها', ev.reminders, r =>
+    `<div class="caldm-item" style="border-inline-start-color:#f59e0b">⏰ ${e(r.title || 'یادآور')}</div>`);
+  if (!html) html = `<div class="caldm-empty">هیچ رویدادی برای این روز ثبت نشده.<br>از دکمه‌های پایین می‌تونی اضافه کنی.</div>`;
+  body.innerHTML = html;
+  document.getElementById('calDayModal').showModal();
+}
+
+/* Render hook: integrate into the main render() router below by adding
+   a call when state.currentPage === 'calendar'. */
+function _calMaybeRender() {
+  if (state.currentPage === 'calendar') renderCalendar();
+}
+
+/* Wire up calendar event handlers. Called once at boot. */
+function setupCalendarHandlers() {
+  const prev   = document.getElementById('calPrev');
+  const next   = document.getElementById('calNext');
+  const today  = document.getElementById('calToday');
+  const title  = document.getElementById('calTitle');
+  const modeBt = document.getElementById('calModeBtn');
+  const grid   = document.getElementById('calGrid');
+  if (!grid) return;
+
+  function shiftMonth(delta) {
+    ensureCalState();
+    let { jy, jm } = state.calView;
+    jm += delta;
+    if (jm > 12) { jm = 1; jy++; }
+    if (jm < 1)  { jm = 12; jy--; }
+    state.calView.jy = jy; state.calView.jm = jm;
+    save(); renderCalendar();
+  }
+  prev?.addEventListener('click', () => shiftMonth(-1));
+  next?.addEventListener('click', () => shiftMonth(+1));
+  function goToday() {
+    const t = todayJalali();
+    state.calView.jy = t.jy; state.calView.jm = t.jm;
+    save(); renderCalendar();
+  }
+  today?.addEventListener('click', goToday);
+  title?.addEventListener('click', goToday);
+  modeBt?.addEventListener('click', () => {
+    state.calView.mode = state.calView.mode === 'heatmap' ? 'dots' : 'heatmap';
+    save(); renderCalendar();
+  });
+
+  // Cell click → open day modal
+  grid.addEventListener('click', ev => {
+    const cell = ev.target.closest('.cal-cell');
+    if (!cell) return;
+    const jy = +cell.dataset.jy, jm = +cell.dataset.jm, jd = +cell.dataset.jd;
+    // If clicking an other-month cell, navigate the calendar there + open
+    if (cell.classList.contains('cal-other')) {
+      state.calView.jy = jy; state.calView.jm = jm; save(); renderCalendar();
+    }
+    openCalDayModal(jy, jm, jd);
+  });
+
+  // Day modal close (form[method=dialog] handles it natively, but be defensive)
+  const dayModal = document.getElementById('calDayModal');
+  dayModal?.addEventListener('click', ev => {
+    if (ev.target === dayModal) dayModal.close();
+  });
+  // Footer shortcuts: route to relevant pages with date prefilled where supported
+  document.getElementById('calDayAddTask')?.addEventListener('click', () => {
+    dayModal.close();
+    if (typeof switchPage === 'function') switchPage('plan');
+  });
+  document.getElementById('calDayAddTx')?.addEventListener('click', () => {
+    dayModal.close();
+    if (typeof switchPage === 'function') switchPage('money');
+    // Pre-open the tx modal if helper exists; otherwise just land on money tab.
+    setTimeout(() => { try { document.getElementById('moneyFabBtn')?.click(); } catch {} }, 250);
+  });
+  document.getElementById('calDayAddHabit')?.addEventListener('click', () => {
+    dayModal.close();
+    if (typeof switchPage === 'function') switchPage('planner');
+  });
+}
+
+
 function renderAchievements() {
   ensureGameState();
   const container = document.getElementById('iAchv');
@@ -10864,6 +11507,7 @@ applyFontSize(state.fontSize);
 applyCompact();
 renderUserProfile();
 refreshQuickCaptureBadge();
+try { setupCalendarHandlers(); } catch (e) { console.warn('Calendar setup failed:', e); }
 
 /* Start auth bootstrap (non-blocking): shows the gate if Supabase is configured
    and user isn't signed in. App still renders behind it via initial render(). */
