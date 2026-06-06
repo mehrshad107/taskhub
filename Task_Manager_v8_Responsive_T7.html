@@ -2942,6 +2942,179 @@
 
     .modal-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
 
+    /* ════════════════════════════════════════════════
+       🥗 NUTRITION (food log, macros/micros, water, TDEE)
+    ════════════════════════════════════════════════ */
+    .nutri-top-grid {
+      display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); align-items: center;
+    }
+    @media (max-width: 560px) { .nutri-top-grid { grid-template-columns: 1fr; } }
+    .nutri-cal-card {
+      padding: var(--space-3); border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(139,92,246,0.10), rgba(34,197,94,0.06));
+      border: 1px solid var(--color-border);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    [data-theme="dark"] .nutri-cal-card { background: linear-gradient(135deg, rgba(139,92,246,0.22), rgba(34,197,94,0.15)); }
+    .nutri-ring-wrap { position: relative; width: 120px; height: 120px; }
+    .nutri-ring-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; pointer-events: none;
+    }
+    .nutri-ring-num { font-size: 1.8rem; font-weight: 800; color: var(--color-primary); line-height: 1; }
+    .nutri-ring-lbl { font-size: .68rem; color: var(--color-text-muted); margin-top: 2px; }
+    .nutri-cal-tag { font-size: .78rem; font-weight: 700; color: var(--color-text); }
+    [data-theme="dark"] .nutri-cal-tag { color: #f5f5f5; }
+
+    .nutri-macros { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .nutri-macro-row {
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      background: var(--color-surface); border: 1px solid var(--color-border);
+    }
+    [data-theme="dark"] .nutri-macro-row { background: rgba(255,255,255,0.04); }
+    .nutri-macro-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .78rem; color: var(--color-text); margin-bottom: 6px;
+    }
+    [data-theme="dark"] .nutri-macro-head { color: #f5f5f5; }
+    .nutri-macro-head b { color: var(--color-primary); font-weight: 800; }
+    .nutri-macro-bar {
+      height: 6px; background: var(--color-bg); border-radius: 3px; overflow: hidden;
+    }
+    [data-theme="dark"] .nutri-macro-bar { background: rgba(255,255,255,0.08); }
+    .nutri-macro-fill { height: 100%; transition: width .4s; border-radius: 3px; }
+
+    .nutri-micros {
+      padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+      background: var(--color-surface); border: 1px solid var(--color-border);
+    }
+    [data-theme="dark"] .nutri-micros { background: rgba(255,255,255,0.04); }
+    .nutri-micros summary {
+      cursor: pointer; font-size: .8rem; font-weight: 700; color: var(--color-text);
+      padding: 4px 0;
+    }
+    [data-theme="dark"] .nutri-micros summary { color: #f5f5f5; }
+    .nutri-micro-grid {
+      display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 8px; margin-top: 8px;
+    }
+    @media (max-width: 480px) { .nutri-micro-grid { grid-template-columns: repeat(2, 1fr); } }
+    .nutri-micro {
+      text-align: center; padding: 8px 6px; border-radius: var(--radius-sm);
+      background: var(--color-bg);
+    }
+    [data-theme="dark"] .nutri-micro { background: rgba(255,255,255,0.05); }
+    .nutri-micro b { display: block; font-size: 1rem; color: var(--color-primary); font-weight: 800; }
+    .nutri-micro span { display: block; font-size: .62rem; color: var(--color-text-muted); margin-top: 2px; }
+
+    .nutri-water-card {
+      padding: var(--space-3); border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(14,165,233,0.10), rgba(59,130,246,0.06));
+      border: 1px solid var(--color-border);
+    }
+    [data-theme="dark"] .nutri-water-card { background: linear-gradient(135deg, rgba(14,165,233,0.22), rgba(59,130,246,0.15)); }
+    .nutri-water-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px; font-weight: 700; color: var(--color-text);
+    }
+    [data-theme="dark"] .nutri-water-head { color: #f5f5f5; }
+    .nutri-water-count { font-size: .78rem; color: #0ea5e9; }
+    .nutri-water-cups { display: flex; gap: 6px; flex-wrap: wrap; }
+    .nutri-cup {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: var(--color-bg); border: 2px solid var(--color-border);
+      font-size: 1.1rem; cursor: pointer; opacity: .4;
+      transition: all .15s;
+    }
+    [data-theme="dark"] .nutri-cup { background: rgba(255,255,255,0.04); }
+    .nutri-cup:hover { transform: scale(1.05); }
+    .nutri-cup.filled { background: linear-gradient(135deg, #0ea5e9, #3b82f6); border-color: #0ea5e9; opacity: 1; }
+
+    .nutri-meal-list { display: flex; flex-direction: column; gap: 8px; }
+    .nutri-meal-card {
+      padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);
+      background: var(--color-surface); border: 1px solid var(--color-border);
+    }
+    [data-theme="dark"] .nutri-meal-card { background: rgba(255,255,255,0.04); }
+    .nutri-meal-head { display: flex; align-items: center; gap: 8px; }
+    .nutri-meal-emoji { font-size: 1.3rem; }
+    .nutri-meal-name { font-weight: 700; color: var(--color-text); flex: 1; }
+    [data-theme="dark"] .nutri-meal-name { color: #f5f5f5; }
+    .nutri-meal-cal { font-size: .72rem; color: var(--color-primary); font-weight: 700; }
+    .nutri-meal-foods { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+    .nutri-meal-empty { font-size: .7rem; color: var(--color-text-muted); padding: 4px 0; }
+    .nutri-food-row {
+      display: grid; grid-template-columns: 24px 1fr auto 24px; gap: 8px; align-items: center;
+      padding: 5px 8px; border-radius: var(--radius-sm); background: var(--color-bg);
+      font-size: .8rem;
+    }
+    [data-theme="dark"] .nutri-food-row { background: rgba(255,255,255,0.04); }
+    .nutri-food-emoji { text-align: center; }
+    .nutri-food-name { color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    [data-theme="dark"] .nutri-food-name { color: #f5f5f5; }
+    .nutri-food-grams { font-weight: 700; color: var(--color-primary); }
+    .nutri-food-grams span { font-size: .65rem; color: var(--color-text-muted); margin-inline-start: 2px; }
+    .nutri-food-del {
+      background: transparent; border: none; color: #ef4444; cursor: pointer;
+      font-size: .9rem; padding: 2px 4px;
+    }
+
+    /* Food picker modal — reuses .fxp- classes from fitness */
+    dialog#nutriAddFoodModal, dialog#tdeeModal {
+      max-width: 640px; width: 92vw; max-height: 88vh;
+      padding: 0; border: none; border-radius: 16px;
+      background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    dialog#nutriAddFoodModal::backdrop, dialog#tdeeModal::backdrop {
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+    }
+    .naf-search-row, .naf-cat-row { margin-bottom: 10px; }
+    .naf-cat-row { display: flex; flex-wrap: wrap; gap: 4px; }
+    .naf-selected {
+      padding: var(--space-3); border-radius: var(--radius-md);
+      background: var(--color-bg); border: 1px solid var(--color-border);
+    }
+    [data-theme="dark"] .naf-selected { background: rgba(255,255,255,0.04); }
+    .naf-sel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .naf-sel-emoji { font-size: 1.4rem; }
+    .naf-sel-name { font-weight: 700; color: var(--color-text); flex: 1; font-size: .95rem; }
+    [data-theme="dark"] .naf-sel-name { color: #f5f5f5; }
+    .naf-sel-macros {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 8px; background: var(--color-surface); border-radius: var(--radius-sm);
+      margin-bottom: 10px; font-size: .72rem;
+    }
+    [data-theme="dark"] .naf-sel-macros { background: rgba(255,255,255,0.06); }
+    .naf-sel-macros span { color: var(--color-text-muted); padding: 2px 8px; border-radius: 4px; background: var(--color-bg); }
+    [data-theme="dark"] .naf-sel-macros span { background: rgba(255,255,255,0.06); color: #f5f5f5; }
+
+    /* TDEE */
+    .tdee-result {
+      margin-top: 16px; padding: var(--space-3); border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(139,92,246,0.10), rgba(34,197,94,0.06));
+      border: 1px solid var(--color-border); text-align: center;
+    }
+    [data-theme="dark"] .tdee-result { background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(34,197,94,0.18)); }
+    .tdee-num { font-size: 2.4rem; font-weight: 800; color: var(--color-primary); line-height: 1; }
+    .tdee-num span { font-size: .9rem; font-weight: 500; color: var(--color-text-muted); }
+    .tdee-hint { font-size: .8rem; color: var(--color-text-muted); margin-top: 12px; }
+    .tdee-macros {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin-top: 8px; font-size: .78rem; color: var(--color-text);
+    }
+    [data-theme="dark"] .tdee-macros { color: #f5f5f5; }
+    .tdee-macros span { padding: 4px 10px; background: var(--color-surface); border-radius: 999px; font-weight: 600; }
+    [data-theme="dark"] .tdee-macros span { background: rgba(255,255,255,0.08); }
+
+    @media (max-width: 768px) {
+      dialog#nutriAddFoodModal, dialog#tdeeModal {
+        position: fixed; inset: auto 0 0 0; width: 100%; max-width: 100%;
+        max-height: 88vh; border-radius: 16px 16px 0 0;
+        animation: sheet-up .3s var(--ease-out) forwards;
+      }
+    }
+
     /* Level-up celebration toast */
     .toast-levelup {
       background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
@@ -4396,6 +4569,24 @@
   <div class="caldm-body fsm-body"></div>
 </dialog>
 
+<!-- 🥗 Nutrition — Add food modal -->
+<dialog id="nutriAddFoodModal">
+  <form method="dialog" class="caldm-head">
+    <h3 class="caldm-title">🍽 افزودن غذا</h3>
+    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </form>
+  <div class="caldm-body naf-body"></div>
+</dialog>
+
+<!-- 🎯 TDEE calculator modal -->
+<dialog id="tdeeModal">
+  <form method="dialog" class="caldm-head">
+    <h3 class="caldm-title">🎯 محاسبه TDEE (نیاز روزانه)</h3>
+    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </form>
+  <div class="caldm-body tdee-body"></div>
+</dialog>
+
 <!-- 📏 Body metric modal -->
 <dialog id="fitMetricModal">
   <form method="dialog" class="caldm-head">
@@ -4925,6 +5116,23 @@ const DEFAULT = {
   /* ── 📏 Body metrics ── */
   bodyMetrics: [], /* [{date:'YYYY-MM-DD', weight, bodyFatPct?, waist?, chest?, arm?, thigh?, neck?, note?}] */
   bodyGoals: { targetWeight: null, deadline: null, type: null }, /* type: 'cut'|'maintain'|'bulk' */
+  /* ── 🥗 Nutrition ── */
+  nutrition: {
+    meals: {},          /* { 'YYYY-MM-DD': [{mealType, foods:[{foodId, grams}], time}] } */
+    waterLog: {},       /* { 'YYYY-MM-DD': cupCount } */
+    customFoods: [],    /* user-added foods beyond the library */
+    goals: {
+      calories: 2000, protein: 120, carbs: 250, fat: 65,    /* daily targets */
+      fiber: 30, sodium: 2300,                              /* mg for sodium */
+      water: 8,                                             /* glasses */
+    },
+    bodyInfo: {
+      gender: null, age: null, heightCm: null, weightKg: null,
+      activityLevel: 'moderate',  /* sedentary|light|moderate|active|veryActive */
+      goalType: 'maintain',       /* cut|maintain|bulk */
+      lastTDEE: null,
+    },
+  },
   /* ── Onboarding ── */
   onboardingDone: false, /* true after user finishes or skips first-run tour */
   /* ── Behavior analytics (privacy: local only, never sent anywhere) ── */
@@ -8275,6 +8483,8 @@ const CMD_STATIC_COMMANDS = [
   { id:'fitness',    title:'تناسب اندام',             icon:'🏋', kind:'command', sub:'برنامه تمرین، جلسه زنده، رکوردها', run: () => { if (typeof switchPage==='function') switchPage('fitness'); } },
   { id:'fit-start',  title:'شروع تمرین امروز',         icon:'🔥', kind:'command', sub:'جلسه تمرین رو همین الان شروع کن', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ openFitSession(false); }catch{} }, 200); } },
   { id:'fit-metric', title:'ثبت وزن/اندازه',           icon:'📏', kind:'command', sub:'سنجش بدن جدید', run: () => { try { openFitMetricModal(); } catch {} } },
+  { id:'nutrition',  title:'تغذیه — وعده‌ها',           icon:'🥗', kind:'command', sub:'ثبت غذا، ماکرو، آب', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ setFitSubTab('nutrition'); }catch{} }, 150); } },
+  { id:'tdee',       title:'محاسبه TDEE',               icon:'🎯', kind:'command', sub:'هدف کالری روزانه', run: () => { try { openTDEEModal(); } catch {} } },
   { id:'excel',      title:'خروجی Excel',              icon:'📊', kind:'command', sub:'xlsx با ۴ شیت', run: () => exportToExcel() },
   { id:'theme',      title:'تغییر تم رنگی',          icon:'🎨', kind:'command', run: () => document.getElementById('themePickerBtn')?.click() },
   { id:'dark',       title:'تغییر حالت روشن/تاریک',  icon:'🌙', kind:'command', run: () => document.getElementById('darkToggle')?.click() },
@@ -10283,20 +10493,22 @@ function renderFitness() {
   const root = document.getElementById('fitnessRoot');
   if (!root) return;
   const subs = [
-    { id:'today',    label:'امروز',     emoji:'🔥' },
-    { id:'plans',    label:'برنامه‌ها', emoji:'📋' },
-    { id:'progress', label:'پیشرفت',    emoji:'📈' },
-    { id:'metrics',  label:'سنجش',      emoji:'📏' },
+    { id:'today',     label:'امروز',     emoji:'🔥' },
+    { id:'plans',     label:'برنامه‌ها', emoji:'📋' },
+    { id:'nutrition', label:'تغذیه',     emoji:'🥗' },
+    { id:'progress',  label:'پیشرفت',    emoji:'📈' },
+    { id:'metrics',   label:'سنجش',      emoji:'📏' },
   ];
   const tabsHtml = `<div class="fit-subtabs">${subs.map(s =>
     `<button class="fit-subtab ${s.id===_fitSubTab?'active':''}" data-fit-sub="${s.id}">${s.emoji} ${s.label}</button>`
   ).join('')}</div>`;
 
   let body = '';
-  if (_fitSubTab === 'today')    body = _renderFitToday();
-  if (_fitSubTab === 'plans')    body = _renderFitPlans();
-  if (_fitSubTab === 'progress') body = _renderFitProgress();
-  if (_fitSubTab === 'metrics')  body = _renderFitMetrics();
+  if (_fitSubTab === 'today')     body = _renderFitToday();
+  if (_fitSubTab === 'plans')     body = _renderFitPlans();
+  if (_fitSubTab === 'nutrition') body = _renderFitNutrition();
+  if (_fitSubTab === 'progress')  body = _renderFitProgress();
+  if (_fitSubTab === 'metrics')   body = _renderFitMetrics();
 
   root.innerHTML = tabsHtml + `<div class="fit-body">${body}</div>`;
 
@@ -10307,6 +10519,7 @@ function renderFitness() {
 
   // Section-specific wiring after innerHTML set
   _wireFitSectionHandlers();
+  if (_fitSubTab === 'nutrition') _wireNutritionHandlers();
 }
 
 function _todayKey() { return new Date().toISOString().slice(0,10); }
@@ -11019,6 +11232,513 @@ function openFitMetricModal() {
     renderFitness();
     showToast?.('📏 ثبت شد', { duration: 1500 });
   };
+  dlg.showModal();
+}
+
+
+/* ════════════════════════════════════════════════
+   🥗 NUTRITION MODULE — food DB, meal log, macros/micros, TDEE, water
+════════════════════════════════════════════════ */
+function ensureNutritionState() {
+  if (!state.nutrition || typeof state.nutrition !== 'object') state.nutrition = {};
+  const n = state.nutrition;
+  if (!n.meals    || typeof n.meals !== 'object')    n.meals = {};
+  if (!n.waterLog || typeof n.waterLog !== 'object') n.waterLog = {};
+  if (!Array.isArray(n.customFoods)) n.customFoods = [];
+  if (!n.goals || typeof n.goals !== 'object') {
+    n.goals = { calories:2000, protein:120, carbs:250, fat:65, fiber:30, sodium:2300, water:8 };
+  }
+  if (!n.bodyInfo || typeof n.bodyInfo !== 'object') {
+    n.bodyInfo = { gender:null, age:null, heightCm:null, weightKg:null,
+                   activityLevel:'moderate', goalType:'maintain', lastTDEE:null };
+  }
+}
+
+/* Food DB — per 100g unless `serving` overrides.
+   Each item: id, name_fa, name_en, cat, emoji, cal, p (protein g), c (carbs g),
+   f (fat g), fib (fiber g), sodium (mg), iron (mg), calcium (mg), vitC (mg).
+   Iranian-focused (kebab, ghormeh sabzi, polo, etc.) + global staples. */
+const FOOD_LIB = [
+  // ── 🍚 پلو و برنج ──
+  { id:'rice-pl',    name_fa:'چلو سفید',          name_en:'Plain Rice',         cat:'grain', emoji:'🍚', cal:130, p:2.7, c:28,  f:0.3, fib:0.4, sodium:1,   iron:0.2, calcium:10, vitC:0 },
+  { id:'rice-bsm',   name_fa:'برنج بسمتی پخته',   name_en:'Basmati Rice',       cat:'grain', emoji:'🍚', cal:121, p:3,   c:25,  f:0.4, fib:0.4, sodium:0,   iron:0.5, calcium:8,  vitC:0 },
+  { id:'rice-brown', name_fa:'برنج قهوه‌ای',       name_en:'Brown Rice',         cat:'grain', emoji:'🌾', cal:112, p:2.6, c:23,  f:0.9, fib:1.8, sodium:5,   iron:0.5, calcium:10, vitC:0 },
+  { id:'tahdig',     name_fa:'ته‌دیگ',             name_en:'Tahdig',             cat:'grain', emoji:'🍳', cal:280, p:4,   c:38,  f:13,  fib:1,   sodium:120, iron:0.4, calcium:15, vitC:0 },
+  { id:'baghali-pl', name_fa:'باقالی پلو',         name_en:'Baghali Polo',       cat:'grain', emoji:'🌿', cal:190, p:7,   c:30,  f:5,   fib:3,   sodium:200, iron:1.2, calcium:30, vitC:5 },
+  { id:'zereshk-pl', name_fa:'زرشک پلو',           name_en:'Zereshk Polo',       cat:'grain', emoji:'🍒', cal:175, p:3.5, c:35,  f:3,   fib:1.5, sodium:80,  iron:0.6, calcium:18, vitC:8 },
+  { id:'lubia-pl',   name_fa:'لوبیا پلو',          name_en:'Lubia Polo',         cat:'grain', emoji:'🥘', cal:200, p:10,  c:28,  f:6,   fib:2.5, sodium:280, iron:1.8, calcium:35, vitC:3 },
+  { id:'adas-pl',    name_fa:'عدس پلو',            name_en:'Adas Polo',          cat:'grain', emoji:'🌰', cal:185, p:8,   c:32,  f:3.5, fib:4,   sodium:180, iron:2.5, calcium:25, vitC:2 },
+
+  // ── 🍗 خورش و غذاهای اصلی ایرانی ──
+  { id:'ghorme',     name_fa:'قورمه سبزی',         name_en:'Ghormeh Sabzi',      cat:'meal',  emoji:'🥬', cal:155, p:9,   c:8,   f:9,   fib:3,   sodium:380, iron:2.5, calcium:60, vitC:15 },
+  { id:'gheyme',     name_fa:'قیمه',               name_en:'Gheymeh',            cat:'meal',  emoji:'🍲', cal:165, p:9,   c:14,  f:8,   fib:2,   sodium:420, iron:2,   calcium:35, vitC:5 },
+  { id:'fesenjan',   name_fa:'فسنجون',             name_en:'Fesenjan',           cat:'meal',  emoji:'🌰', cal:220, p:11,  c:10,  f:16,  fib:2,   sodium:280, iron:1.8, calcium:30, vitC:3 },
+  { id:'aash',       name_fa:'آش رشته',            name_en:'Ash Reshteh',        cat:'meal',  emoji:'🥣', cal:135, p:6,   c:18,  f:4,   fib:3,   sodium:380, iron:2,   calcium:40, vitC:8 },
+  { id:'aabgoosht',  name_fa:'آبگوشت',             name_en:'Abgoosht',           cat:'meal',  emoji:'🍖', cal:170, p:10,  c:9,   f:10,  fib:2,   sodium:420, iron:2,   calcium:30, vitC:5 },
+  { id:'koofteh',    name_fa:'کوفته تبریزی',       name_en:'Koofteh Tabrizi',    cat:'meal',  emoji:'🍡', cal:190, p:12,  c:12,  f:10,  fib:2.5, sodium:380, iron:2,   calcium:40, vitC:5 },
+  { id:'mirza',      name_fa:'میرزا قاسمی',        name_en:'Mirza Ghasemi',      cat:'meal',  emoji:'🍆', cal:140, p:5,   c:8,   f:10,  fib:3,   sodium:280, iron:1,   calcium:30, vitC:12 },
+  { id:'kashk-bdj',  name_fa:'کشک بادمجان',        name_en:'Kashk Bademjan',     cat:'meal',  emoji:'🍆', cal:155, p:6,   c:9,   f:11,  fib:3,   sodium:380, iron:0.8, calcium:80, vitC:5 },
+  { id:'kookoo-s',   name_fa:'کوکو سبزی',          name_en:'Kookoo Sabzi',       cat:'meal',  emoji:'🍳', cal:165, p:10,  c:5,   f:12,  fib:2,   sodium:280, iron:2,   calcium:60, vitC:25 },
+  { id:'kookoo-sb',  name_fa:'کوکو سیب‌زمینی',     name_en:'Kookoo Sibzamini',   cat:'meal',  emoji:'🥔', cal:175, p:6,   c:18,  f:9,   fib:2,   sodium:280, iron:1,   calcium:30, vitC:8 },
+  { id:'kotlet',     name_fa:'کتلت',               name_en:'Kotlet',             cat:'meal',  emoji:'🍔', cal:220, p:11,  c:18,  f:12,  fib:1.5, sodium:380, iron:1.5, calcium:25, vitC:5 },
+  { id:'estanbol',   name_fa:'استانبولی',          name_en:'Estanbouli',         cat:'meal',  emoji:'🍅', cal:145, p:4,   c:22,  f:5,   fib:2,   sodium:280, iron:0.8, calcium:18, vitC:10 },
+  { id:'shfetne',    name_fa:'شیشلیک',             name_en:'Shishlik',           cat:'meal',  emoji:'🍖', cal:230, p:24,  c:1,   f:14,  fib:0,   sodium:280, iron:2.5, calcium:15, vitC:0 },
+  { id:'haleem',     name_fa:'حلیم',               name_en:'Haleem',             cat:'meal',  emoji:'🌾', cal:165, p:10,  c:20,  f:5,   fib:2.5, sodium:280, iron:2,   calcium:35, vitC:0 },
+
+  // ── 🍗 کباب ──
+  { id:'kab-kobide', name_fa:'کباب کوبیده',        name_en:'Kabab Koobideh',     cat:'meat',  emoji:'🍢', cal:225, p:21,  c:1,   f:15,  fib:0,   sodium:380, iron:2,   calcium:15, vitC:0 },
+  { id:'kab-barg',   name_fa:'کباب برگ',           name_en:'Kabab Barg',         cat:'meat',  emoji:'🥩', cal:185, p:25,  c:0,   f:9,   fib:0,   sodium:280, iron:2.5, calcium:10, vitC:0 },
+  { id:'jujeh',      name_fa:'جوجه کباب',          name_en:'Jujeh Kabab',        cat:'meat',  emoji:'🍗', cal:175, p:25,  c:1,   f:8,   fib:0,   sodium:280, iron:1,   calcium:15, vitC:2 },
+  { id:'chenj',      name_fa:'چنجه',               name_en:'Chenjeh',            cat:'meat',  emoji:'🍖', cal:210, p:26,  c:0,   f:11,  fib:0,   sodium:280, iron:2.5, calcium:10, vitC:0 },
+
+  // ── 🍞 نان ──
+  { id:'sangak',     name_fa:'نان سنگک',           name_en:'Sangak Bread',       cat:'bread', emoji:'🍞', cal:280, p:9,   c:55,  f:1.5, fib:5,   sodium:480, iron:2.5, calcium:30, vitC:0 },
+  { id:'barbari',    name_fa:'نان بربری',          name_en:'Barbari Bread',      cat:'bread', emoji:'🍞', cal:290, p:8,   c:58,  f:2,   fib:3,   sodium:520, iron:2,   calcium:30, vitC:0 },
+  { id:'lavash',     name_fa:'نان لواش',           name_en:'Lavash Bread',       cat:'bread', emoji:'🫓', cal:275, p:8,   c:56,  f:1.5, fib:2.5, sodium:480, iron:1.8, calcium:25, vitC:0 },
+  { id:'taftoon',    name_fa:'نان تافتون',         name_en:'Taftoon Bread',      cat:'bread', emoji:'🫓', cal:280, p:8,   c:57,  f:2,   fib:2.5, sodium:480, iron:2,   calcium:30, vitC:0 },
+
+  // ── 🥩 پروتئین خام/پخته ──
+  { id:'chx-brst',   name_fa:'سینه مرغ پخته',      name_en:'Chicken Breast',     cat:'protein', emoji:'🍗', cal:165, p:31,  c:0,   f:3.6, fib:0,   sodium:74,  iron:0.9, calcium:15, vitC:0 },
+  { id:'chx-thigh',  name_fa:'ران مرغ پخته',       name_en:'Chicken Thigh',      cat:'protein', emoji:'🍗', cal:209, p:26,  c:0,   f:11,  fib:0,   sodium:88,  iron:1.3, calcium:12, vitC:0 },
+  { id:'beef-lean',  name_fa:'گوشت گوساله کم‌چرب', name_en:'Lean Beef',          cat:'protein', emoji:'🥩', cal:217, p:26,  c:0,   f:12,  fib:0,   sodium:55,  iron:2.7, calcium:18, vitC:0 },
+  { id:'lamb',       name_fa:'گوشت گوسفند',        name_en:'Lamb',               cat:'protein', emoji:'🥩', cal:294, p:25,  c:0,   f:21,  fib:0,   sodium:72,  iron:1.9, calcium:17, vitC:0 },
+  { id:'fish-w',     name_fa:'ماهی سفید پخته',     name_en:'White Fish',         cat:'protein', emoji:'🐟', cal:130, p:26,  c:0,   f:3,   fib:0,   sodium:90,  iron:0.5, calcium:25, vitC:0 },
+  { id:'salmon',     name_fa:'سالمون',              name_en:'Salmon',             cat:'protein', emoji:'🐟', cal:208, p:20,  c:0,   f:13,  fib:0,   sodium:59,  iron:0.8, calcium:15, vitC:0 },
+  { id:'tuna-can',   name_fa:'تن ماهی (کنسرو)',    name_en:'Canned Tuna',        cat:'protein', emoji:'🐟', cal:116, p:26,  c:0,   f:1,   fib:0,   sodium:320, iron:1.5, calcium:8,  vitC:0 },
+  { id:'egg',        name_fa:'تخم‌مرغ',            name_en:'Egg',                cat:'protein', emoji:'🥚', cal:155, p:13,  c:1.1, f:11,  fib:0,   sodium:124, iron:1.8, calcium:50, vitC:0 },
+  { id:'egg-white',  name_fa:'سفیده تخم‌مرغ',      name_en:'Egg White',          cat:'protein', emoji:'🥚', cal:52,  p:11,  c:0.7, f:0.2, fib:0,   sodium:166, iron:0,   calcium:7,  vitC:0 },
+  { id:'shrimp',     name_fa:'میگو پخته',          name_en:'Shrimp',             cat:'protein', emoji:'🦐', cal:99,  p:24,  c:0.2, f:0.3, fib:0,   sodium:111, iron:0.5, calcium:70, vitC:0 },
+
+  // ── 🥛 لبنیات ──
+  { id:'milk-w',     name_fa:'شیر کم‌چرب',          name_en:'Low-Fat Milk',       cat:'dairy', emoji:'🥛', cal:50,  p:3.4, c:5,   f:1.8, fib:0,   sodium:44,  iron:0,   calcium:122,vitC:0 },
+  { id:'milk-f',     name_fa:'شیر پرچرب',           name_en:'Whole Milk',         cat:'dairy', emoji:'🥛', cal:61,  p:3.2, c:4.8, f:3.3, fib:0,   sodium:43,  iron:0,   calcium:113,vitC:0 },
+  { id:'yog-pl',     name_fa:'ماست ساده',          name_en:'Plain Yogurt',       cat:'dairy', emoji:'🥣', cal:61,  p:3.5, c:4.7, f:3.3, fib:0,   sodium:46,  iron:0.1, calcium:121,vitC:0.5 },
+  { id:'yog-low',    name_fa:'ماست کم‌چرب',        name_en:'Low-Fat Yogurt',     cat:'dairy', emoji:'🥣', cal:42,  p:4.5, c:5,   f:1,   fib:0,   sodium:50,  iron:0.1, calcium:155,vitC:0.5 },
+  { id:'yog-gk',     name_fa:'ماست یونانی',        name_en:'Greek Yogurt',       cat:'dairy', emoji:'🥣', cal:97,  p:9,   c:3.6, f:5,   fib:0,   sodium:36,  iron:0,   calcium:100,vitC:0 },
+  { id:'doogh',      name_fa:'دوغ',                name_en:'Doogh',              cat:'dairy', emoji:'🥤', cal:33,  p:2,   c:4,   f:1,   fib:0,   sodium:160, iron:0,   calcium:80, vitC:0 },
+  { id:'cheese-w',   name_fa:'پنیر سفید',          name_en:'White Cheese',       cat:'dairy', emoji:'🧀', cal:264, p:18,  c:3,   f:20,  fib:0,   sodium:1200,iron:0.3, calcium:550,vitC:0 },
+  { id:'cheese-ck',  name_fa:'پنیر خامه‌ای',       name_en:'Cream Cheese',       cat:'dairy', emoji:'🧀', cal:342, p:6,   c:4,   f:34,  fib:0,   sodium:330, iron:0.4, calcium:98, vitC:0 },
+  { id:'kashk',      name_fa:'کشک',                name_en:'Kashk',              cat:'dairy', emoji:'🥣', cal:155, p:12,  c:18,  f:3,   fib:0,   sodium:1100,iron:0.5, calcium:180,vitC:0 },
+
+  // ── 🥗 سبزیجات ──
+  { id:'cucumber',   name_fa:'خیار',               name_en:'Cucumber',           cat:'veg',   emoji:'🥒', cal:16,  p:0.7, c:3.6, f:0.1, fib:0.5, sodium:2,   iron:0.3, calcium:16, vitC:3 },
+  { id:'tomato',     name_fa:'گوجه‌فرنگی',         name_en:'Tomato',             cat:'veg',   emoji:'🍅', cal:18,  p:0.9, c:3.9, f:0.2, fib:1.2, sodium:5,   iron:0.3, calcium:10, vitC:14 },
+  { id:'lettuce',    name_fa:'کاهو',               name_en:'Lettuce',            cat:'veg',   emoji:'🥬', cal:15,  p:1.4, c:2.9, f:0.2, fib:1.3, sodium:28,  iron:0.9, calcium:36, vitC:9 },
+  { id:'onion',      name_fa:'پیاز',               name_en:'Onion',              cat:'veg',   emoji:'🧅', cal:40,  p:1.1, c:9.3, f:0.1, fib:1.7, sodium:4,   iron:0.2, calcium:23, vitC:7 },
+  { id:'spinach',    name_fa:'اسفناج',             name_en:'Spinach',            cat:'veg',   emoji:'🥬', cal:23,  p:2.9, c:3.6, f:0.4, fib:2.2, sodium:79,  iron:2.7, calcium:99, vitC:28 },
+  { id:'carrot',     name_fa:'هویج',               name_en:'Carrot',             cat:'veg',   emoji:'🥕', cal:41,  p:0.9, c:9.6, f:0.2, fib:2.8, sodium:69,  iron:0.3, calcium:33, vitC:6 },
+  { id:'potato-b',   name_fa:'سیب‌زمینی پخته',     name_en:'Boiled Potato',      cat:'veg',   emoji:'🥔', cal:87,  p:1.9, c:20,  f:0.1, fib:1.8, sodium:5,   iron:0.3, calcium:5,  vitC:13 },
+  { id:'potato-f',   name_fa:'سیب‌زمینی سرخ‌کرده', name_en:'French Fries',       cat:'veg',   emoji:'🍟', cal:312, p:3.4, c:41,  f:15,  fib:3.8, sodium:210, iron:0.8, calcium:18, vitC:9 },
+  { id:'eggplant',   name_fa:'بادمجان',            name_en:'Eggplant',           cat:'veg',   emoji:'🍆', cal:25,  p:1,   c:6,   f:0.2, fib:3,   sodium:2,   iron:0.2, calcium:9,  vitC:2 },
+  { id:'broccoli',   name_fa:'بروکلی',             name_en:'Broccoli',           cat:'veg',   emoji:'🥦', cal:34,  p:2.8, c:7,   f:0.4, fib:2.6, sodium:33,  iron:0.7, calcium:47, vitC:89 },
+  { id:'cucumber-p', name_fa:'فلفل دلمه',          name_en:'Bell Pepper',        cat:'veg',   emoji:'🫑', cal:31,  p:1,   c:6,   f:0.3, fib:2.1, sodium:4,   iron:0.4, calcium:7,  vitC:127 },
+
+  // ── 🍎 میوه‌ها ──
+  { id:'apple',      name_fa:'سیب',                name_en:'Apple',              cat:'fruit', emoji:'🍎', cal:52,  p:0.3, c:14,  f:0.2, fib:2.4, sodium:1,   iron:0.1, calcium:6,  vitC:4.6 },
+  { id:'banana',     name_fa:'موز',                name_en:'Banana',             cat:'fruit', emoji:'🍌', cal:89,  p:1.1, c:23,  f:0.3, fib:2.6, sodium:1,   iron:0.3, calcium:5,  vitC:8.7 },
+  { id:'orange',     name_fa:'پرتقال',             name_en:'Orange',             cat:'fruit', emoji:'🍊', cal:47,  p:0.9, c:12,  f:0.1, fib:2.4, sodium:0,   iron:0.1, calcium:40, vitC:53 },
+  { id:'grape',      name_fa:'انگور',              name_en:'Grape',              cat:'fruit', emoji:'🍇', cal:69,  p:0.7, c:18,  f:0.2, fib:0.9, sodium:2,   iron:0.4, calcium:10, vitC:10 },
+  { id:'date',       name_fa:'خرما',               name_en:'Date',               cat:'fruit', emoji:'🌴', cal:282, p:2.5, c:75,  f:0.4, fib:8,   sodium:2,   iron:1,   calcium:39, vitC:0.4 },
+  { id:'pomegranate',name_fa:'انار',               name_en:'Pomegranate',        cat:'fruit', emoji:'🌹', cal:83,  p:1.7, c:19,  f:1.2, fib:4,   sodium:3,   iron:0.3, calcium:10, vitC:10 },
+  { id:'fig',        name_fa:'انجیر',              name_en:'Fig',                cat:'fruit', emoji:'🟣', cal:74,  p:0.8, c:19,  f:0.3, fib:2.9, sodium:1,   iron:0.4, calcium:35, vitC:2 },
+  { id:'watermelon', name_fa:'هندوانه',            name_en:'Watermelon',         cat:'fruit', emoji:'🍉', cal:30,  p:0.6, c:8,   f:0.2, fib:0.4, sodium:1,   iron:0.2, calcium:7,  vitC:8 },
+  { id:'melon',      name_fa:'طالبی',              name_en:'Melon',              cat:'fruit', emoji:'🍈', cal:34,  p:0.8, c:8,   f:0.2, fib:0.9, sodium:16,  iron:0.2, calcium:9,  vitC:37 },
+  { id:'kiwi',       name_fa:'کیوی',               name_en:'Kiwi',               cat:'fruit', emoji:'🥝', cal:61,  p:1.1, c:15,  f:0.5, fib:3,   sodium:3,   iron:0.3, calcium:34, vitC:93 },
+  { id:'strawberry', name_fa:'توت‌فرنگی',          name_en:'Strawberry',         cat:'fruit', emoji:'🍓', cal:32,  p:0.7, c:7.7, f:0.3, fib:2,   sodium:1,   iron:0.4, calcium:16, vitC:59 },
+
+  // ── 🥜 مغزها و حبوبات ──
+  { id:'almond',     name_fa:'بادام',              name_en:'Almond',             cat:'nut',   emoji:'🥜', cal:579, p:21,  c:22,  f:50,  fib:12,  sodium:1,   iron:3.7, calcium:269,vitC:0 },
+  { id:'walnut',     name_fa:'گردو',               name_en:'Walnut',             cat:'nut',   emoji:'🌰', cal:654, p:15,  c:14,  f:65,  fib:7,   sodium:2,   iron:2.9, calcium:98, vitC:1 },
+  { id:'pistachio',  name_fa:'پسته',               name_en:'Pistachio',          cat:'nut',   emoji:'🟢', cal:560, p:20,  c:28,  f:45,  fib:10,  sodium:1,   iron:3.9, calcium:105,vitC:5 },
+  { id:'hazelnut',   name_fa:'فندق',               name_en:'Hazelnut',           cat:'nut',   emoji:'🌰', cal:628, p:15,  c:17,  f:61,  fib:10,  sodium:0,   iron:4.7, calcium:114,vitC:6 },
+  { id:'peanut',     name_fa:'بادام‌زمینی',         name_en:'Peanut',             cat:'nut',   emoji:'🥜', cal:567, p:26,  c:16,  f:49,  fib:8.5, sodium:18,  iron:4.6, calcium:92, vitC:0 },
+  { id:'lentil',     name_fa:'عدس پخته',           name_en:'Cooked Lentil',      cat:'legume',emoji:'🌰', cal:116, p:9,   c:20,  f:0.4, fib:8,   sodium:2,   iron:3.3, calcium:19, vitC:1.5 },
+  { id:'chickpea',   name_fa:'نخود پخته',          name_en:'Cooked Chickpea',    cat:'legume',emoji:'🟡', cal:164, p:9,   c:27,  f:2.6, fib:8,   sodium:7,   iron:2.9, calcium:49, vitC:1.3 },
+  { id:'rajme',      name_fa:'لوبیا قرمز پخته',    name_en:'Cooked Red Bean',    cat:'legume',emoji:'🫘', cal:127, p:9,   c:23,  f:0.5, fib:7,   sodium:1,   iron:2.9, calcium:35, vitC:1 },
+
+  // ── ☕ نوشیدنی و سایر ──
+  { id:'water',      name_fa:'آب',                 name_en:'Water',              cat:'drink', emoji:'💧', cal:0,   p:0,   c:0,   f:0,   fib:0,   sodium:0,   iron:0,   calcium:0,  vitC:0 },
+  { id:'tea',        name_fa:'چای بدون شکر',       name_en:'Tea (no sugar)',     cat:'drink', emoji:'🍵', cal:1,   p:0,   c:0.3, f:0,   fib:0,   sodium:3,   iron:0,   calcium:0,  vitC:0 },
+  { id:'coffee',     name_fa:'قهوه',               name_en:'Coffee',             cat:'drink', emoji:'☕', cal:2,   p:0.3, c:0,   f:0,   fib:0,   sodium:5,   iron:0,   calcium:5,  vitC:0 },
+  { id:'oj',         name_fa:'آب پرتقال',          name_en:'Orange Juice',       cat:'drink', emoji:'🥤', cal:45,  p:0.7, c:10,  f:0.2, fib:0.2, sodium:1,   iron:0.2, calcium:11, vitC:50 },
+  { id:'cola',       name_fa:'نوشابه (کولا)',      name_en:'Cola',               cat:'drink', emoji:'🥤', cal:42,  p:0,   c:11,  f:0,   fib:0,   sodium:4,   iron:0,   calcium:2,  vitC:0 },
+  { id:'oil-olive',  name_fa:'روغن زیتون',         name_en:'Olive Oil',          cat:'fat',   emoji:'🫒', cal:884, p:0,   c:0,   f:100, fib:0,   sodium:2,   iron:0.6, calcium:1,  vitC:0 },
+  { id:'butter',     name_fa:'کره',                name_en:'Butter',             cat:'fat',   emoji:'🧈', cal:717, p:0.9, c:0.1, f:81,  fib:0,   sodium:11,  iron:0,   calcium:24, vitC:0 },
+  { id:'honey',      name_fa:'عسل',                name_en:'Honey',              cat:'sweet', emoji:'🍯', cal:304, p:0.3, c:82,  f:0,   fib:0.2, sodium:4,   iron:0.4, calcium:6,  vitC:0.5 },
+  { id:'sugar',      name_fa:'شکر',                name_en:'Sugar',              cat:'sweet', emoji:'🍬', cal:387, p:0,   c:100, f:0,   fib:0,   sodium:1,   iron:0,   calcium:1,  vitC:0 },
+  { id:'choc-dk',    name_fa:'شکلات تلخ',          name_en:'Dark Chocolate',     cat:'sweet', emoji:'🍫', cal:546, p:5,   c:61,  f:31,  fib:7,   sodium:24,  iron:8,   calcium:73, vitC:0 },
+];
+
+const NUTRI_CAT_LABELS = {
+  grain:   { fa:'غلات',    emoji:'🍚', color:'#f59e0b' },
+  meal:    { fa:'خورش',    emoji:'🥘', color:'#dc2626' },
+  meat:    { fa:'کباب',    emoji:'🍢', color:'#b91c1c' },
+  bread:   { fa:'نان',     emoji:'🍞', color:'#d97706' },
+  protein: { fa:'پروتئین', emoji:'🥩', color:'#9333ea' },
+  dairy:   { fa:'لبنیات',  emoji:'🥛', color:'#3b82f6' },
+  veg:     { fa:'سبزیجات', emoji:'🥬', color:'#22c55e' },
+  fruit:   { fa:'میوه',    emoji:'🍎', color:'#ec4899' },
+  nut:     { fa:'مغز',     emoji:'🥜', color:'#a16207' },
+  legume:  { fa:'حبوبات',  emoji:'🫘', color:'#84cc16' },
+  drink:   { fa:'نوشیدنی', emoji:'☕', color:'#0ea5e9' },
+  fat:     { fa:'چربی',    emoji:'🫒', color:'#65a30d' },
+  sweet:   { fa:'شیرینی',  emoji:'🍬', color:'#ec4899' },
+};
+
+const MEAL_TYPES = [
+  { id:'breakfast', label:'صبحانه',     emoji:'🌅' },
+  { id:'snack1',    label:'میان‌وعده ۱', emoji:'🍎' },
+  { id:'lunch',     label:'ناهار',      emoji:'🍽' },
+  { id:'snack2',    label:'میان‌وعده ۲', emoji:'☕' },
+  { id:'dinner',    label:'شام',        emoji:'🌙' },
+];
+
+function getAllFoods() {
+  ensureNutritionState();
+  return [...FOOD_LIB, ...(state.nutrition.customFoods || [])];
+}
+function getFoodById(id) { return getAllFoods().find(f => f.id === id); }
+
+/* Compute totals (cal + 8 macros/micros) for a list of [{foodId, grams}]. */
+function _nutriSumFoods(items) {
+  const sum = { cal:0, p:0, c:0, f:0, fib:0, sodium:0, iron:0, calcium:0, vitC:0 };
+  items.forEach(it => {
+    const fd = getFoodById(it.foodId);
+    if (!fd) return;
+    const r = (it.grams || 0) / 100;
+    Object.keys(sum).forEach(k => { sum[k] += (fd[k] || 0) * r; });
+  });
+  return sum;
+}
+function _todayMeals() {
+  ensureNutritionState();
+  const k = _todayKey();
+  return state.nutrition.meals[k] || [];
+}
+function _nutriTodayTotals() {
+  const all = _todayMeals().reduce((acc, m) => acc.concat(m.foods || []), []);
+  return _nutriSumFoods(all);
+}
+
+function _renderFitNutrition() {
+  ensureNutritionState();
+  const tot = _nutriTodayTotals();
+  const g = state.nutrition.goals;
+  const todayMeals = _todayMeals();
+  const water = state.nutrition.waterLog[_todayKey()] || 0;
+
+  // Ring chart for calories
+  const calPct = Math.min(100, (tot.cal / g.calories) * 100);
+  const ringSize = 120;
+  const r = 52, cx = ringSize/2, cy = ringSize/2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - calPct/100);
+  const ringColor = calPct > 100 ? '#ef4444' : calPct > 90 ? '#f59e0b' : '#22c55e';
+
+  let html = `<div class="nutri-top-grid">
+    <div class="nutri-cal-card">
+      <div class="nutri-ring-wrap">
+        <svg width="${ringSize}" height="${ringSize}" class="nutri-ring">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(139,92,246,0.12)" stroke-width="10"></circle>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${ringColor}" stroke-width="10" stroke-linecap="round"
+                  stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
+                  transform="rotate(-90 ${cx} ${cy})"></circle>
+        </svg>
+        <div class="nutri-ring-center">
+          <div class="nutri-ring-num">${toFaDigits(Math.round(tot.cal))}</div>
+          <div class="nutri-ring-lbl">از ${toFaDigits(g.calories)}</div>
+        </div>
+      </div>
+      <div class="nutri-cal-tag">کالری امروز</div>
+    </div>
+    <div class="nutri-macros">
+      ${_renderMacroBar('پروتئین', tot.p, g.protein, 'g', '#ef4444')}
+      ${_renderMacroBar('کربوهیدرات', tot.c, g.carbs, 'g', '#f59e0b')}
+      ${_renderMacroBar('چربی', tot.f, g.fat, 'g', '#3b82f6')}
+      ${_renderMacroBar('فیبر', tot.fib, g.fiber, 'g', '#22c55e')}
+    </div>
+  </div>`;
+
+  // Micros (collapsed details)
+  html += `<details class="nutri-micros">
+    <summary>📊 ریزمغذی‌ها</summary>
+    <div class="nutri-micro-grid">
+      <div class="nutri-micro"><b>${toFaDigits(Math.round(tot.sodium))}</b><span>mg سدیم</span></div>
+      <div class="nutri-micro"><b>${toFaDigits(tot.iron.toFixed(1))}</b><span>mg آهن</span></div>
+      <div class="nutri-micro"><b>${toFaDigits(Math.round(tot.calcium))}</b><span>mg کلسیم</span></div>
+      <div class="nutri-micro"><b>${toFaDigits(Math.round(tot.vitC))}</b><span>mg ویت C</span></div>
+    </div>
+  </details>`;
+
+  // Water tracker
+  const waterPct = Math.min(100, (water / g.water) * 100);
+  html += `<div class="nutri-water-card">
+    <div class="nutri-water-head">
+      <span>💧 آب امروز</span>
+      <span class="nutri-water-count">${toFaDigits(water)}/${toFaDigits(g.water)} لیوان</span>
+    </div>
+    <div class="nutri-water-cups" id="nutriWaterCups">
+      ${Array.from({length: g.water}, (_, i) =>
+        `<button type="button" class="nutri-cup ${i < water ? 'filled' : ''}" data-cup="${i+1}">💧</button>`
+      ).join('')}
+    </div>
+  </div>`;
+
+  // 5 meal cards
+  html += `<div class="fit-section-head" style="margin-top:14px"><h3>🍽 وعده‌های امروز</h3>
+    <button class="ghost-btn fit-tiny-btn" id="nutriTDEEBtn">🎯 TDEE</button></div>
+    <div class="nutri-meal-list">`;
+  MEAL_TYPES.forEach(mt => {
+    const meal = todayMeals.find(m => m.mealType === mt.id);
+    const foods = meal ? meal.foods : [];
+    const mealTot = _nutriSumFoods(foods);
+    html += `<div class="nutri-meal-card">
+      <div class="nutri-meal-head">
+        <span class="nutri-meal-emoji">${mt.emoji}</span>
+        <span class="nutri-meal-name">${mt.label}</span>
+        ${foods.length ? `<span class="nutri-meal-cal">${toFaDigits(Math.round(mealTot.cal))} کالری</span>` : ''}
+        <button type="button" class="ghost-btn fit-tiny-btn" data-add-meal="${mt.id}">+ غذا</button>
+      </div>
+      ${foods.length ? `<div class="nutri-meal-foods">
+        ${foods.map((it, fi) => {
+          const fd = getFoodById(it.foodId);
+          if (!fd) return '';
+          return `<div class="nutri-food-row">
+            <span class="nutri-food-emoji">${fd.emoji}</span>
+            <span class="nutri-food-name">${e(fd.name_fa)}</span>
+            <span class="nutri-food-grams">${toFaDigits(it.grams)}<span>g</span></span>
+            <button type="button" class="nutri-food-del" data-meal="${mt.id}" data-fi="${fi}">✕</button>
+          </div>`;
+        }).join('')}
+      </div>` : `<div class="nutri-meal-empty">هنوز غذایی ثبت نشده</div>`}
+    </div>`;
+  });
+  html += `</div>`;
+
+  return html;
+}
+
+function _renderMacroBar(label, cur, target, unit, color) {
+  const pct = target > 0 ? Math.min(100, (cur/target)*100) : 0;
+  return `<div class="nutri-macro-row">
+    <div class="nutri-macro-head">
+      <span>${label}</span>
+      <span><b>${toFaDigits(cur.toFixed(0))}</b> / ${toFaDigits(target)} ${unit}</span>
+    </div>
+    <div class="nutri-macro-bar"><div class="nutri-macro-fill" style="width:${pct.toFixed(1)}%;background:${color}"></div></div>
+  </div>`;
+}
+
+function _wireNutritionHandlers() {
+  // Water cups
+  document.querySelectorAll('.nutri-cup').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const n = +btn.dataset.cup;
+      const k = _todayKey();
+      const cur = state.nutrition.waterLog[k] || 0;
+      // Click on a filled cup at exact position N → set to N-1 (uncheck), else set to N
+      state.nutrition.waterLog[k] = (cur === n) ? n - 1 : n;
+      if (state.nutrition.waterLog[k] === state.nutrition.goals.water) {
+        try { grantXP?.(15, 'water-full'); } catch {}
+      }
+      save(); renderFitness();
+    });
+  });
+  // Add-food per meal
+  document.querySelectorAll('[data-add-meal]').forEach(btn => {
+    btn.addEventListener('click', () => openNutriAddFood(btn.dataset.addMeal));
+  });
+  // Delete food
+  document.querySelectorAll('.nutri-food-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mt = btn.dataset.meal, fi = +btn.dataset.fi;
+      const k = _todayKey();
+      const meals = state.nutrition.meals[k] || [];
+      const meal = meals.find(m => m.mealType === mt);
+      if (!meal) return;
+      meal.foods.splice(fi, 1);
+      if (!meal.foods.length) {
+        state.nutrition.meals[k] = meals.filter(m => m.mealType !== mt);
+      }
+      if (!(state.nutrition.meals[k] || []).length) delete state.nutrition.meals[k];
+      save(); renderFitness();
+    });
+  });
+  // TDEE button
+  document.getElementById('nutriTDEEBtn')?.addEventListener('click', openTDEEModal);
+}
+
+/* ── Food picker for meal ── */
+function openNutriAddFood(mealType) {
+  const dlg = document.getElementById('nutriAddFoodModal');
+  if (!dlg) return;
+  let filter = '', cat = 'all', selectedId = null, grams = 100;
+
+  function renderPicker() {
+    const body = dlg.querySelector('.naf-body');
+    const all = getAllFoods();
+    const q = filter.toLowerCase().trim();
+    const filtered = all.filter(x => {
+      if (cat !== 'all' && x.cat !== cat) return false;
+      if (!q) return true;
+      return (x.name_fa + ' ' + x.name_en).toLowerCase().includes(q);
+    });
+    const sel = selectedId ? getFoodById(selectedId) : null;
+    body.innerHTML = `
+      <div class="naf-search-row">
+        <input id="nafSearch" class="input-field" placeholder="جستجو غذا..." value="${e(filter)}" autocomplete="off" />
+      </div>
+      <div class="naf-cat-row">
+        <button type="button" class="fxp-cat ${cat==='all'?'active':''}" data-cat="all">همه</button>
+        ${Object.entries(NUTRI_CAT_LABELS).map(([k,v]) =>
+          `<button type="button" class="fxp-cat ${cat===k?'active':''}" data-cat="${k}" style="--cat-color:${v.color}">${v.emoji} ${v.fa}</button>`
+        ).join('')}
+      </div>
+      ${sel ? `
+        <div class="naf-selected">
+          <div class="naf-sel-head">
+            <span class="naf-sel-emoji">${sel.emoji}</span>
+            <span class="naf-sel-name">${e(sel.name_fa)}</span>
+            <button type="button" class="ghost-btn fit-tiny-btn" id="nafClear">تغییر</button>
+          </div>
+          <div class="naf-sel-macros">
+            <span>${toFaDigits(Math.round(sel.cal*grams/100))} کالری</span>
+            <span>P ${toFaDigits((sel.p*grams/100).toFixed(1))}</span>
+            <span>C ${toFaDigits((sel.c*grams/100).toFixed(1))}</span>
+            <span>F ${toFaDigits((sel.f*grams/100).toFixed(1))}</span>
+          </div>
+          <div class="modal-field">
+            <label>گرم (مقدار)</label>
+            <input id="nafGrams" type="number" class="input-field" value="${grams}" min="1" step="5" />
+          </div>
+          <button type="button" class="primary-btn" id="nafSaveBtn" style="width:100%;background:var(--color-primary);color:white;min-height:44px">✓ افزودن به ${MEAL_TYPES.find(m=>m.id===mealType).label}</button>
+        </div>
+      ` : `
+        <div class="fxp-list">
+          ${filtered.slice(0, 80).map(fd =>
+            `<button type="button" class="fxp-item" data-food-id="${fd.id}">
+              <span class="fxp-emoji">${fd.emoji}</span>
+              <span class="fxp-info">
+                <span class="fxp-name">${e(fd.name_fa)}</span>
+                <span class="fxp-meta">${toFaDigits(fd.cal)} کال/۱۰۰g · P${toFaDigits(fd.p)} C${toFaDigits(fd.c)} F${toFaDigits(fd.f)}</span>
+              </span>
+            </button>`
+          ).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>'}
+        </div>
+      `}
+    `;
+    const inp = body.querySelector('#nafSearch');
+    inp?.addEventListener('input', () => { filter = inp.value; renderPicker(); inp.focus(); });
+    body.querySelectorAll('.fxp-cat').forEach(b => b.addEventListener('click', () => { cat = b.dataset.cat; renderPicker(); }));
+    body.querySelectorAll('.fxp-item').forEach(b => b.addEventListener('click', () => { selectedId = b.dataset.foodId; renderPicker(); }));
+    body.querySelector('#nafClear')?.addEventListener('click', () => { selectedId = null; renderPicker(); });
+    body.querySelector('#nafGrams')?.addEventListener('input', ev => { grams = +ev.target.value || 0; renderPicker(); });
+    body.querySelector('#nafSaveBtn')?.addEventListener('click', () => {
+      if (!selectedId || grams <= 0) return;
+      const k = _todayKey();
+      ensureNutritionState();
+      if (!state.nutrition.meals[k]) state.nutrition.meals[k] = [];
+      let meal = state.nutrition.meals[k].find(m => m.mealType === mealType);
+      if (!meal) {
+        meal = { mealType, foods: [], time: new Date().toISOString() };
+        state.nutrition.meals[k].push(meal);
+      }
+      meal.foods.push({ foodId: selectedId, grams });
+      save();
+      try { trackEvent?.('meal-log'); } catch {}
+      try { grantXP?.(5, 'meal-log'); } catch {}
+      dlg.close();
+      renderFitness();
+      showToast?.('🍽 ثبت شد', { duration: 1500 });
+    });
+  }
+  renderPicker();
+  dlg.showModal();
+}
+
+/* ── TDEE Calculator modal (Mifflin-St Jeor) ── */
+function openTDEEModal() {
+  ensureNutritionState();
+  const dlg = document.getElementById('tdeeModal');
+  const b = state.nutrition.bodyInfo;
+  const body = dlg.querySelector('.tdee-body');
+
+  function renderTDEE() {
+    let tdee = b.lastTDEE;
+    if (b.gender && b.age && b.heightCm && b.weightKg) {
+      // Mifflin-St Jeor BMR
+      let bmr;
+      if (b.gender === 'male') bmr = 10*b.weightKg + 6.25*b.heightCm - 5*b.age + 5;
+      else                     bmr = 10*b.weightKg + 6.25*b.heightCm - 5*b.age - 161;
+      const mult = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, veryActive:1.9 }[b.activityLevel] || 1.55;
+      tdee = Math.round(bmr * mult);
+      // Goal adjustment
+      const adj = { cut:-500, maintain:0, bulk:+300 }[b.goalType] || 0;
+      tdee += adj;
+    }
+
+    body.innerHTML = `
+      <div class="modal-field">
+        <label>جنسیت</label>
+        <div class="money-tx-type-row">
+          <button type="button" class="money-tx-type ${b.gender==='male'?'active':''}" data-gen="male">👨 مرد</button>
+          <button type="button" class="money-tx-type ${b.gender==='female'?'active':''}" data-gen="female">👩 زن</button>
+        </div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field"><label>سن</label><input id="tdeeAge" type="number" class="input-field" value="${b.age||''}" min="1" /></div>
+        <div class="modal-field"><label>قد (cm)</label><input id="tdeeH" type="number" class="input-field" value="${b.heightCm||''}" min="1" /></div>
+      </div>
+      <div class="modal-field"><label>وزن (kg)</label><input id="tdeeW" type="number" class="input-field" value="${b.weightKg||''}" min="1" step="0.5" /></div>
+      <div class="modal-field">
+        <label>سطح فعالیت</label>
+        <select id="tdeeAct" class="input-field" style="height:42px">
+          <option value="sedentary"  ${b.activityLevel==='sedentary'?'selected':''}>کم‌تحرک (پشت میز)</option>
+          <option value="light"      ${b.activityLevel==='light'?'selected':''}>سبک (۱-۳ روز ورزش)</option>
+          <option value="moderate"   ${b.activityLevel==='moderate'?'selected':''}>متوسط (۳-۵ روز ورزش)</option>
+          <option value="active"     ${b.activityLevel==='active'?'selected':''}>فعال (۶-۷ روز ورزش)</option>
+          <option value="veryActive" ${b.activityLevel==='veryActive'?'selected':''}>خیلی فعال (ورزش سنگین روزانه)</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>هدف</label>
+        <div class="money-tx-type-row">
+          <button type="button" class="money-tx-type ${b.goalType==='cut'?'active':''}"      data-goal="cut">📉 کاهش وزن</button>
+          <button type="button" class="money-tx-type ${b.goalType==='maintain'?'active':''}" data-goal="maintain">⚖ حفظ</button>
+          <button type="button" class="money-tx-type ${b.goalType==='bulk'?'active':''}"     data-goal="bulk">📈 افزایش</button>
+        </div>
+      </div>
+      ${tdee ? `<div class="tdee-result">
+        <div class="tdee-num">${toFaDigits(tdee)} <span>کالری/روز</span></div>
+        <div class="tdee-hint">پیشنهاد ماکرو روزانه:</div>
+        <div class="tdee-macros">
+          <span>🥩 ${toFaDigits(Math.round(tdee*0.30/4))}g پروتئین</span>
+          <span>🍚 ${toFaDigits(Math.round(tdee*0.40/4))}g کربو</span>
+          <span>🫒 ${toFaDigits(Math.round(tdee*0.30/9))}g چربی</span>
+        </div>
+        <button type="button" class="primary-btn" id="tdeeApply" style="margin-top:12px;width:100%;background:var(--color-primary);color:white;min-height:42px">✓ اعمال این هدف‌ها</button>
+      </div>` : `<div class="tdee-hint" style="text-align:center;padding:20px">همه فیلدها رو پر کن تا محاسبه کنیم</div>`}
+    `;
+
+    body.querySelectorAll('[data-gen]').forEach(btn => btn.addEventListener('click', () => { b.gender = btn.dataset.gen; renderTDEE(); }));
+    body.querySelectorAll('[data-goal]').forEach(btn => btn.addEventListener('click', () => { b.goalType = btn.dataset.goal; renderTDEE(); }));
+    body.querySelector('#tdeeAge')?.addEventListener('input', e => { b.age = +e.target.value || null; renderTDEE(); });
+    body.querySelector('#tdeeH')?.addEventListener('input', e => { b.heightCm = +e.target.value || null; renderTDEE(); });
+    body.querySelector('#tdeeW')?.addEventListener('input', e => { b.weightKg = +e.target.value || null; renderTDEE(); });
+    body.querySelector('#tdeeAct')?.addEventListener('change', e => { b.activityLevel = e.target.value; renderTDEE(); });
+    body.querySelector('#tdeeApply')?.addEventListener('click', () => {
+      b.lastTDEE = tdee;
+      state.nutrition.goals.calories = tdee;
+      state.nutrition.goals.protein = Math.round(tdee*0.30/4);
+      state.nutrition.goals.carbs   = Math.round(tdee*0.40/4);
+      state.nutrition.goals.fat     = Math.round(tdee*0.30/9);
+      save();
+      dlg.close();
+      renderFitness();
+      showToast?.('🎯 هدف‌های روزانه به‌روزرسانی شد', { duration: 2200 });
+    });
+  }
+  renderTDEE();
   dlg.showModal();
 }
 
