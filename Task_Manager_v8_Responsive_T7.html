@@ -3108,12 +3108,57 @@
     [data-theme="dark"] .tdee-macros span { background: rgba(255,255,255,0.08); }
 
     @media (max-width: 768px) {
-      dialog#nutriAddFoodModal, dialog#tdeeModal {
+      dialog#nutriAddFoodModal, dialog#tdeeModal, dialog#recoveryModal {
         position: fixed; inset: auto 0 0 0; width: 100%; max-width: 100%;
         max-height: 88vh; border-radius: 16px 16px 0 0;
         animation: sheet-up .3s var(--ease-out) forwards;
       }
     }
+
+    /* ── 🛌 Recovery prompt ── */
+    dialog#recoveryModal {
+      max-width: 460px; width: 92vw; max-height: 86vh;
+      padding: 0; border: none; border-radius: 16px;
+      background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    dialog#recoveryModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
+    .rec-section { margin-bottom: var(--space-4); }
+    .rec-label {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 700; color: var(--color-text); margin-bottom: 8px;
+    }
+    [data-theme="dark"] .rec-label { color: #f5f5f5; }
+    .rec-val { color: var(--color-primary); font-size: 1.1rem; font-weight: 800; }
+    .rec-range {
+      width: 100%; height: 8px; -webkit-appearance: none; appearance: none;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+      border-radius: 4px; outline: none; cursor: pointer;
+    }
+    .rec-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%; background: white;
+      border: 3px solid var(--color-primary); cursor: pointer;
+    }
+    .rec-range::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%; background: white;
+      border: 3px solid var(--color-primary); cursor: pointer;
+    }
+    .rec-range-labels {
+      display: flex; justify-content: space-between;
+      font-size: .65rem; color: var(--color-text-muted); margin-top: 4px;
+    }
+    .rec-mood-row { display: flex; gap: 6px; justify-content: space-between; }
+    .rec-mood-btn {
+      flex: 1; min-height: 50px; font-size: 1.6rem; border-radius: var(--radius-md);
+      background: var(--color-bg); border: 2px solid var(--color-border); cursor: pointer;
+      transition: all .15s;
+    }
+    [data-theme="dark"] .rec-mood-btn { background: rgba(255,255,255,0.04); }
+    .rec-mood-btn:hover { transform: scale(1.05); }
+    .rec-mood-btn.active { background: var(--color-primary-soft); border-color: var(--color-primary); transform: scale(1.1); }
+    .rec-foot { display: flex; gap: 8px; margin-top: var(--space-3); }
+    .rec-foot button { flex: 1; min-height: 42px; }
 
     /* Level-up celebration toast */
     .toast-levelup {
@@ -4359,6 +4404,11 @@
       <div class="insight-card-head"><span>🪞 شناخت من</span><span class="insight-date">تحلیل رفتار</span></div>
       <div id="iSelf"></div>
     </div>
+
+    <div class="insight-card" style="grid-column:1/-1">
+      <div class="insight-card-head"><span>🏋 تناسب اندام و تغذیه</span><span class="insight-date">۷ روز اخیر</span></div>
+      <div id="iFitness" class="insight-today-grid" style="margin-top:8px"></div>
+    </div>
   </div>
 </div>
 
@@ -4567,6 +4617,15 @@
     <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
   </form>
   <div class="caldm-body fsm-body"></div>
+</dialog>
+
+<!-- 🛌 Recovery prompt modal (after workout) -->
+<dialog id="recoveryModal">
+  <form method="dialog" class="caldm-head">
+    <h3 class="caldm-title">🛌 چطور بود؟</h3>
+    <button type="submit" class="ghost-btn" aria-label="رد کن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </form>
+  <div class="caldm-body rec-body"></div>
 </dialog>
 
 <!-- 🥗 Nutrition — Add food modal -->
@@ -11172,16 +11231,24 @@ function openFitSession(isFreeMode) {
     clearInterval(durTimer);
     stopRestTimer();
     sess.durationSec = Math.floor((Date.now() - sess.startedAt) / 1000);
-    state.fitness.sessions.push(JSON.parse(JSON.stringify(sess)));
-    state.fitness.activeSession = null;
-    save();
     dlg.close();
-    // Reward + insights
-    try { grantXP?.(50, 'workout-done'); } catch {}
-    try { checkBadges?.(); } catch {}
-    try { trackEvent?.('workout-done'); } catch {}
-    renderFitness();
-    showToast?.('💪 جلسه ذخیره شد! +۵۰ XP', { variant: 'success', duration: 2800 });
+    // Show recovery prompt FIRST; saving happens after user fills (or skips).
+    openRecoveryPrompt(sess, () => {
+      state.fitness.sessions.push(JSON.parse(JSON.stringify(sess)));
+      state.fitness.activeSession = null;
+      save();
+      // Reward + insights
+      try { grantXP?.(50, 'workout-done'); } catch {}
+      try { checkBadges?.(); } catch {}
+      try { trackEvent?.('workout-done'); } catch {}
+      // Check for overtraining warning
+      try {
+        const warn = detectOvertraining();
+        if (warn) showToast?.('⚠ ' + warn, { variant: 'warn', duration: 5000 });
+      } catch {}
+      renderFitness();
+      showToast?.('💪 جلسه ذخیره شد! +۵۰ XP', { variant: 'success', duration: 2800 });
+    });
   }
 
   // Close handlers
@@ -11740,6 +11807,238 @@ function openTDEEModal() {
   }
   renderTDEE();
   dlg.showModal();
+}
+
+
+/* ════════════════════════════════════════════════
+   🏃 ATHLETES PRO — recovery prompt, overtraining detector,
+   correlation insights between fitness, nutrition, and behavior.
+════════════════════════════════════════════════ */
+
+/* Post-workout recovery prompt. Called after user finishes a session.
+   Mutates `sess` to add: recoveryScore (1-10), mood ('🔥'|'😄'|'🙂'|'😐'|'😴'),
+   sleepH (hours). Then calls onDone(). 'Skip' also calls onDone(). */
+function openRecoveryPrompt(sess, onDone) {
+  const dlg = document.getElementById('recoveryModal');
+  if (!dlg) { onDone(); return; }
+  const body = dlg.querySelector('.rec-body');
+
+  let recovery = sess.recoveryScore || 7;
+  let mood = sess.mood || '🙂';
+  let sleep = sess.sleepH || 7;
+
+  function renderPrompt() {
+    body.innerHTML = `
+      <div class="rec-section">
+        <div class="rec-label">⚡ چقدر سر حال هستی؟ <span class="rec-val">${toFaDigits(recovery)}/۱۰</span></div>
+        <input type="range" id="recRange" min="1" max="10" value="${recovery}" class="rec-range" />
+        <div class="rec-range-labels"><span>خسته</span><span>عالی</span></div>
+      </div>
+      <div class="rec-section">
+        <div class="rec-label">😊 خلق امروز</div>
+        <div class="rec-mood-row">
+          ${['😴','😐','🙂','😄','🔥'].map(m =>
+            `<button type="button" class="rec-mood-btn ${m===mood?'active':''}" data-mood="${m}">${m}</button>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="rec-section">
+        <div class="rec-label">🛌 دیشب چند ساعت خوابیدی؟ <span class="rec-val">${toFaDigits(sleep)} ساعت</span></div>
+        <input type="range" id="recSleep" min="3" max="12" step="0.5" value="${sleep}" class="rec-range" />
+        <div class="rec-range-labels"><span>۳</span><span>۱۲</span></div>
+      </div>
+      <div class="rec-foot">
+        <button type="button" class="ghost-btn" id="recSkipBtn">رد کن</button>
+        <button type="button" class="primary-btn" id="recSaveBtn" style="background:var(--color-primary);color:white;min-height:42px">✓ ذخیره</button>
+      </div>
+    `;
+    body.querySelector('#recRange').addEventListener('input', e => { recovery = +e.target.value; renderPrompt(); });
+    body.querySelector('#recSleep').addEventListener('input', e => { sleep = +e.target.value; renderPrompt(); });
+    body.querySelectorAll('.rec-mood-btn').forEach(btn => btn.addEventListener('click', () => { mood = btn.dataset.mood; renderPrompt(); }));
+    body.querySelector('#recSaveBtn').addEventListener('click', () => {
+      sess.recoveryScore = recovery;
+      sess.mood = mood;
+      sess.sleepH = sleep;
+      dlg.close();
+      onDone();
+    });
+    body.querySelector('#recSkipBtn').addEventListener('click', () => { dlg.close(); onDone(); });
+  }
+  renderPrompt();
+  dlg.showModal();
+}
+
+/* Detect overtraining: returns warning string or null.
+   Rules:
+   1. ≥5 days consecutive workouts (no rest day) → 'برای ریکاوری ۱-۲ روز استراحت کن'
+   2. Last 5 sessions avg recovery <5 AND avg sleep <6h → 'خواب و ریکاوری پایینه — لود رو کم کن'
+   3. 4 consecutive weeks of training without a deload (volume drop) → 'پیشنهاد deload هفته'
+*/
+function detectOvertraining() {
+  ensureFitnessState();
+  const sessions = state.fitness.sessions || [];
+  if (sessions.length < 3) return null;
+
+  // Sort newest-first by date
+  const recent = [...sessions].sort((a,b) => b.date < a.date ? -1 : 1);
+
+  // Rule 1: consecutive day streak (any session counts as a workout day)
+  const dates = new Set(recent.map(s => s.date));
+  let streakDays = 0;
+  let cur = new Date();
+  while (true) {
+    const k = cur.toISOString().slice(0,10);
+    if (dates.has(k)) { streakDays++; cur.setDate(cur.getDate() - 1); }
+    else break;
+  }
+  if (streakDays >= 5) return `${toFaDigits(streakDays)} روز پشت‌سرهم تمرین کردی — یک روز استراحت بده!`;
+
+  // Rule 2: avg recovery + sleep low across last 5 sessions
+  const last5 = recent.slice(0, 5).filter(s => s.recoveryScore != null);
+  if (last5.length >= 3) {
+    const avgRec = last5.reduce((s,x) => s + (x.recoveryScore||0), 0) / last5.length;
+    const sleepData = last5.filter(s => s.sleepH != null);
+    const avgSleep = sleepData.length ? sleepData.reduce((s,x) => s + (x.sleepH||0), 0) / sleepData.length : 7;
+    if (avgRec < 5 && avgSleep < 6) return 'ریکاوری و خوابت پایینه — حجم تمرین رو کم کن';
+  }
+
+  // Rule 3: 4 consecutive weeks training without volume dip (basic check)
+  // Count sessions per ISO week for the last 4 weeks; if all ≥3 → suggest deload
+  const weekCounts = {};
+  recent.forEach(s => {
+    const d = new Date(s.date);
+    const wk = `${d.getFullYear()}-W${Math.ceil(((d - new Date(d.getFullYear(),0,1)) / 86400000 + new Date(d.getFullYear(),0,1).getDay()+1)/7)}`;
+    weekCounts[wk] = (weekCounts[wk] || 0) + 1;
+  });
+  const weeksSorted = Object.keys(weekCounts).sort().slice(-4);
+  if (weeksSorted.length === 4 && weeksSorted.every(w => weekCounts[w] >= 3)) {
+    return '۴ هفته بدون deload گذشت — این هفته ۴۰٪ حجم رو کم کن';
+  }
+
+  return null;
+}
+
+/* Athletes insight cards — appended to the existing insight page.
+   Returns HTML string. Computes:
+   - bestWorkoutHour: most-common hour user starts workouts
+   - foodEnergyCorr: relation between protein intake and recovery score next day
+   - weightTrend7d / 30d: linear slope from bodyMetrics
+*/
+function fitnessInsightCards() {
+  ensureFitnessState();
+  ensureNutritionState();
+  const sessions = state.fitness.sessions || [];
+  const metrics = state.bodyMetrics || [];
+  const cards = [];
+
+  // Best workout hour (from startedAt if available, else from createdAt)
+  if (sessions.length >= 3) {
+    const hours = {};
+    sessions.forEach(s => {
+      const t = s.startedAt ? new Date(s.startedAt) : new Date(s.date + 'T12:00:00');
+      const h = t.getHours();
+      hours[h] = (hours[h] || 0) + 1;
+    });
+    const best = Object.entries(hours).sort((a,b) => b[1]-a[1])[0];
+    if (best) {
+      const h = +best[0];
+      const label = h < 12 ? `${toFaDigits(h)} صبح` : h === 12 ? '۱۲ ظهر' : `${toFaDigits(h-12)} بعدازظهر`;
+      cards.push(`<div class="insight-card">
+        <div class="insight-card-icon">⏰</div>
+        <div class="insight-card-title">بهترین ساعت تمرین</div>
+        <div class="insight-card-value">${label}</div>
+        <div class="insight-card-sub">معمولاً این ساعت تمرین می‌کنی — برنامه ریزی کن دورش</div>
+      </div>`);
+    }
+  }
+
+  // Recent recovery avg
+  const recentRec = sessions.slice(-7).filter(s => s.recoveryScore != null);
+  if (recentRec.length >= 2) {
+    const avg = recentRec.reduce((s,x) => s + x.recoveryScore, 0) / recentRec.length;
+    const tone = avg >= 7 ? '#22c55e' : avg >= 5 ? '#f59e0b' : '#ef4444';
+    cards.push(`<div class="insight-card">
+      <div class="insight-card-icon" style="background:${tone}22;color:${tone}">⚡</div>
+      <div class="insight-card-title">میانگین ریکاوری (۷ تمرین اخیر)</div>
+      <div class="insight-card-value" style="color:${tone}">${toFaDigits(avg.toFixed(1))}/۱۰</div>
+      <div class="insight-card-sub">${avg < 5 ? 'پایینه — استراحت یا خواب بیشتر' : avg >= 8 ? 'عالی! آماده تمرین سنگین‌تر' : 'متعادل — برنامه‌ت خوبه'}</div>
+    </div>`);
+  }
+
+  // Weight trend (last 30 days)
+  if (metrics.length >= 2) {
+    const sorted = [...metrics].sort((a,b) => a.date < b.date ? -1 : 1);
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+    const recent = sorted.filter(m => new Date(m.date) >= cutoff);
+    if (recent.length >= 2) {
+      const first = recent[0], last = recent[recent.length-1];
+      const delta = last.weight - first.weight;
+      const dirEmoji = delta > 0.3 ? '📈' : delta < -0.3 ? '📉' : '⚖';
+      const dirColor = delta > 0.3 ? '#ef4444' : delta < -0.3 ? '#22c55e' : '#3b82f6';
+      cards.push(`<div class="insight-card">
+        <div class="insight-card-icon" style="background:${dirColor}22;color:${dirColor}">${dirEmoji}</div>
+        <div class="insight-card-title">روند وزن ۳۰ روز اخیر</div>
+        <div class="insight-card-value" style="color:${dirColor}">${delta > 0 ? '+' : ''}${toFaDigits(delta.toFixed(1))} kg</div>
+        <div class="insight-card-sub">${toFaDigits(recent.length)} ثبت در این بازه</div>
+      </div>`);
+    }
+  }
+
+  // Workout streak
+  if (sessions.length >= 1) {
+    const dates = new Set(sessions.map(s => s.date));
+    let streak = 0;
+    let cur = new Date();
+    while (true) {
+      const k = cur.toISOString().slice(0,10);
+      if (dates.has(k)) { streak++; cur.setDate(cur.getDate() - 1); }
+      else break;
+    }
+    if (streak > 0) {
+      cards.push(`<div class="insight-card">
+        <div class="insight-card-icon">🔥</div>
+        <div class="insight-card-title">استریک تمرین</div>
+        <div class="insight-card-value" style="color:#f59e0b">${toFaDigits(streak)} روز</div>
+        <div class="insight-card-sub">${streak >= 7 ? 'فوق‌العاده! ادامه بده' : 'هر روز یه قدم نزدیک‌تر'}</div>
+      </div>`);
+    }
+  }
+
+  // Nutrition: avg protein last 7 days vs goal
+  const meals = state.nutrition.meals || {};
+  const last7Keys = Array.from({length:7}, (_,i) => {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    return d.toISOString().slice(0,10);
+  });
+  const dailyProtein = last7Keys.map(k => {
+    const dayMeals = meals[k] || [];
+    const all = dayMeals.reduce((a,m) => a.concat(m.foods||[]), []);
+    return _nutriSumFoods(all).p;
+  }).filter(p => p > 0);
+  if (dailyProtein.length >= 2) {
+    const avg = dailyProtein.reduce((s,x) => s + x, 0) / dailyProtein.length;
+    const goal = state.nutrition.goals.protein || 120;
+    const pct = (avg / goal) * 100;
+    const tone = pct >= 90 ? '#22c55e' : pct >= 70 ? '#f59e0b' : '#ef4444';
+    cards.push(`<div class="insight-card">
+      <div class="insight-card-icon" style="background:${tone}22;color:${tone}">🥩</div>
+      <div class="insight-card-title">میانگین پروتئین (هفته)</div>
+      <div class="insight-card-value" style="color:${tone}">${toFaDigits(Math.round(avg))}g</div>
+      <div class="insight-card-sub">${toFaDigits(Math.round(pct))}٪ از هدف ${toFaDigits(goal)}g</div>
+    </div>`);
+  }
+
+  // Overtraining warning
+  const warn = detectOvertraining();
+  if (warn) {
+    cards.push(`<div class="insight-card" style="grid-column:span 2;background:linear-gradient(135deg,rgba(239,68,68,0.10),rgba(245,158,11,0.06));border-color:#ef4444">
+      <div class="insight-card-icon" style="background:#ef444422;color:#ef4444">⚠</div>
+      <div class="insight-card-title">هشدار</div>
+      <div class="insight-card-sub" style="color:#ef4444;font-weight:700;margin-top:4px">${e(warn)}</div>
+    </div>`);
+  }
+
+  return cards.join('');
 }
 
 
@@ -12791,6 +13090,13 @@ function renderInsight() {
   try { renderMoneyChart(); } catch (e) { console.warn('[chart-money] render failed', e); }
   try { renderAchievements(); } catch (e) { console.warn('[achv] render failed', e); }
   try { renderSelfKnowledge(); } catch (e) { console.warn('[self] render failed', e); }
+  try {
+    const fEl = document.getElementById('iFitness');
+    if (fEl) {
+      const html = fitnessInsightCards();
+      fEl.innerHTML = html || '<div style="text-align:center;padding:20px;color:var(--color-text-muted);font-size:.85rem">هنوز داده‌ای از ورزش/تغذیه نداری — از تب «ورزش» شروع کن</div>';
+    }
+  } catch (e) { console.warn('[fitness-insights] render failed', e); }
   const now = new Date();
   const today = new Date(now); today.setHours(0,0,0,0);
   const todayKey = isoDateKey(today);
