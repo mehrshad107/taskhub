@@ -1032,6 +1032,148 @@
 
     @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
+    /* ════════════════════════════════════════════════
+       ✨ UX POLISH — animations, micro-interactions, mobile
+    ════════════════════════════════════════════════ */
+    @keyframes page-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes modal-pop-in {
+      from { opacity: 0; transform: scale(0.92) translateY(8px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+    @keyframes backdrop-fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes ripple-out {
+      from { transform: translate(-50%, -50%) scale(0); opacity: .6; }
+      to   { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+    }
+    @keyframes toast-slide-in {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+    @keyframes toast-slide-out {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-12px); }
+    }
+    @keyframes tab-indicator-grow {
+      from { transform: scaleX(0.4); opacity: 0; }
+      to   { transform: scaleX(1);   opacity: 1; }
+    }
+
+    /* Page transition: each .page.active fades in fresh */
+    .page.active {
+      animation: page-fade-in .28s var(--ease-out) both;
+    }
+
+    /* Modal pop-in (desktop). Mobile keeps sheet-up. */
+    @media (min-width: 769px) {
+      dialog[open] {
+        animation: modal-pop-in .22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+      dialog[open]::backdrop {
+        animation: backdrop-fade .22s ease-out both;
+      }
+    }
+
+    /* Universal button press feedback */
+    button:not(:disabled):active,
+    .primary-btn:not(:disabled):active,
+    .ghost-btn:not(:disabled):active,
+    .icon-btn:not(:disabled):active {
+      transform: scale(0.96);
+      transition: transform .08s ease-out;
+    }
+    /* Hover lift for interactive surfaces (desktop only) */
+    @media (hover: hover) {
+      .primary-btn:not(:disabled):hover,
+      .fit-big-btn:not(:disabled):hover,
+      .ai-fab:hover { will-change: transform; }
+    }
+
+    /* Ripple — added by a one-time JS handler that injects a span on click */
+    .ripple-host { position: relative; overflow: hidden; }
+    .ripple {
+      position: absolute; left: var(--rx, 50%); top: var(--ry, 50%);
+      width: 100px; height: 100px; border-radius: 50%;
+      background: currentColor; opacity: .22; pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple-out .55s ease-out forwards;
+    }
+
+    /* Page tab active indicator: animated underline that slides */
+    .page-tab { position: relative; transition: color .18s ease; }
+    .page-tab.active::after {
+      content: ''; position: absolute; left: 12%; right: 12%; bottom: 0;
+      height: 3px; border-radius: 3px 3px 0 0; background: var(--color-primary);
+      animation: tab-indicator-grow .26s var(--ease-out) both;
+      transform-origin: center;
+    }
+    @media (max-width: 768px) {
+      .page-tab.active::after { left: 18%; right: 18%; height: 3px; bottom: 2px; border-radius: 3px; }
+    }
+
+    /* Fit sub-tabs animated indicator */
+    .fit-subtab { position: relative; transition: color .18s ease, background .18s ease; }
+    .fit-subtab.active::after {
+      content: ''; position: absolute; left: 12%; right: 12%; bottom: 2px;
+      height: 2.5px; border-radius: 2.5px; background: var(--color-primary);
+      animation: tab-indicator-grow .26s var(--ease-out) both;
+    }
+
+    /* FAB hide on scroll-down */
+    #mFab.fab-hidden {
+      transform: translateY(120%) scale(.85);
+      opacity: 0; pointer-events: none;
+    }
+    #mFab { transition: transform .28s var(--ease-out), opacity .2s ease-out, background .15s; }
+
+    /* Toast container: stack at bottom-center */
+    #toastStack {
+      position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 20px));
+      transform: translateX(-50%);
+      z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+      align-items: center; pointer-events: none; max-width: 92vw;
+    }
+    @media (max-width: 768px) {
+      #toastStack { bottom: max(80px, env(safe-area-inset-bottom, 80px)); }
+    }
+    .toast2 {
+      pointer-events: auto; min-width: 240px; max-width: 92vw;
+      padding: 12px 18px; border-radius: 12px;
+      background: var(--color-surface);
+      color: var(--color-text); border: 1px solid var(--color-border);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+      font-size: .85rem; font-weight: 600; line-height: 1.5;
+      animation: toast-slide-in .32s var(--ease-out) both;
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    [data-theme="dark"] .toast2 { background: rgba(40,40,55,0.96); color: #f5f5f5; border-color: rgba(255,255,255,0.1); }
+    .toast2.success { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; }
+    .toast2.warn    { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; }
+    .toast2.error   { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; }
+    .toast2.money   { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; border: none; }
+    .toast2.hide { animation: toast-slide-out .25s ease-in both; }
+    .toast2-bar {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+      background: currentColor; opacity: .35; transform-origin: left center;
+      animation: toast-bar-shrink linear forwards;
+    }
+    @keyframes toast-bar-shrink { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+    /* Respect prefers-reduced-motion: kill animations */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
     @media (max-width: 768px) {
       .mobile-only { display: inline-flex; }
 
@@ -6098,27 +6240,42 @@ let editTaskValueAccountId = null;  // selected account id in edit modal
 /* ── Toast notifications (with optional undo) ── */
 function showToast(msg, opts) {
   opts = opts || {};
-  const stack = document.getElementById('toastStack');
-  if (!stack) return null;
+  let stack = document.getElementById('toastStack');
+  if (!stack) {
+    // Lazy-create the stack if HTML didn't include it (defensive).
+    stack = document.createElement('div'); stack.id = 'toastStack';
+    document.body.appendChild(stack);
+  }
+  // Build new-style toast (uses .toast2 from the polish CSS)
   const t = document.createElement('div');
-  t.className = 'toast ' + (opts.variant ? 'toast-' + opts.variant : '');
+  const variant = opts.variant || '';
+  t.className = 'toast toast2 ' + (variant ? variant + ' toast-' + variant : '');
+  const duration = opts.duration || 4500;
+
   const m = document.createElement('div'); m.className = 'toast-msg'; m.innerHTML = msg;
   t.appendChild(m);
   let timer = null;
   const dismiss = () => {
-    if (t.classList.contains('leaving')) return;
-    t.classList.add('leaving');
+    if (t.classList.contains('leaving') || t.classList.contains('hide')) return;
+    t.classList.add('leaving'); t.classList.add('hide');
     if (timer) clearTimeout(timer);
-    setTimeout(() => t.remove(), 220);
+    setTimeout(() => t.remove(), 280);
   };
   if (opts.undoLabel && typeof opts.onUndo === 'function') {
     const u = document.createElement('button'); u.className = 'toast-undo'; u.type = 'button';
     u.textContent = opts.undoLabel;
-    u.addEventListener('click', () => { try { opts.onUndo(); } catch {} dismiss(); });
+    u.style.cssText = 'margin-inline-start:auto;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:inherit;padding:4px 12px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0';
+    u.addEventListener('click', ev => { ev.stopPropagation(); try { opts.onUndo(); } catch {} dismiss(); });
     t.appendChild(u);
   }
+  // Progress bar
+  const bar = document.createElement('div'); bar.className = 'toast2-bar';
+  bar.style.animationDuration = duration + 'ms';
+  t.appendChild(bar);
+  // Tap-anywhere dismisses (except undo button which stopPropagated)
+  t.addEventListener('click', dismiss);
   stack.appendChild(t);
-  timer = setTimeout(dismiss, opts.duration || 5000);
+  timer = setTimeout(dismiss, duration);
   return { dismiss };
 }
 
@@ -13445,6 +13602,50 @@ applyFontSize(state.fontSize);
 applyCompact();
 renderUserProfile();
 refreshQuickCaptureBadge();
+
+/* ════════════════════════════════════════════════
+   ✨ UX POLISH WIRING — ripple effect + scroll-aware FAB
+════════════════════════════════════════════════ */
+(function setupUXPolish() {
+  // ── Ripple on click for buttons (primary, ghost, page-tab, fit-subtab, ...) ──
+  const RIPPLE_SELECTOR = '.primary-btn, .ghost-btn, .page-tab, .fit-subtab, .icon-btn, .cal-mode-btn, .nutri-cup, .rec-mood-btn, .fit-big-btn, .fxp-cat, .money-tx-type, .fpm-day-tab';
+  document.addEventListener('pointerdown', ev => {
+    const btn = ev.target.closest(RIPPLE_SELECTOR);
+    if (!btn || btn.disabled) return;
+    // Make it a ripple host once.
+    if (!btn.classList.contains('ripple-host')) btn.classList.add('ripple-host');
+    const rect = btn.getBoundingClientRect();
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    r.style.setProperty('--rx', x + 'px');
+    r.style.setProperty('--ry', y + 'px');
+    btn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  }, { passive: true });
+
+  // ── Scroll-aware FAB (hide on scroll-down, show on scroll-up) ──
+  const fab = document.getElementById('mFab');
+  if (fab) {
+    let lastY = window.scrollY || 0;
+    let ticking = false;
+    function onScroll() {
+      const y = window.scrollY || 0;
+      const dy = y - lastY;
+      // Hide only when scrolled down meaningfully AND not near top
+      if (Math.abs(dy) > 6) {
+        if (dy > 0 && y > 80) fab.classList.add('fab-hidden');
+        else fab.classList.remove('fab-hidden');
+        lastY = y;
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(onScroll); ticking = true; }
+    }, { passive: true });
+  }
+})();
 
 /* Start auth bootstrap (non-blocking): shows the gate if Supabase is configured
    and user isn't signed in. App still renders behind it via initial render(). */
