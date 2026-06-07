@@ -260,6 +260,36 @@
     [data-color-theme="rose"]                          { --color-primary:#e11d48; --color-primary-hover:#be123c; --color-primary-soft:#fff1f2; --color-primary-mid:#fda4af; --color-primary-glow:rgba(225,29,72,0.18); }
     [data-color-theme="rose"][data-theme="dark"]       { --color-primary:#fb7185; --color-primary-hover:#fda4af; --color-primary-soft:#4c0519; --color-primary-mid:#9f1239; --color-primary-glow:rgba(251,113,133,0.22); }
 
+    /* 🎀 pink-bow (girly) — full surface tint, not just primary */
+    [data-color-theme="bow"]                           {
+      --color-primary:#db2777; --color-primary-hover:#be185d; --color-primary-soft:#fdf2f8; --color-primary-mid:#f9a8d4; --color-primary-glow:rgba(219,39,119,0.22);
+      --color-bg: #fff5f9; --color-surface: #fffafc; --color-border: #fce7f3; --color-text: #831843; --color-text-muted: #be185d;
+    }
+    [data-color-theme="bow"][data-theme="dark"]        {
+      --color-primary:#f9a8d4; --color-primary-hover:#fbcfe8; --color-primary-soft:#500724; --color-primary-mid:#be185d; --color-primary-glow:rgba(249,168,212,0.28);
+      --color-bg: #1a0a14; --color-surface: #2a0e1d; --color-border: #500724; --color-text: #fce7f3; --color-text-muted: #f9a8d4;
+    }
+    /* Pink bow decoration injected via CSS pseudo on FAB + topbar logo */
+    [data-color-theme="bow"] .ai-fab::after,
+    [data-color-theme="bow"] #mFab::after,
+    [data-color-theme="bow"] .topbar-logo::after {
+      content: '🎀'; position: absolute; top: -6px; inset-inline-end: -4px;
+      font-size: 14px; line-height: 1; pointer-events: none;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+    }
+    [data-color-theme="bow"] #mFab, [data-color-theme="bow"] .ai-fab,
+    [data-color-theme="bow"] .topbar-logo { position: relative; }
+
+    /* 🦇 midnight (Batman vibe) */
+    [data-color-theme="midnight"]                      { --color-primary:#1e1b4b; --color-primary-hover:#0f0d2e; --color-primary-soft:#eef2ff; --color-primary-mid:#a5b4fc; --color-primary-glow:rgba(30,27,75,0.25); }
+    [data-color-theme="midnight"][data-theme="dark"]   { --color-primary:#818cf8; --color-primary-hover:#a5b4fc; --color-primary-soft:#1e1b4b; --color-primary-mid:#312e81; --color-primary-glow:rgba(129,140,248,0.28); }
+
+    /* 🃏 joker (purple+green) */
+    [data-color-theme="joker"]                         { --color-primary:#581c87; --color-primary-hover:#4c1574; --color-primary-soft:#f5f3ff; --color-primary-mid:#c084fc; --color-primary-glow:rgba(88,28,135,0.22); }
+    [data-color-theme="joker"][data-theme="dark"]      { --color-primary:#c084fc; --color-primary-hover:#d8b4fe; --color-primary-soft:#3b0764; --color-primary-mid:#6b21a8; --color-primary-glow:rgba(192,132,252,0.28); }
+    /* Joker accent: green glint on key elements */
+    [data-color-theme="joker"] .primary-btn { box-shadow: 0 0 0 1px rgba(34,197,94,0.35) inset; }
+
     /* ══════════════════════════════════════════════
        BASE RESET
     ══════════════════════════════════════════════ */
@@ -5266,6 +5296,9 @@ const COLOR_THEMES = [
   { id: 'dusk',      name: 'گرگ‌ومیش',  emoji: '🌆',  light: '#7c3aed', dark: '#c084fc' },
   { id: 'mint',      name: 'نعنا',       emoji: '🍃',  light: '#0d9488', dark: '#2dd4bf' },
   { id: 'rose',      name: 'رز-گلد',     emoji: '🌹',  light: '#e11d48', dark: '#fb7185' },
+  { id: 'bow',       name: 'پاپیون',     emoji: '🎀',  light: '#db2777', dark: '#f9a8d4' },
+  { id: 'midnight',  name: 'نیمه‌شب',     emoji: '🦇',  light: '#1e1b4b', dark: '#818cf8' },
+  { id: 'joker',     name: 'جوکر',       emoji: '🃏',  light: '#581c87', dark: '#c084fc' },
 ];
 
 function getPriorities() { return [...PRIORITIES, ...(state.customPriorities||[])]; }
@@ -5884,7 +5917,20 @@ document.getElementById('compactToggleBtn').addEventListener('click', () => {
 });
 
 /* ══ USER PROFILE ══ */
-const PROFILE_EMOJIS = ['😊','😎','🤓','👨‍💻','👩‍💻','🦸','🧠','💪','🌟','🚀','🎯','💎','🔥','⚡','🌈','🦋','🌺','🍀','🐉','🦄','🎭','🌙','☀️','🎨','🎸'];
+const PROFILE_EMOJIS = [
+  // Faces + classic
+  '😊','😎','🤓','👨‍💻','👩‍💻','🥷','🧙','🧙‍♀️','🧛','🧛‍♀️','🤖','👽','👻','💀','☠',
+  // Heroes + villains (no trademarked logos — close emoji approximations)
+  '🦇','🃏','🦸','🦸‍♀️','🦹','🦹‍♀️','👹','👺','🧌','🧝','🧝‍♀️','🧜','🧜‍♀️','🧞','🧞‍♀️',
+  // Beasts
+  '🐉','🦅','🐺','🦁','🐯','🦊','🦂','🕷','🦈','🐙','🦖',
+  // Power / sigils
+  '⚡','🔥','💎','👑','🗡','🏹','⚔','🛡','🪄','🔮','💫','🌟','✨','🎭','🎪',
+  // Soft / cute / pink-vibe
+  '🎀','🦋','🌸','🌺','💖','💕','💗','💝','🌷','🌹','🦄','🍓','🧁','🍡',
+  // Originals
+  '💪','🚀','🎯','🌈','🍀','🌙','☀','🎨','🎸',
+];
 
 function renderUserProfile() {
   const btn = document.getElementById('profileBtn');
@@ -6644,7 +6690,14 @@ document.getElementById('editModalSave').addEventListener('click', ()=>{
 });
 
 /* ══ FOLDER MANAGEMENT ══ */
-const FOLDER_EMOJIS = ['📁','📂','💼','🏠','🎓','💡','🔬','🎨','🎵','🏋️','📚','🌿','⚽','💰','✈️','🎮','🔧','📝','🎯','🌟','❤️','🧪','🖥️','🎪','🛒'];
+const FOLDER_EMOJIS = [
+  // Classics
+  '📁','📂','💼','🏠','🎓','💡','🔬','🎨','🎵','🏋','📚','🌿','⚽','💰','✈','🎮','🔧','📝','🎯','🌟','❤','🧪','🖥','🎪','🛒',
+  // Fantasy / cool
+  '🦇','🃏','🦸','🥷','🧙','🐉','⚡','🔥','🗡','🛡','👑','💎','🪄','🔮','🏰','⚔','🏹',
+  // Pink / soft
+  '🎀','🌸','💖','🦋','🌷','🦄','🧁','🍓',
+];
 
 function renderFolderTabs() {
   const container = document.getElementById('folderTabsContainer');
@@ -9471,7 +9524,14 @@ document.getElementById('weeklyReportPrint').addEventListener('click', () => {
 /* ════════════════════════════════════════════════
    HABIT TRACKER
 ════════════════════════════════════════════════ */
-const HABIT_EMOJIS = ['💧','📖','🏃','💪','🧘','☀️','🌙','🍎','💊','🥗','📚','✍️','🎵','🎨','🛏','💻','📿','🚶','🚴','🧠','❤️','🙏','💬','🌱','⏰','📷','🎯','🔥','✨','🌟'];
+const HABIT_EMOJIS = [
+  // Health / mind
+  '💧','📖','🏃','💪','🧘','☀','🌙','🍎','💊','🥗','📚','✍','🎵','🎨','🛏','💻','📿','🚶','🚴','🧠','❤','🙏','💬','🌱','⏰','📷','🎯','🔥','✨','🌟',
+  // Fantasy / power
+  '🦇','🦸','🥷','🧙','⚡','🗡','🛡','👑','💎','🪄','🐉',
+  // Pink / cute
+  '🎀','🌸','💖','🦋','🦄','🌷',
+];
 
 function ensureHabits() { if (!Array.isArray(state.habits)) state.habits = []; }
 function habitDoneOn(habit, dateKey) {
