@@ -269,16 +269,28 @@
       --color-primary:#f9a8d4; --color-primary-hover:#fbcfe8; --color-primary-soft:#500724; --color-primary-mid:#be185d; --color-primary-glow:rgba(249,168,212,0.28);
       --color-bg: #1a0a14; --color-surface: #2a0e1d; --color-border: #500724; --color-text: #fce7f3; --color-text-muted: #f9a8d4;
     }
-    /* Pink bow decoration injected via CSS pseudo on FAB + topbar logo */
+    /* Pink bow decoration: tilted 🎀 emoji on corner of every primary
+       button (and FAB + topbar logo). Rotate -18deg so it leans like
+       a real ribbon. Anchored to top-end corner (RTL: top-left). */
+    [data-color-theme="bow"] .primary-btn::after,
     [data-color-theme="bow"] .ai-fab::after,
     [data-color-theme="bow"] #mFab::after,
-    [data-color-theme="bow"] .topbar-logo::after {
-      content: '🎀'; position: absolute; top: -6px; inset-inline-end: -4px;
+    [data-color-theme="bow"] .topbar-logo::after,
+    [data-color-theme="bow"] .fit-big-btn::after,
+    [data-color-theme="bow"] .emp-cta::after {
+      content: '🎀';
+      position: absolute; top: -6px; inset-inline-end: -6px;
       font-size: 14px; line-height: 1; pointer-events: none;
+      transform: rotate(-18deg);
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+      z-index: 2;
     }
-    [data-color-theme="bow"] #mFab, [data-color-theme="bow"] .ai-fab,
-    [data-color-theme="bow"] .topbar-logo { position: relative; }
+    [data-color-theme="bow"] .primary-btn,
+    [data-color-theme="bow"] #mFab,
+    [data-color-theme="bow"] .ai-fab,
+    [data-color-theme="bow"] .topbar-logo,
+    [data-color-theme="bow"] .fit-big-btn,
+    [data-color-theme="bow"] .emp-cta { position: relative; overflow: visible; }
 
     /* 🦇 midnight (Batman vibe) */
     [data-color-theme="midnight"]                      { --color-primary:#1e1b4b; --color-primary-hover:#0f0d2e; --color-primary-soft:#eef2ff; --color-primary-mid:#a5b4fc; --color-primary-glow:rgba(30,27,75,0.25); }
