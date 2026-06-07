@@ -359,7 +359,13 @@
       min-width: 0;
     }
 
-    /* ستون سوم (چپ در RTL): دکمه‌های toolbar */
+    /* ستون سوم (چپ در RTL): wrapper برای help + settings — یک grid item */
+    .topbar-end {
+      display: flex; align-items: center; gap: var(--space-2);
+      justify-content: flex-end; min-width: 0;
+    }
+
+    /* toolbar حالا hidden ولی panel‌هایش escape می‌کنن */
     .toolbar { justify-content: flex-end; }
     /* GLOBAL: toolbar icons live inside settings sheet now (desktop + mobile).
        Keep .toolbar in the layout tree so its position:fixed panel descendants
@@ -4381,14 +4387,15 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
     </div>
-    <!-- Help button: explicit "راهنما" next to gear so users don't have to dig -->
-    <button class="mobile-settings-btn" id="topHelpBtn" title="راهنما و میانبرها" aria-label="راهنما"
-            onclick="document.getElementById('helpModal')?.showModal()"
-            style="font-size:1.05rem;font-weight:800;color:var(--color-primary)">❓</button>
-    <!-- Settings entry (now on desktop too — unified menu replaces spread toolbar icons) -->
-    <button class="mobile-settings-btn" id="mSettingsBtn" title="تنظیمات" aria-label="تنظیمات">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-    </button>
+    <!-- Top-left cluster: help + settings. Wrapped so grid sees one item in col 3. -->
+    <div class="topbar-end">
+      <button class="mobile-settings-btn" id="topHelpBtn" title="راهنما و میانبرها" aria-label="راهنما"
+              onclick="document.getElementById('helpModal')?.showModal()"
+              style="font-size:1.05rem;font-weight:800;color:var(--color-primary)">❓</button>
+      <button class="mobile-settings-btn" id="mSettingsBtn" title="تنظیمات" aria-label="تنظیمات">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
   </header>
 
   <!-- PAGE: PLAN -->
@@ -4956,11 +4963,11 @@
 
 <!-- ❓ Help / Shortcuts dialog -->
 <dialog id="helpModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">❓ راهنمای میانبرها و فیچرها</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="helpModal"
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--color-border)">
+    <h3 class="modal-title" style="margin:0">❓ راهنمای میانبرها و فیچرها</h3>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="helpModal" id="helpModalClose"
             onclick="closeDialog('helpModal');return false;" aria-label="بستن"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer;z-index:10;position:relative">✕</button>
   </div>
   <div class="caldm-body">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);font-size:.85rem">
@@ -14364,7 +14371,14 @@ window.closeDialog = function closeDialog(idOrEl) {
   if (!dlg) return;
   try { dlg.close(); } catch (e) {}
   // Force-remove the open attribute even if close() threw or returned silently
-  if (dlg.hasAttribute && dlg.hasAttribute('open')) dlg.removeAttribute('open');
+  try { if (dlg.hasAttribute && dlg.hasAttribute('open')) dlg.removeAttribute('open'); } catch (e) {}
+  // Aggressive last-resort: hide via inline style so even if [open] persists OR
+  // the dialog stays in top-layer, the modal disappears. Restored next tick so
+  // a subsequent .showModal() call works normally.
+  try {
+    dlg.style.display = 'none';
+    setTimeout(() => { try { dlg.style.display = ''; } catch (e) {} }, 60);
+  } catch (e) {}
   // Restore scroll lock in case any path set overflow:hidden
   document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
