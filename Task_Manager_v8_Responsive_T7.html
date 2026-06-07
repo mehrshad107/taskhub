@@ -10898,17 +10898,20 @@ function _renderFitProgress() {
     else break;
   }
 
-  // Compute PRs per exercise (max weight × reps)
+  // Compute PRs per exercise (max weight × reps).
+  // For weight=0 exercises (bodyweight: pullup, pushup, etc.), PR = max reps.
   const prs = {}; // exId → { weight, reps, date }
   sessions.forEach(sess => {
     (sess.exercises || []).forEach(ex => {
       (ex.sets || []).forEach(set => {
         if (!set.done) return;
-        const cur = prs[ex.exId];
-        if (!cur || (set.weight||0) > (cur.weight||0) ||
-            ((set.weight||0) === (cur.weight||0) && (set.reps||0) > (cur.reps||0))) {
-          prs[ex.exId] = { weight: set.weight||0, reps: set.reps||0, date: sess.date };
-        }
+        const w = set.weight || 0, r = set.reps || 0;
+        if (r <= 0) return; // skip empty sets
+        const prev = prs[ex.exId];
+        const better = !prev
+          || w > prev.weight
+          || (w === prev.weight && r > prev.reps);
+        if (better) prs[ex.exId] = { weight: w, reps: r, date: sess.date };
       });
     });
   });
@@ -10924,7 +10927,9 @@ function _renderFitProgress() {
   const prEntries = Object.entries(prs)
     .map(([exId, pr]) => ({ exId, ...pr, ex: getExerciseById(exId) }))
     .filter(p => p.ex)
-    .sort((a,b) => b.weight - a.weight).slice(0, 12);
+    // Sort by weight desc, fallback to reps so bodyweight PRs surface too
+    .sort((a,b) => (b.weight - a.weight) || (b.reps - a.reps))
+    .slice(0, 12);
   if (prEntries.length) {
     html += `<div class="fit-section-head" style="margin-top:20px"><h3>🏆 رکوردهای شخصی</h3></div>
       <div class="fit-pr-list">`;
@@ -12102,8 +12107,16 @@ function _renderFitRecoveryView() {
 
 function _wireRecoveryView() {
   _wireFitBack('today');
-  document.getElementById('recvRange')?.addEventListener('input', e => { _recRecovery = +e.target.value; renderFitness(); });
-  document.getElementById('recvSleep')?.addEventListener('input', e => { _recSleep    = +e.target.value; renderFitness(); });
+  // Sliders: cheap text-only update on every drag (avoid full re-render per pixel)
+  const valEls = document.querySelectorAll('.rec-val');
+  document.getElementById('recvRange')?.addEventListener('input', e => {
+    _recRecovery = +e.target.value;
+    if (valEls[0]) valEls[0].textContent = toFaDigits(_recRecovery) + '/۱۰';
+  });
+  document.getElementById('recvSleep')?.addEventListener('input', e => {
+    _recSleep = +e.target.value;
+    if (valEls[1]) valEls[1].textContent = toFaDigits(_recSleep) + ' ساعت';
+  });
   document.querySelectorAll('[data-recv-mood]').forEach(b => b.addEventListener('click', () => { _recMood = b.dataset.recvMood; renderFitness(); }));
 
   function finishWithRecovery(saveRecovery) {
