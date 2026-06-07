@@ -8151,8 +8151,8 @@ function renderMoney() {
       state.moneyTransactions = state.moneyTransactions.filter(t => t.id !== tx.id);
       save();
       showToast(`🗑 تراکنش حذف شد`, {
-        variant: 'money', duration: 4500,
-        undo: () => { state.moneyTransactions.push(removed); save(); renderMoney(); },
+        variant: 'money', duration: 4500, undoLabel: 'لغو',
+        onUndo: () => { state.moneyTransactions.push(removed); save(); renderMoney(); },
       });
       setTimeout(() => renderMoney(), 260); // wait for slide-out animation
     });
@@ -8522,11 +8522,13 @@ function processRecurringTransactions({ silent = true } = {}) {
   ensureMoneyState();
   const today = new Date().toISOString().slice(0,10);
   let created = 0;
-  let safety = 0; // hard cap to prevent runaway loop on bad data
   state.moneyRecurring.forEach(r => {
     if (!r.active) return;
     if (!r.accountId) return;
-    // catch up: if nextDue <= today, create tx and advance, repeat (capped at 366 to prevent abuse)
+    // catch up: if nextDue <= today, create tx and advance, repeat (capped at 366 PER RULE
+    // to prevent runaway on bad data — previously the cap was shared across all rules,
+    // so later rules could be starved if an earlier rule consumed the budget).
+    let safety = 0;
     while (r.nextDue && r.nextDue <= today && safety < 366) {
       safety++;
       // verify account(s) still exist; if not, deactivate
