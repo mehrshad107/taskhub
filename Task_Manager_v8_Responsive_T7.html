@@ -361,6 +361,24 @@
 
     /* ستون سوم (چپ در RTL): دکمه‌های toolbar */
     .toolbar { justify-content: flex-end; }
+    /* GLOBAL: toolbar icons live inside settings sheet now (desktop + mobile).
+       Keep .toolbar in the layout tree so its position:fixed panel descendants
+       (themePickerPanel, bgPanel, fontSizePanel, ambientPanel) can still escape
+       and render at viewport when triggered via the sheet. Hide via 0x0 + clip. */
+    .toolbar {
+      position: absolute !important; top: 0 !important; left: 0 !important;
+      width: 0 !important; height: 0 !important; padding: 0 !important;
+      gap: 0 !important; flex: 0 0 0 !important; overflow: hidden !important;
+    }
+    /* mSettingsBtn was mobile-only; promote to all viewports */
+    .mobile-settings-btn {
+      width: 40px; height: 40px; flex-shrink: 0; cursor: pointer;
+      border-radius: var(--radius-md); border: 1px solid var(--color-border);
+      background: var(--color-surface); color: var(--color-text);
+      display: inline-grid; place-items: center; font-size: 1.05rem;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .mobile-settings-btn:hover { background: var(--color-primary-soft); border-color: var(--color-primary); color: var(--color-primary); }
 
     .brand { display: flex; align-items: center; gap: var(--space-3); flex-shrink: 0; }
 
@@ -2774,6 +2792,38 @@
     .hof-badge-emoji { font-size: 32px; line-height: 1; }
     .hof-badge-name { font-size: .72rem; font-weight: 700; color: #fde68a; }
     .hof-badge-when { font-size: .62rem; color: #a8987a; }
+    /* Categorized full-list view: 8 collapsible groups, ~100 mini badges */
+    .hof-cat {
+      margin-top: var(--space-3); border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(245,158,11,0.20);
+    }
+    .hof-cat-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; cursor: pointer; font-weight: 700;
+      color: #fde68a; font-size: .85rem; list-style: none;
+    }
+    .hof-cat-head::-webkit-details-marker { display: none; }
+    .hof-cat-head::after { content:'▸'; margin-inline-start:auto; transition: transform .2s; }
+    .hof-cat[open] .hof-cat-head::after { transform: rotate(90deg); }
+    .hof-cat-progress { font-size: .72rem; color: #a8987a; font-weight: 600; }
+    .hof-cat-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 6px; padding: 0 10px 12px;
+    }
+    .hof-mini-badge {
+      padding: 8px 4px; text-align: center; border-radius: 8px;
+      background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06);
+      transition: transform .15s ease; cursor: help;
+    }
+    .hof-mini-badge.got {
+      background: linear-gradient(180deg, rgba(245,158,11,0.18), rgba(245,158,11,0.06));
+      border-color: rgba(245,158,11,0.40);
+    }
+    .hof-mini-badge.locked { opacity: .45; filter: grayscale(.6); }
+    .hof-mini-badge:hover { transform: translateY(-2px); }
+    .hof-mini-emoji { font-size: 20px; line-height: 1; }
+    .hof-mini-name { font-size: .58rem; color: #fde68a; margin-top: 4px; line-height: 1.3; }
+    .hof-mini-badge.locked .hof-mini-name { color: #888; }
 
     .hof-empty {
       padding: var(--space-5); text-align: center; color: #a8987a;
@@ -4315,8 +4365,8 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
     </div>
-    <!-- Mobile-only settings entry -->
-    <button class="mobile-settings-btn mobile-only" id="mSettingsBtn" title="تنظیمات" aria-label="تنظیمات">
+    <!-- Settings entry (now on desktop too — unified menu replaces spread toolbar icons) -->
+    <button class="mobile-settings-btn" id="mSettingsBtn" title="تنظیمات" aria-label="تنظیمات">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
   </header>
@@ -4879,7 +4929,6 @@
       <span><kbd>↑↓</kbd> ناوبری</span>
       <span><kbd>↵</kbd> انتخاب</span>
       <span><kbd>Esc</kbd> بستن</span>
-      <span><button type="button" id="cmdHelpBtn" class="cmd-help-link" style="background:transparent;border:none;color:var(--color-primary);cursor:pointer;font:inherit;padding:0">❓ راهنما</button></span>
       <span class="cmd-footer-tip">دستورهای فوری: <kbd>Ctrl+۱-۵</kbd> تب</span>
     </div>
   </div>
@@ -7540,14 +7589,24 @@ function renderSettingsSheet() {
     <button class="set-row" data-act="notify"><span class="set-ic">💬</span><span class="set-lbl">نوتیفیکیشن</span>${sw(state.notificationsEnabled)}</button>
     <div class="set-group-label">حساب کاربری</div>
     <button class="set-row" data-act="profile"><span class="set-ic">${state.userEmoji||'👤'}</span><span class="set-lbl">${state.userName? e(state.userName) : 'پروفایل'}</span>${chev}</button>
+    <div class="set-group-label">دیگر</div>
+    <button class="set-row" data-act="help"><span class="set-ic">❓</span><span class="set-lbl">راهنما و میانبرها</span>${chev}</button>
+    <button class="set-row" data-act="hof"><span class="set-ic">🏛</span><span class="set-lbl">تالار افتخار</span>${chev}</button>
+    <button class="set-row" data-act="export"><span class="set-ic">💾</span><span class="set-lbl">دانلود پشتیبان</span>${chev}</button>
   `;
   const pickers = { theme:'themePickerBtn', bg:'bgPickerBtn', font:'fontSizeBtn', ambient:'ambientBtn', profile:'profileBtn' };
   const toggles = { dark:'darkToggle', compact:'compactToggleBtn', pomodoro:'pomodoroToggle', sound:'soundToggle', notify:'notifyToggle' };
+  const directs = {
+    help:   () => document.getElementById('helpModal')?.showModal(),
+    hof:    () => { if (typeof openHallOfFame === 'function') openHallOfFame(); },
+    export: () => { if (typeof exportStateAsJSON === 'function') exportStateAsJSON(); },
+  };
   sheet.querySelectorAll('.set-row').forEach(row => {
     row.addEventListener('click', () => {
       const act = row.dataset.act;
       if (pickers[act]) { sheet.hidden = true; document.getElementById(pickers[act]).click(); }
       else if (toggles[act]) { document.getElementById(toggles[act]).click(); renderSettingsSheet(); }
+      else if (directs[act]) { sheet.hidden = true; try { directs[act](); } catch {} }
     });
   });
 }
@@ -9283,10 +9342,6 @@ document.getElementById('cmdInput').addEventListener('input', cmdRender);
 document.getElementById('cmdPalette').addEventListener('click', ev => {
   if (ev.target === document.getElementById('cmdPalette')) cmdClose();
 });
-document.getElementById('cmdHelpBtn')?.addEventListener('click', ev => {
-  ev.stopPropagation(); cmdClose();
-  document.getElementById('helpModal')?.showModal();
-});
 document.getElementById('cmdInput').addEventListener('keydown', ev => {
   if (ev.key === 'Escape') { ev.preventDefault(); cmdClose(); }
   else if (ev.key === 'ArrowDown') { ev.preventDefault(); _cmdActiveIdx = Math.min(_cmdActiveIdx + 1, _cmdCurrentResults.length - 1); cmdUpdateActiveVisual(); }
@@ -10052,27 +10107,199 @@ const LEVELS = [
   { name: 'حرفه‌ای',    min: 3000, color:'#ec4899' },
   { name: 'افسانه',    min: 6000, color:'#f59e0b' },
 ];
+/* BADGES — categorized achievements. Total ~100 across 8 groups.
+   Auto-unlockable ones fire via checkBadges() rules.
+   Profession badges (programming/trading/content/education/accounting)
+   unlock when tasks contain matching Persian keywords (tagged via
+   _badgeKeywordMatch). User can curate "ندیده" sections in HoF. */
+const BADGE_CATEGORIES = {
+  general:    { name: 'عمومی',         emoji: '⭐' },
+  fitness:    { name: 'ورزش',          emoji: '🏋' },
+  programming:{ name: 'برنامه‌نویسی',  emoji: '💻' },
+  trading:    { name: 'ترید و سرمایه', emoji: '📈' },
+  content:    { name: 'تولید محتوا',   emoji: '🎬' },
+  education:  { name: 'آموزش',         emoji: '🎓' },
+  accounting: { name: 'حسابداری',      emoji: '🧾' },
+  personal:   { name: 'شخصی',          emoji: '💫' },
+};
+
 const BADGES = [
-  { id:'first-task',    emoji:'🎯', name:'اولین قدم',     desc:'اولین تسک رو تموم کردی' },
-  { id:'task-100',      emoji:'💯', name:'صد تایی',        desc:'۱۰۰ تسک تموم کردی' },
-  { id:'task-500',      emoji:'🌟', name:'پانصد تایی',    desc:'۵۰۰ تسک تموم کردی' },
-  { id:'streak-7',      emoji:'🔥', name:'یک هفته کامل',  desc:'۷ روز پی‌درپی عادتی رو ادامه دادی' },
-  { id:'streak-30',     emoji:'🏔', name:'یک ماه کامل',   desc:'۳۰ روز پی‌درپی عادت' },
-  { id:'streak-100',    emoji:'💎', name:'صد روز پی‌درپی', desc:'۱۰۰ روز عادت بدون شکست' },
-  { id:'first-account', emoji:'🏦', name:'برنامه‌ریز مالی', desc:'اولین حساب رو ساختی' },
-  { id:'budget-set',    emoji:'🎯', name:'بودجه‌بند',      desc:'بودجه ماهانه تعیین کردی' },
-  { id:'recurring-set', emoji:'🔁', name:'اتومات',         desc:'اولین تراکنش تکرارشونده' },
-  { id:'focus-1000',    emoji:'🧠', name:'تمرکز پولادین',  desc:'۱۰۰۰ دقیقه تمرکز کل' },
-  { id:'focus-10000',   emoji:'⚡', name:'صد ساعت تمرکز', desc:'۱۰۰ ساعت تمرکز کل' },
-  { id:'early-bird',    emoji:'🌅', name:'صبح‌خیز',         desc:'فعالیت اوج صبح' },
-  { id:'night-owl',     emoji:'🦉', name:'شب‌زنده‌دار',     desc:'فعالیت اوج شب' },
-  { id:'install-pwa',   emoji:'📲', name:'نصب اپ',         desc:'TaskHub رو نصب کردی' },
-  { id:'export-data',   emoji:'💾', name:'حافظ داده',      desc:'اولین بکاپ گرفتی' },
-  { id:'one-month',     emoji:'📅', name:'یک ماه با ما',  desc:'۳۰ روز از اولین استفاده گذشت' },
-  { id:'one-year',      emoji:'🎂', name:'یک سال با ما',  desc:'۳۶۵ روز از اولین استفاده گذشت' },
-  { id:'level-master',  emoji:'👑', name:'استاد شدی',     desc:'به سطح استاد رسیدی' },
-  { id:'level-legend',  emoji:'🏆', name:'افسانه شدی',    desc:'به سطح افسانه رسیدی' },
+  // ── عمومی (general) — original 19 ──
+  { id:'first-task',    cat:'general', emoji:'🎯', name:'اولین قدم',      desc:'اولین تسک رو تموم کردی' },
+  { id:'task-10',       cat:'general', emoji:'✅', name:'ده تایی',         desc:'۱۰ تسک تموم کردی' },
+  { id:'task-50',       cat:'general', emoji:'🎖', name:'پنجاه تایی',     desc:'۵۰ تسک تموم کردی' },
+  { id:'task-100',      cat:'general', emoji:'💯', name:'صد تایی',         desc:'۱۰۰ تسک تموم کردی' },
+  { id:'task-500',      cat:'general', emoji:'🌟', name:'پانصد تایی',     desc:'۵۰۰ تسک تموم کردی' },
+  { id:'task-1000',     cat:'general', emoji:'🌠', name:'هزار تایی',       desc:'۱۰۰۰ تسک تموم کردی' },
+  { id:'streak-3',      cat:'general', emoji:'✨', name:'سه روزه',         desc:'۳ روز پی‌درپی عادت' },
+  { id:'streak-7',      cat:'general', emoji:'🔥', name:'یک هفته کامل',   desc:'۷ روز پی‌درپی عادت' },
+  { id:'streak-30',     cat:'general', emoji:'🏔', name:'یک ماه کامل',    desc:'۳۰ روز پی‌درپی عادت' },
+  { id:'streak-100',    cat:'general', emoji:'💎', name:'صد روز پی‌درپی', desc:'۱۰۰ روز عادت بدون شکست' },
+  { id:'streak-365',    cat:'general', emoji:'🌌', name:'یک سال عادت',    desc:'۳۶۵ روز عادت پی‌درپی' },
+  { id:'focus-100',     cat:'general', emoji:'🎯', name:'صد دقیقه تمرکز', desc:'۱۰۰ دقیقه تمرکز کل' },
+  { id:'focus-1000',    cat:'general', emoji:'🧠', name:'تمرکز پولادین',  desc:'۱۰۰۰ دقیقه تمرکز کل' },
+  { id:'focus-10000',   cat:'general', emoji:'⚡', name:'صد ساعت تمرکز',  desc:'۱۰۰ ساعت تمرکز کل' },
+  { id:'focus-50000',   cat:'general', emoji:'🌪', name:'پانصد ساعت',     desc:'۵۰۰ ساعت تمرکز کل' },
+  { id:'early-bird',    cat:'general', emoji:'🌅', name:'صبح‌خیز',         desc:'فعالیت اوج صبح' },
+  { id:'night-owl',     cat:'general', emoji:'🦉', name:'شب‌زنده‌دار',     desc:'فعالیت اوج شب' },
+  { id:'install-pwa',   cat:'general', emoji:'📲', name:'نصب اپ',          desc:'TaskHub رو نصب کردی' },
+  { id:'export-data',   cat:'general', emoji:'💾', name:'حافظ داده',       desc:'اولین بکاپ گرفتی' },
+  { id:'one-month',     cat:'general', emoji:'📅', name:'یک ماه با ما',   desc:'۳۰ روز از اولین استفاده' },
+  { id:'one-year',      cat:'general', emoji:'🎂', name:'یک سال با ما',   desc:'۳۶۵ روز از اولین استفاده' },
+  { id:'level-master',  cat:'general', emoji:'👑', name:'استاد شدی',      desc:'به سطح استاد رسیدی' },
+  { id:'level-legend',  cat:'general', emoji:'🏆', name:'افسانه شدی',     desc:'به سطح افسانه رسیدی' },
+
+  // ── 🏋 ورزش (fitness) ──
+  { id:'fit-first',     cat:'fitness', emoji:'💪', name:'اولین تمرین',     desc:'اولین جلسه ورزش رو ثبت کردی' },
+  { id:'fit-10',        cat:'fitness', emoji:'🥇', name:'۱۰ جلسه',          desc:'۱۰ جلسه تمرین کامل' },
+  { id:'fit-50',        cat:'fitness', emoji:'🥈', name:'۵۰ جلسه',          desc:'۵۰ جلسه تمرین' },
+  { id:'fit-100',       cat:'fitness', emoji:'🥉', name:'۱۰۰ جلسه',         desc:'۱۰۰ جلسه — ورزشکار جدی' },
+  { id:'fit-streak-7',  cat:'fitness', emoji:'🔥', name:'هفته فعال',        desc:'۷ روز پی‌درپی ورزش' },
+  { id:'fit-streak-30', cat:'fitness', emoji:'⛰', name:'ماه فعال',         desc:'۳۰ روز پی‌درپی ورزش' },
+  { id:'fit-1000min',   cat:'fitness', emoji:'⏱', name:'۱۰۰۰ دقیقه ورزش',  desc:'مجموع زمان تمرین' },
+  { id:'fit-pr-50kg',   cat:'fitness', emoji:'🏋', name:'PR ۵۰kg',         desc:'حداقل ۵۰ کیلو در یک تمرین زدی' },
+  { id:'fit-pr-100kg',  cat:'fitness', emoji:'🦏', name:'PR ۱۰۰kg',        desc:'صد کیلو رو زدی!' },
+  { id:'fit-pullup-10', cat:'fitness', emoji:'🤸', name:'۱۰ بارفیکس',       desc:'۱۰ تکرار بارفیکس در یک ست' },
+  { id:'fit-cardio',    cat:'fitness', emoji:'🏃', name:'دونده',            desc:'۵ جلسه هوازی' },
+  { id:'fit-yoga',      cat:'fitness', emoji:'🧘', name:'آرام',             desc:'۵ جلسه یوگا' },
+  { id:'fit-plan',      cat:'fitness', emoji:'📋', name:'برنامه‌ریز',       desc:'برنامه تمرینی شخصی ساختی' },
+  { id:'fit-water',     cat:'fitness', emoji:'💧', name:'هیدراته',          desc:'۷ روز پی‌درپی ۸ لیوان آب' },
+  { id:'fit-recovery',  cat:'fitness', emoji:'🛌', name:'ریکاوری‌شناس',     desc:'۱۰ بار ریکاوری ثبت کردی' },
+
+  // ── 💻 برنامه‌نویسی (programming) ──
+  { id:'dev-first',     cat:'programming', emoji:'💻', name:'اولین کد',     desc:'اولین تسک برنامه‌نویسی رو زدی' },
+  { id:'dev-10',        cat:'programming', emoji:'⌨', name:'۱۰ تسک کد',     desc:'۱۰ تسک کدنویسی' },
+  { id:'dev-50',        cat:'programming', emoji:'🖥', name:'۵۰ تسک کد',    desc:'برنامه‌نویس جدی' },
+  { id:'dev-bug-hunter',cat:'programming', emoji:'🐞', name:'باگ‌شکار',     desc:'۱۰ تسک با کلیدواژه «باگ» یا «فیکس»' },
+  { id:'dev-deploy',    cat:'programming', emoji:'🚀', name:'دیپلوی',       desc:'تسک با کلیدواژه «دیپلوی» یا «deploy»' },
+  { id:'dev-review',    cat:'programming', emoji:'🔍', name:'ریویوور',      desc:'تسک با کلیدواژه «ریویو» یا «PR»' },
+  { id:'dev-test',      cat:'programming', emoji:'🧪', name:'تست‌نویس',      desc:'تسک با کلیدواژه «تست»' },
+  { id:'dev-doc',       cat:'programming', emoji:'📖', name:'مستندساز',     desc:'تسک با کلیدواژه «مستند» یا «docs»' },
+  { id:'dev-refactor',  cat:'programming', emoji:'🔧', name:'بازآرا',       desc:'تسک با کلیدواژه «refactor»' },
+  { id:'dev-fullstack', cat:'programming', emoji:'🧙', name:'فول‌استک',     desc:'هر سه: frontend، backend، database' },
+  { id:'dev-open-src',  cat:'programming', emoji:'🦄', name:'متن‌باز',      desc:'تسک با «open source» یا «GitHub»' },
+  { id:'dev-ship',      cat:'programming', emoji:'🎉', name:'محصول لانچ',   desc:'تسک با «لانچ» یا «launch»' },
+
+  // ── 📈 ترید و سرمایه (trading) ──
+  { id:'trade-first',   cat:'trading', emoji:'📊', name:'اولین معامله',     desc:'اولین تراکنش با تگ ترید' },
+  { id:'trade-10',      cat:'trading', emoji:'📈', name:'۱۰ معامله',         desc:'۱۰ معامله ثبت کردی' },
+  { id:'trade-50',      cat:'trading', emoji:'💹', name:'۵۰ معامله',         desc:'تریدر جدی' },
+  { id:'trade-profit',  cat:'trading', emoji:'💰', name:'سودده',             desc:'یک ماه با سود مثبت' },
+  { id:'trade-3m',      cat:'trading', emoji:'🎖', name:'سه ماه سودده',      desc:'۳ ماه پی‌درپی سود' },
+  { id:'trade-discipline',cat:'trading',emoji:'🎯',name:'منضبط',             desc:'۲۰ تسک با کلیدواژه «استاپ» یا «risk»' },
+  { id:'trade-journal', cat:'trading', emoji:'📓', name:'ژورنال‌نویس',      desc:'۳۰ روز ثبت معامله پی‌درپی' },
+  { id:'trade-crypto',  cat:'trading', emoji:'₿',  name:'کریپتو',           desc:'حساب کریپتو ساختی' },
+  { id:'trade-stocks',  cat:'trading', emoji:'🏛', name:'سهام‌دار',         desc:'تراکنش با تگ «سهام»' },
+  { id:'trade-loss-cut',cat:'trading', emoji:'✂', name:'استاپ‌بند',         desc:'تسک با «cut loss» یا «استاپ زدم»' },
+  { id:'trade-portfolio',cat:'trading',emoji:'💼', name:'سبدساز',           desc:'۳ حساب سرمایه‌گذاری ساختی' },
+  { id:'trade-hodl',    cat:'trading', emoji:'💎', name:'هودلر',            desc:'یک پوزیشن ۹۰+ روز نگه داشتی' },
+
+  // ── 🎬 تولید محتوا (content) ──
+  { id:'content-first', cat:'content', emoji:'📝', name:'اولین محتوا',      desc:'اولین تسک محتوا' },
+  { id:'content-10',    cat:'content', emoji:'📰', name:'۱۰ پست',            desc:'۱۰ تسک محتوا' },
+  { id:'content-50',    cat:'content', emoji:'📺', name:'۵۰ پست',            desc:'تولیدکننده فعال' },
+  { id:'content-video', cat:'content', emoji:'🎬', name:'فیلم‌ساز',         desc:'تسک با «ویدیو» یا «video»' },
+  { id:'content-photo', cat:'content', emoji:'📷', name:'عکاس',             desc:'تسک با «عکاسی»' },
+  { id:'content-write', cat:'content', emoji:'✍', name:'نویسنده',          desc:'تسک با «نوشتن» یا «مقاله»' },
+  { id:'content-edit',  cat:'content', emoji:'✂', name:'تدوینگر',          desc:'تسک با «تدوین» یا «edit»' },
+  { id:'content-podcast',cat:'content',emoji:'🎙', name:'پادکستر',         desc:'تسک با «پادکست»' },
+  { id:'content-design',cat:'content', emoji:'🎨', name:'دیزاینر',          desc:'تسک با «طراحی» یا «design»' },
+  { id:'content-publish',cat:'content',emoji:'📤', name:'منتشرکن',          desc:'تسک با «منتشر» یا «publish»' },
+  { id:'content-viral', cat:'content', emoji:'🔥', name:'وایرال',           desc:'تسک با «وایرال» یا «viral»' },
+  { id:'content-100k',  cat:'content', emoji:'👥', name:'۱۰۰هزار فالوور',   desc:'تسک با «۱۰۰هزار» یا «100k»' },
+
+  // ── 🎓 آموزش (education) ──
+  { id:'edu-first',     cat:'education', emoji:'📚', name:'اولین درس',      desc:'اولین تسک آموزش' },
+  { id:'edu-10',        cat:'education', emoji:'📖', name:'۱۰ درس',          desc:'۱۰ تسک آموزش/مطالعه' },
+  { id:'edu-50',        cat:'education', emoji:'🎓', name:'دانشجوی فعال',   desc:'۵۰ تسک آموزش' },
+  { id:'edu-course',    cat:'education', emoji:'📺', name:'دوره‌بین',       desc:'تسک با «دوره» یا «course»' },
+  { id:'edu-book',      cat:'education', emoji:'📕', name:'کتاب‌خوان',      desc:'تسک با «کتاب»' },
+  { id:'edu-exam',      cat:'education', emoji:'📝', name:'امتحان',         desc:'تسک با «امتحان» یا «exam»' },
+  { id:'edu-language',  cat:'education', emoji:'🗣', name:'زبان‌آموز',      desc:'تسک با «زبان» یا «language»' },
+  { id:'edu-cert',      cat:'education', emoji:'🎖', name:'گواهینامه',     desc:'تسک با «گواهینامه» یا «certificate»' },
+  { id:'edu-teach',     cat:'education', emoji:'👨‍🏫', name:'مدرس',          desc:'تسک با «تدریس» یا «آموزش به دیگران»' },
+  { id:'edu-research',  cat:'education', emoji:'🔬', name:'پژوهشگر',        desc:'تسک با «تحقیق» یا «research»' },
+  { id:'edu-thesis',    cat:'education', emoji:'📜', name:'پایان‌نامه',     desc:'تسک با «پایان‌نامه» یا «thesis»' },
+  { id:'edu-master',    cat:'education', emoji:'🧙', name:'استاد دانش',     desc:'۱۰۰ تسک آموزش' },
+
+  // ── 🧾 حسابداری (accounting) ──
+  { id:'acc-first',     cat:'accounting', emoji:'🏦', name:'برنامه‌ریز مالی', desc:'اولین حساب رو ساختی' },
+  { id:'acc-budget',    cat:'accounting', emoji:'🎯', name:'بودجه‌بند',      desc:'بودجه ماهانه تعیین کردی' },
+  { id:'acc-budget-3m', cat:'accounting', emoji:'📊', name:'سه ماه بودجه',   desc:'۳ ماه پی‌درپی توی بودجه موندی' },
+  { id:'acc-recurring', cat:'accounting', emoji:'🔁', name:'اتومات',         desc:'اولین تراکنش تکرارشونده' },
+  { id:'acc-100tx',     cat:'accounting', emoji:'💯', name:'۱۰۰ تراکنش',     desc:'۱۰۰ تراکنش ثبت کردی' },
+  { id:'acc-saver',     cat:'accounting', emoji:'💰', name:'پس‌اندازکن',     desc:'یک ماه نرخ پس‌انداز > ۲۰٪' },
+  { id:'acc-savings-5m',cat:'accounting', emoji:'🏆', name:'پنج ماه پس‌انداز', desc:'۵ ماه پی‌درپی پس‌انداز مثبت' },
+  { id:'acc-multi-acc', cat:'accounting', emoji:'🏛', name:'چندحسابه',      desc:'۳ حساب فعال' },
+  { id:'acc-tax',       cat:'accounting', emoji:'🧾', name:'مالیات‌بند',     desc:'تسک با «مالیات» یا «tax»' },
+  { id:'acc-invoice',   cat:'accounting', emoji:'📄', name:'فاکتورزن',      desc:'تسک با «فاکتور» یا «invoice»' },
+  { id:'acc-report',    cat:'accounting', emoji:'📈', name:'گزارش‌گیر',     desc:'اولین گزارش هفتگی' },
+  { id:'acc-debt-free', cat:'accounting', emoji:'🆓', name:'بی‌قرض',         desc:'تسک با «قرض تموم» یا «debt-free»' },
+
+  // ── 💫 شخصی (personal) ──
+  { id:'p-meditation',  cat:'personal', emoji:'🧘', name:'مدیتیشن',         desc:'۲۰ روز عادت مدیتیشن' },
+  { id:'p-journal',     cat:'personal', emoji:'📔', name:'دفترچه‌نویس',    desc:'۳۰ روز یادداشت پلنر' },
+  { id:'p-gratitude',   cat:'personal', emoji:'🙏', name:'سپاس‌گزار',      desc:'تسک با «شکرگزاری»' },
+  { id:'p-family',      cat:'personal', emoji:'👨‍👩‍👧', name:'خانواده‌دوست', desc:'تسک با «خانواده»' },
+  { id:'p-travel',      cat:'personal', emoji:'✈', name:'مسافر',           desc:'تسک با «سفر» یا «travel»' },
+  { id:'p-cook',        cat:'personal', emoji:'👨‍🍳', name:'آشپز',           desc:'تسک با «آشپزی» یا «cook»' },
+  { id:'p-music',       cat:'personal', emoji:'🎸', name:'هنرمند موسیقی',   desc:'تسک با «موسیقی» یا «music»' },
+  { id:'p-art',         cat:'personal', emoji:'🎨', name:'هنرمند',          desc:'تسک با «نقاشی» یا «art»' },
+  { id:'p-volunteer',   cat:'personal', emoji:'❤', name:'داوطلب',          desc:'تسک با «خیریه» یا «volunteer»' },
+  { id:'p-zen',         cat:'personal', emoji:'☯', name:'استاد ذن',        desc:'۱۰۰ روز مدیتیشن پی‌درپی' },
 ];
+
+/* Keyword map for profession badges. Used by checkBadges() to scan task
+   text for matching tokens. */
+const BADGE_KEYWORDS = {
+  'dev-bug-hunter':  ['باگ','فیکس','bug','fix'],
+  'dev-deploy':      ['دیپلوی','deploy'],
+  'dev-review':      ['ریویو','review','PR','pull request'],
+  'dev-test':        ['تست','test','unit','integration'],
+  'dev-doc':         ['مستند','docs','documentation'],
+  'dev-refactor':    ['refactor','بازآرا'],
+  'dev-open-src':    ['open source','github','گیت‌هاب'],
+  'dev-ship':        ['لانچ','launch','release','ship'],
+  'trade-discipline':['استاپ','stop loss','risk','مدیریت ریسک'],
+  'trade-stocks':    ['سهام','stock','بورس'],
+  'trade-loss-cut':  ['cut loss','استاپ زدم','حد ضرر'],
+  'content-video':   ['ویدیو','video','کلیپ'],
+  'content-photo':   ['عکاسی','photo','عکس'],
+  'content-write':   ['نوشتن','مقاله','article','blog'],
+  'content-edit':    ['تدوین','edit','editing'],
+  'content-podcast': ['پادکست','podcast'],
+  'content-design':  ['طراحی','design','UI','UX'],
+  'content-publish': ['منتشر','publish','upload'],
+  'content-viral':   ['وایرال','viral'],
+  'content-100k':    ['۱۰۰هزار','100k','100 هزار'],
+  'edu-course':      ['دوره','course'],
+  'edu-book':        ['کتاب','book'],
+  'edu-exam':        ['امتحان','exam','کنکور'],
+  'edu-language':    ['زبان','language','english','english'],
+  'edu-cert':        ['گواهینامه','certificate','مدرک'],
+  'edu-teach':       ['تدریس','teaching'],
+  'edu-research':    ['تحقیق','research'],
+  'edu-thesis':      ['پایان‌نامه','thesis','dissertation'],
+  'acc-tax':         ['مالیات','tax'],
+  'acc-invoice':     ['فاکتور','invoice','billing'],
+  'acc-debt-free':   ['قرض تموم','debt-free','بدهی صفر'],
+  'p-gratitude':     ['شکرگزاری','gratitude','شکر'],
+  'p-family':        ['خانواده','family'],
+  'p-travel':        ['سفر','travel','مسافرت'],
+  'p-cook':          ['آشپزی','cook','cooking'],
+  'p-music':         ['موسیقی','music','گیتار','پیانو'],
+  'p-art':           ['نقاشی','art','painting'],
+  'p-volunteer':     ['خیریه','volunteer','کمک'],
+};
+
+/* Helper: does any task in state contain ANY of these keywords? */
+function _badgeKeywordMatch(keywords) {
+  const lc = keywords.map(k => k.toLowerCase());
+  return (state.tasks || []).some(t => {
+    const txt = (t.text || '').toLowerCase();
+    return lc.some(k => txt.includes(k));
+  });
+}
 
 function ensureGameState() {
   if (typeof state.xp !== 'number') state.xp = 0;
@@ -10165,6 +10392,66 @@ function checkBadges() {
   const lv = getLevelInfo(state.xp);
   if (lv.name === 'استاد')   unlockBadge('level-master');
   if (lv.name === 'افسانه') unlockBadge('level-legend');
+
+  // ── extra task volume tiers
+  if (taskTotal >= 10)   unlockBadge('task-10');
+  if (taskTotal >= 50)   unlockBadge('task-50');
+  if (taskTotal >= 1000) unlockBadge('task-1000');
+  if (maxStreak >= 3)    unlockBadge('streak-3');
+  if (maxStreak >= 365)  unlockBadge('streak-365');
+  if (totalFocusMin >= 100)   unlockBadge('focus-100');
+  if (totalFocusMin >= 50000) unlockBadge('focus-50000');
+
+  // ── fitness — derived from state.fitness.sessions
+  try {
+    const sess = state.fitness?.sessions || [];
+    if (sess.length >= 1)   unlockBadge('fit-first');
+    if (sess.length >= 10)  unlockBadge('fit-10');
+    if (sess.length >= 50)  unlockBadge('fit-50');
+    if (sess.length >= 100) unlockBadge('fit-100');
+    const totalMin = Math.round(sess.reduce((s,x)=>s+(x.durationSec||0),0)/60);
+    if (totalMin >= 1000) unlockBadge('fit-1000min');
+    // PRs
+    sess.forEach(s => (s.exercises||[]).forEach(ex => (ex.sets||[]).forEach(set => {
+      if (!set.done) return;
+      if ((set.weight||0) >= 50)  unlockBadge('fit-pr-50kg');
+      if ((set.weight||0) >= 100) unlockBadge('fit-pr-100kg');
+      const meta = getExerciseById?.(ex.exId);
+      if (meta?.id === 'pullup' && (set.reps||0) >= 10) unlockBadge('fit-pullup-10');
+      if (meta?.cat === 'cardio') unlockBadge('fit-cardio');
+      if (meta?.cat === 'yoga')   unlockBadge('fit-yoga');
+    })));
+    if ((state.fitness?.plans||[]).length >= 1) unlockBadge('fit-plan');
+    // streak from sessions
+    const dates = new Set(sess.map(s=>s.date));
+    let fStreak = 0, cur = new Date();
+    while (true) {
+      const k = cur.toISOString().slice(0,10);
+      if (dates.has(k)) { fStreak++; cur.setDate(cur.getDate()-1); } else break;
+    }
+    if (fStreak >= 7)  unlockBadge('fit-streak-7');
+    if (fStreak >= 30) unlockBadge('fit-streak-30');
+    // recovery entries
+    const recCount = sess.filter(s => s.recoveryScore != null).length;
+    if (recCount >= 10) unlockBadge('fit-recovery');
+  } catch {}
+
+  // ── trading / accounting derived
+  try {
+    const tx = state.moneyTransactions || [];
+    if (tx.length >= 100) unlockBadge('acc-100tx');
+    if ((state.moneyAccounts||[]).length >= 3) {
+      unlockBadge('trade-portfolio'); unlockBadge('acc-multi-acc');
+    }
+    if ((state.moneyAccounts||[]).some(a => a.type === 'crypto')) unlockBadge('trade-crypto');
+  } catch {}
+
+  // ── keyword-driven profession badges
+  try {
+    Object.entries(BADGE_KEYWORDS).forEach(([badgeId, keys]) => {
+      if (_badgeKeywordMatch(keys)) unlockBadge(badgeId);
+    });
+  } catch {}
 }
 
 function grantXP(kind) {
@@ -10360,6 +10647,30 @@ function renderHallOfFame() {
     ` : `
       <div class="hof-empty">هنوز نشانی نگرفتی. با تکمیل تسک‌ها، عادت‌ها و رسیدن به اهداف، اولین نشان‌ها به دستت می‌رسن! 🌱</div>
     `}
+
+    <!-- All badges grouped by category — full progress view, ~100 total -->
+    <div class="hof-section-title" style="margin-top:var(--space-5)">🏛 همه نشان‌ها بر اساس دسته</div>
+    ${Object.entries(BADGE_CATEGORIES).map(([catId, cat]) => {
+      const catBadges = BADGES.filter(b => (b.cat||'general') === catId);
+      if (!catBadges.length) return '';
+      const earned = catBadges.filter(b => state.badges?.[b.id]?.unlocked).length;
+      return `
+        <details class="hof-cat" ${earned > 0 ? 'open' : ''}>
+          <summary class="hof-cat-head">
+            <span>${cat.emoji} ${cat.name}</span>
+            <span class="hof-cat-progress">${toFaDigits(earned)}/${toFaDigits(catBadges.length)}</span>
+          </summary>
+          <div class="hof-cat-grid">
+            ${catBadges.map(b => {
+              const got = state.badges?.[b.id]?.unlocked;
+              return `<div class="hof-mini-badge ${got?'got':'locked'}" title="${e(b.desc)}">
+                <div class="hof-mini-emoji">${got ? b.emoji : '🔒'}</div>
+                <div class="hof-mini-name">${e(b.name)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </details>`;
+    }).join('')}
 
     <div class="hof-footer">
       🔒 تالار افتخار تو فقط روی این مرورگر ذخیره می‌شه. هیچ‌جا فرستاده نمی‌شه.
