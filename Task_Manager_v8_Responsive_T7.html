@@ -4655,7 +4655,7 @@
   </div>
   <div class="modal-actions">
     <button type="button" class="primary-btn" id="plannerModalSave">ثبت هدف</button>
-    <button type="button" class="ghost-btn" id="plannerModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="plannerModalClose" data-close="plannerModal" onclick="closeDialog('plannerModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -4667,7 +4667,7 @@
         <div class="wr-title">📊 گزارش هفتگی من</div>
         <div class="wr-date" id="wrDateRange"></div>
       </div>
-      <button class="icon-btn" type="button" id="weeklyReportClose" style="background:transparent" aria-label="بستن">✕</button>
+      <button class="icon-btn dlg-close-btn" type="button" id="weeklyReportClose" style="background:transparent" aria-label="بستن" data-close="weeklyReportModal" onclick="closeDialog('weeklyReportModal');return false;">✕</button>
     </div>
     <div class="wr-stats-grid" id="wrStatsGrid"></div>
     <div class="wr-highlights" id="wrHighlights"></div>
@@ -4702,7 +4702,7 @@
   <div class="modal-actions">
     <button type="button" class="danger-btn" id="habitModalDelete" style="margin-inline-end:auto;display:none">🗑 حذف</button>
     <button type="button" class="primary-btn" id="habitModalSave">ذخیره</button>
-    <button type="button" class="ghost-btn" id="habitModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="habitModalClose" data-close="habitModal" onclick="closeDialog('habitModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -4724,7 +4724,7 @@
   <div class="modal-actions">
     <button type="button" class="danger-btn" id="accountModalDelete" style="margin-inline-end:auto;display:none">🗑 حذف</button>
     <button type="button" class="primary-btn" id="accountModalSave">ذخیره</button>
-    <button type="button" class="ghost-btn" id="accountModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="accountModalClose" data-close="accountModal" onclick="closeDialog('accountModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -4757,7 +4757,7 @@
 <dialog id="hofModal" class="hof-modal">
   <div class="hof-modal-bar">
     <h3 class="modal-title" style="margin:0">🏛 تالار افتخار</h3>
-    <button type="button" class="ghost-btn" id="hofModalClose" style="min-height:34px;padding:0 var(--space-3)">✕</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="hofModalClose" style="min-height:34px;padding:0 var(--space-3)" data-close="hofModal" onclick="closeDialog('hofModal');return false;">✕</button>
   </div>
   <div id="hofContent"></div>
 </dialog>
@@ -4769,7 +4769,7 @@
   <div id="recurringList" style="display:flex;flex-direction:column;gap:var(--space-3);max-height:55vh;overflow:auto;margin-bottom:var(--space-4)"></div>
   <div class="empty" id="recurringEmpty" hidden>هنوز قانون تکرارشونده‌ای نساختی. هنگام ثبت تراکنش، گزینهٔ «🔁 تکرارشونده» را تیک بزن.</div>
   <div class="modal-actions">
-    <button type="button" class="ghost-btn" id="recurringModalClose">بستن</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="recurringModalClose" data-close="recurringModal" onclick="closeDialog('recurringModal');return false;">بستن</button>
   </div>
 </dialog>
 
@@ -4779,7 +4779,7 @@
   <div id="budgetEditList"></div>
   <div class="modal-actions">
     <button type="button" class="primary-btn" id="budgetModalSave">ذخیره</button>
-    <button type="button" class="ghost-btn" id="budgetModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="budgetModalClose" data-close="budgetModal" onclick="closeDialog('budgetModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -4794,7 +4794,7 @@
     <button type="button" class="ghost-btn" id="quickCaptureShowInbox" style="min-height:40px">📥 صندوق</button>
     <div style="display:flex;gap:var(--space-2)">
       <button type="button" class="primary-btn" id="quickCaptureSave">ثبت</button>
-      <button type="button" class="ghost-btn" id="quickCaptureClose">بستن</button>
+      <button type="button" class="ghost-btn dlg-close-btn" id="quickCaptureClose" data-close="quickCaptureModal" onclick="closeDialog('quickCaptureModal');return false;">بستن</button>
     </div>
   </div>
   <!-- Inbox list (collapsible) -->
@@ -4889,7 +4889,7 @@
   <div class="modal-actions">
     <button type="button" class="danger-btn" id="txModalDelete" style="margin-inline-end:auto;display:none">🗑 حذف</button>
     <button type="button" class="primary-btn" id="txModalSave">ثبت</button>
-    <button type="button" class="ghost-btn" id="txModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="txModalClose" data-close="txModal" onclick="closeDialog('txModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -4902,7 +4902,7 @@
   </div>
   <div class="modal-actions">
     <button type="button" class="primary-btn" id="visionModalSave">ذخیره</button>
-    <button type="button" class="ghost-btn" id="visionModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="visionModalClose" data-close="visionModal" onclick="closeDialog('visionModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -5647,7 +5647,7 @@ function renderBgPanel() {
         const dataUrl=canvas.toDataURL('image/jpeg',0.78);
         const prev={t:state.bgType,i:state.bgImage};
         state.bgImage=dataUrl; state.bgType='image';
-        try{ save(); }catch{ state.bgType=prev.t; state.bgImage=prev.i; alert('تصویر خیلی بزرگ است. تصویر کوچک‌تری انتخاب کنید.'); return; }
+        try{ save(); }catch{ state.bgType=prev.t; state.bgImage=prev.i; showToast?.('⚠ تصویر خیلی بزرگه — کوچک‌تر انتخاب کن', { duration: 3000, variant:'warn' }); return; }
         applyBackground(); renderBgPanel();
       };
       img.src=ev.target.result;
@@ -5865,13 +5865,7 @@ function renderProfilePanel() {
       }
     });
     panel.querySelector('#bookmarkletHelp')?.addEventListener('click', () => {
-      alert(
-        'راهنمای نصب ویجت مرورگر:\n\n' +
-        '1. نوار Bookmarks مرورگرت رو فعال کن (Ctrl+Shift+B در Chrome/Edge).\n' +
-        '2. دکمهٔ «⚡ ذخیره در TaskHub» رو با موس بکش و رها کن روی نوار Bookmarks.\n' +
-        '3. حالا هر وقت متنی رو در سایت‌های دیگه select کردی، روی این bookmark کلیک کن — متن خودکار به صندوق TaskHub اضافه میشه.\n\n' +
-        'نکته: اگه چیزی select نکرده باشی، عنوان صفحه + آدرسش ذخیره میشه.'
-      );
+      showToast?.('💡 ⌘ دکمه ⚡ رو روی نوار Bookmarks مرورگرت بکش و رها کن — بعد توی هر سایت میتونی متن انتخابی رو با یه کلیک به TaskHub بفرستی', { duration: 7000 });
     });
   })();
 
@@ -7121,7 +7115,7 @@ document.getElementById('ambientFileInput').addEventListener('change', function(
   // ~5 MB safety cap so we don't blow up localStorage
   const MAX_BYTES = 5 * 1024 * 1024;
   if (file.size > MAX_BYTES) {
-    alert('فایل خیلی بزرگ است (حداکثر ۵ مگابایت). یک فایل کوچک‌تر انتخاب کن.');
+    showToast?.('⚠ فایل بزرگه (حداکثر ۵ مگ) — کوچک‌تر انتخاب کن', { duration: 3000, variant:'warn' });
     this.value = ''; return;
   }
   const reader = new FileReader();
@@ -7134,7 +7128,7 @@ document.getElementById('ambientFileInput').addEventListener('change', function(
     try { save(); }
     catch {
       state.ambientCustomData = prev.data; state.ambientCustomName = prev.name; state.ambientSound = prev.sound;
-      alert('ذخیره موزیک ناموفق بود (احتمالاً فضای ذخیره‌سازی پر است). یک فایل کوچک‌تر امتحان کن.');
+      showToast?.('⚠ ذخیره موزیک ناموفق — فضا پر شده. فایل کوچک‌تر امتحان کن', { duration: 3500, variant:'warn' });
       return;
     }
     // auto-play the new file
@@ -7819,7 +7813,7 @@ function openPlannerGoalModal(period, dateKey, title) {
   const limit = PLANNER_LIMITS[period];
   if (plannerCountGoals(period, dateKey) >= limit) {
     const label = period==='daily'?'روزانه':period==='weekly'?'هفتگی':'ماهانه';
-    alert(`به سقف مجاز رسیدی: حداکثر ${toFaDigits(limit)} هدف ${label}.\nبرای افزودن هدف جدید، یکی از هدف‌های موجود را حذف کن.`);
+    showToast?.(`⚠ سقف ${toFaDigits(limit)} هدف ${label} پر — اول یکی رو حذف کن`, { duration: 3000, variant:'warn' });
     return;
   }
   _plannerModalCtx = { period, dateKey, editId: null };
@@ -7861,8 +7855,8 @@ document.getElementById('plannerModalSave').addEventListener('click', () => {
     // enforce limit at save-time as well
     const limit = PLANNER_LIMITS[_plannerModalCtx.period];
     if (plannerCountGoals(_plannerModalCtx.period, _plannerModalCtx.dateKey) >= limit) {
-      alert(`به سقف مجاز رسیدی: حداکثر ${toFaDigits(limit)} هدف.`);
-      document.getElementById('plannerModal').close();
+      showToast?.(`⚠ به سقف رسیدی: حداکثر ${toFaDigits(limit)} هدف`, { duration: 2800, variant:'warn' });
+      closeDialog('plannerModal');
       return;
     }
     const isRecurring = (_plannerModalCtx.period === 'daily') && document.getElementById('plannerRecurringCheck').checked;
@@ -7874,10 +7868,10 @@ document.getElementById('plannerModalSave').addEventListener('click', () => {
     state.plannerGoals.push({ id: crypto.randomUUID(), text, period: _plannerModalCtx.period, dateKey: _plannerModalCtx.dateKey, done: false, category: _plannerSelCat, priority: _plannerSelPri, recurringId });
   }
   save(); renderPlanner();
-  document.getElementById('plannerModal').close();
+  closeDialog('plannerModal');
 });
-document.getElementById('plannerModalClose').addEventListener('click', () => document.getElementById('plannerModal').close());
-document.getElementById('plannerModal').addEventListener('click', ev=>{ if(ev.target===document.getElementById('plannerModal'))document.getElementById('plannerModal').close(); });
+document.getElementById('plannerModalClose').addEventListener('click', () => closeDialog('plannerModal'));
+document.getElementById('plannerModal').addEventListener('click', ev=>{ if(ev.target===document.getElementById('plannerModal'))closeDialog('plannerModal'); });
 document.getElementById('plannerGoalInput').addEventListener('keydown', ev => { if (ev.key==='Enter') document.getElementById('plannerModalSave').click(); });
 
 /* add buttons */
@@ -8024,10 +8018,10 @@ document.getElementById('editVisionBtn').addEventListener('click', () => {
 document.getElementById('visionModalSave').addEventListener('click', () => {
   ensurePlannerState();
   state.vision = document.getElementById('visionInput').value.trim();
-  save(); renderPlanner(); document.getElementById('visionModal').close();
+  save(); renderPlanner(); closeDialog('visionModal');
 });
-document.getElementById('visionModalClose').addEventListener('click', () => document.getElementById('visionModal').close());
-document.getElementById('visionModal').addEventListener('click', ev=>{ if(ev.target===document.getElementById('visionModal'))document.getElementById('visionModal').close(); });
+document.getElementById('visionModalClose').addEventListener('click', () => closeDialog('visionModal'));
+document.getElementById('visionModal').addEventListener('click', ev=>{ if(ev.target===document.getElementById('visionModal'))closeDialog('visionModal'); });
 
 /* ════════════════════════════════════════════════
    MONEY / CAPITAL MANAGEMENT
@@ -8201,8 +8195,8 @@ function openAccountModal(id) {
   setTimeout(() => nameInp.focus(), 60);
 }
 document.getElementById('addAccountBtn').addEventListener('click', () => openAccountModal(null));
-document.getElementById('accountModalClose').addEventListener('click', () => document.getElementById('accountModal').close());
-document.getElementById('accountModal').addEventListener('click', ev => { if (ev.target === document.getElementById('accountModal')) document.getElementById('accountModal').close(); });
+document.getElementById('accountModalClose').addEventListener('click', () => closeDialog('accountModal'));
+document.getElementById('accountModal').addEventListener('click', ev => { if (ev.target === document.getElementById('accountModal')) closeDialog('accountModal'); });
 document.getElementById('accountModalSave').addEventListener('click', () => {
   ensureMoneyState();
   const name = document.getElementById('accountNameInput').value.trim();
@@ -8215,14 +8209,14 @@ document.getElementById('accountModalSave').addEventListener('click', () => {
   } else {
     state.moneyAccounts.push({ id: crypto.randomUUID(), name, type: _accountTypeSelected, balance, emoji: t.emoji });
   }
-  save(); renderMoney(); document.getElementById('accountModal').close();
+  save(); renderMoney(); closeDialog('accountModal');
 });
 document.getElementById('accountModalDelete').addEventListener('click', () => {
   if (!_editingAccountId) return;
   if (!confirm('حذف این حساب همراه با تراکنش‌های مربوط به آن؟')) return;
   state.moneyTransactions = state.moneyTransactions.filter(tx => tx.accountId !== _editingAccountId && tx.toAccountId !== _editingAccountId);
   state.moneyAccounts = state.moneyAccounts.filter(a => a.id !== _editingAccountId);
-  save(); renderMoney(); document.getElementById('accountModal').close();
+  save(); renderMoney(); closeDialog('accountModal');
 });
 
 /* ── Transaction modal ── */
@@ -8428,18 +8422,18 @@ document.querySelectorAll('#txTypeRow .money-tx-type').forEach(btn => {
   });
 });
 document.getElementById('addTxBtn').addEventListener('click', () => {
-  if (!state.moneyAccounts.length) { alert('ابتدا یک حساب اضافه کن.'); return; }
+  if (!state.moneyAccounts.length) { showToast?.('⚠ اول یه حساب اضافه کن', { duration: 2500, variant:'warn' }); return; }
   openTxModal(null);
 });
-document.getElementById('txModalClose').addEventListener('click', () => document.getElementById('txModal').close());
-document.getElementById('txModal').addEventListener('click', ev => { if (ev.target === document.getElementById('txModal')) document.getElementById('txModal').close(); });
+document.getElementById('txModalClose').addEventListener('click', () => closeDialog('txModal'));
+document.getElementById('txModal').addEventListener('click', ev => { if (ev.target === document.getElementById('txModal')) closeDialog('txModal'); });
 document.getElementById('txModalSave').addEventListener('click', () => {
   ensureMoneyState();
   const amount = parseFloat(document.getElementById('txAmountInput').value);
   if (!(amount > 0)) { document.getElementById('txAmountInput').focus(); return; }
-  if (!_txAccountId) { alert('یک حساب انتخاب کن.'); return; }
+  if (!_txAccountId) { showToast?.('⚠ یه حساب انتخاب کن', { duration: 2500, variant:'warn' }); return; }
   if (_txType === 'transfer' && (!_txToAccountId || _txToAccountId === _txAccountId)) {
-    alert('برای انتقال، یک حساب مقصد متفاوت انتخاب کن.'); return;
+    showToast?.('⚠ برای انتقال، حساب مقصد متفاوت انتخاب کن', { duration: 2800, variant:'warn' }); return;
   }
   const date = document.getElementById('txDateInput').value || new Date().toISOString().slice(0,10);
   const note = document.getElementById('txNoteInput').value.trim();
@@ -8457,7 +8451,7 @@ document.getElementById('txModalSave').addEventListener('click', () => {
       r.dayOfWeek = _txFreq === 'weekly' ? _txDayOfWeek : null;
       r.nextDue = date;
     }
-    save(); renderMoney(); document.getElementById('txModal').close();
+    save(); renderMoney(); closeDialog('txModal');
     return;
   }
 
@@ -8481,7 +8475,7 @@ document.getElementById('txModalSave').addEventListener('click', () => {
     save();
     processRecurringTransactions({ silent: false });
     renderMoney();
-    document.getElementById('txModal').close();
+    closeDialog('txModal');
     showToast('🔁 قانون تکرارشونده ثبت شد', { duration: 2500 });
     return;
   }
@@ -8500,20 +8494,20 @@ document.getElementById('txModalSave').addEventListener('click', () => {
     state.moneyTransactions.push({ id: crypto.randomUUID(), ...payload });
     try { trackEvent('tx-create'); grantXP('tx-create'); } catch {}
   }
-  save(); renderMoney(); document.getElementById('txModal').close();
+  save(); renderMoney(); closeDialog('txModal');
 });
 document.getElementById('txModalDelete').addEventListener('click', () => {
   if (_editingRecurringId) {
     if (!confirm('این قانون تکرارشونده حذف شود؟ (تراکنش‌های قبلی دست‌نخورده می‌مونن)')) return;
     state.moneyRecurring = state.moneyRecurring.filter(r => r.id !== _editingRecurringId);
-    save(); renderMoney(); document.getElementById('txModal').close();
+    save(); renderMoney(); closeDialog('txModal');
     showToast('🗑 قانون تکرارشونده حذف شد', { duration: 2200 });
     return;
   }
   if (!_editingTxId) return;
   if (!confirm('این تراکنش حذف شود؟')) return;
   state.moneyTransactions = state.moneyTransactions.filter(t => t.id !== _editingTxId);
-  save(); renderMoney(); document.getElementById('txModal').close();
+  save(); renderMoney(); closeDialog('txModal');
 });
 
 /* ════════════════════════════════════════════════
@@ -8606,7 +8600,7 @@ function renderRecurringList() {
       </div>
     `;
     card.querySelector('[data-act="run"]').addEventListener('click', () => {
-      if (!acc) { alert('حساب این قانون حذف شده.'); return; }
+      if (!acc) { showToast?.('⚠ حساب این قانون حذف شده', { duration: 2500, variant:'warn' }); return; }
       // Create one tx dated today (without changing nextDue cycle)
       state.moneyTransactions.push({
         id: crypto.randomUUID(),
@@ -8640,8 +8634,8 @@ function openRecurringManager() {
   document.getElementById('recurringModal').showModal();
 }
 document.getElementById('manageRecurringBtn').addEventListener('click', openRecurringManager);
-document.getElementById('recurringModalClose').addEventListener('click', () => document.getElementById('recurringModal').close());
-document.getElementById('recurringModal').addEventListener('click', ev => { if (ev.target === document.getElementById('recurringModal')) document.getElementById('recurringModal').close(); });
+document.getElementById('recurringModalClose').addEventListener('click', () => closeDialog('recurringModal'));
+document.getElementById('recurringModal').addEventListener('click', ev => { if (ev.target === document.getElementById('recurringModal')) closeDialog('recurringModal'); });
 
 function refreshRecurringBadge() {
   ensureMoneyState();
@@ -9166,9 +9160,9 @@ function openWeeklyReport() {
 }
 
 document.getElementById('weeklyReportBtn').addEventListener('click', openWeeklyReport);
-document.getElementById('weeklyReportClose').addEventListener('click', () => document.getElementById('weeklyReportModal').close());
+document.getElementById('weeklyReportClose').addEventListener('click', () => closeDialog('weeklyReportModal'));
 document.getElementById('weeklyReportModal').addEventListener('click', ev => {
-  if (ev.target === document.getElementById('weeklyReportModal')) document.getElementById('weeklyReportModal').close();
+  if (ev.target === document.getElementById('weeklyReportModal')) closeDialog('weeklyReportModal');
 });
 
 document.getElementById('weeklyReportCopy').addEventListener('click', async () => {
@@ -9371,8 +9365,8 @@ function _updateTaskReminderHint() {
   } catch { hint.textContent = ''; }
 }
 document.getElementById('addHabitBtn').addEventListener('click', () => openHabitModal(null));
-document.getElementById('habitModalClose').addEventListener('click', () => document.getElementById('habitModal').close());
-document.getElementById('habitModal').addEventListener('click', ev => { if (ev.target === document.getElementById('habitModal')) document.getElementById('habitModal').close(); });
+document.getElementById('habitModalClose').addEventListener('click', () => closeDialog('habitModal'));
+document.getElementById('habitModal').addEventListener('click', ev => { if (ev.target === document.getElementById('habitModal')) closeDialog('habitModal'); });
 document.getElementById('habitModalSave').addEventListener('click', () => {
   ensureHabits();
   const name = document.getElementById('habitNameInput').value.trim();
@@ -9393,7 +9387,7 @@ document.getElementById('habitModalSave').addEventListener('click', () => {
       reminderTime,
     });
   }
-  save(); renderHabits(); document.getElementById('habitModal').close();
+  save(); renderHabits(); closeDialog('habitModal');
   if (reminderTime) {
     // Offer permission request if not yet asked
     if ('Notification' in window && Notification.permission === 'default') {
@@ -9405,7 +9399,7 @@ document.getElementById('habitModalDelete').addEventListener('click', () => {
   if (!_editingHabitId) return;
   if (!confirm('این عادت همراه با تاریخچه‌اش حذف بشه؟')) return;
   state.habits = state.habits.filter(h => h.id !== _editingHabitId);
-  save(); renderHabits(); document.getElementById('habitModal').close();
+  save(); renderHabits(); closeDialog('habitModal');
 });
 
 /* ════════════════════════════════════════════════
@@ -10186,7 +10180,7 @@ function _onbRender() {
 function _onbFinish() {
   state.onboardingDone = true;
   save();
-  document.getElementById('onbModal').close();
+  closeDialog('onbModal');
   // Seed a sample operation so the user has something to play with
   try {
     if (!state.operations.length) {
@@ -12597,8 +12591,8 @@ function openBudgetModal() {
   document.getElementById('budgetModal').showModal();
 }
 document.getElementById('manageBudgetsBtn').addEventListener('click', openBudgetModal);
-document.getElementById('budgetModalClose').addEventListener('click', () => document.getElementById('budgetModal').close());
-document.getElementById('budgetModal').addEventListener('click', ev => { if (ev.target === document.getElementById('budgetModal')) document.getElementById('budgetModal').close(); });
+document.getElementById('budgetModalClose').addEventListener('click', () => closeDialog('budgetModal'));
+document.getElementById('budgetModal').addEventListener('click', ev => { if (ev.target === document.getElementById('budgetModal')) closeDialog('budgetModal'); });
 document.getElementById('budgetModalSave').addEventListener('click', () => {
   const newBudgets = {};
   document.querySelectorAll('#budgetEditList input[data-cat-id]').forEach(inp => {
@@ -12606,7 +12600,7 @@ document.getElementById('budgetModalSave').addEventListener('click', () => {
     if (v > 0) newBudgets[inp.dataset.catId] = v;
   });
   state.moneyBudgets = newBudgets;
-  save(); renderMoney(); document.getElementById('budgetModal').close();
+  save(); renderMoney(); closeDialog('budgetModal');
   showToast('🎯 بودجه‌ها ذخیره شد', { duration: 2500 });
 });
 
@@ -12709,8 +12703,8 @@ document.getElementById('quickCaptureFab').addEventListener('click', () => {
   document.getElementById('quickCaptureModal').showModal();
   setTimeout(() => document.getElementById('quickCaptureText').focus(), 60);
 });
-document.getElementById('quickCaptureClose').addEventListener('click', () => document.getElementById('quickCaptureModal').close());
-document.getElementById('quickCaptureModal').addEventListener('click', ev => { if (ev.target === document.getElementById('quickCaptureModal')) document.getElementById('quickCaptureModal').close(); });
+document.getElementById('quickCaptureClose').addEventListener('click', () => closeDialog('quickCaptureModal'));
+document.getElementById('quickCaptureModal').addEventListener('click', ev => { if (ev.target === document.getElementById('quickCaptureModal')) closeDialog('quickCaptureModal'); });
 document.getElementById('quickCaptureSave').addEventListener('click', () => {
   ensureInbox();
   const txt = document.getElementById('quickCaptureText').value.trim();
@@ -13490,7 +13484,7 @@ document.getElementById('onbPrev')?.addEventListener('click', () => {
 });
 document.getElementById('onbSkip')?.addEventListener('click', () => {
   state.onboardingDone = true; save();
-  document.getElementById('onbModal').close();
+  closeDialog('onbModal');
 });
 // Auto-show onboarding on first visit (no operations + not seen yet)
 setTimeout(() => {
@@ -13513,9 +13507,9 @@ try {
    slide-over/sheet pattern instead of <dialog>.
 ──────────────────────────────────────────────── */
 // Hall of Fame close handlers
-document.getElementById('hofModalClose')?.addEventListener('click', () => document.getElementById('hofModal').close());
+document.getElementById('hofModalClose')?.addEventListener('click', () => closeDialog('hofModal'));
 document.getElementById('hofModal')?.addEventListener('click', ev => {
-  if (ev.target === document.getElementById('hofModal')) document.getElementById('hofModal').close();
+  if (ev.target === document.getElementById('hofModal')) closeDialog('hofModal');
 });
 // PWA install → unlock badge
 window.addEventListener('appinstalled', () => { try { unlockBadge('install-pwa'); } catch {} });
