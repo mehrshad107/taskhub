@@ -2957,7 +2957,7 @@
     .fit-metric-bf { font-size: .72rem; color: var(--color-text-muted); }
 
     /* Plan editor modal */
-    dialog#fitPlanModal, dialog#fitExPickerModal, dialog#fitSessionModal, dialog#fitMetricModal {
+    dialog#fitPlanModal, dialog#fitExPickerModal, dialog#fitSessionModal {
       max-width: 640px; width: 92vw; max-height: 88vh;
       padding: 0; border: none; border-radius: 16px;
       background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
@@ -2965,8 +2965,7 @@
     }
     dialog#fitPlanModal::backdrop,
     dialog#fitExPickerModal::backdrop,
-    dialog#fitSessionModal::backdrop,
-    dialog#fitMetricModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
+    dialog#fitSessionModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
 
     .fpm-day-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
     .fpm-day-tab {
@@ -4788,18 +4787,6 @@
   <div class="caldm-body tdee-body"></div>
 </dialog>
 
-<!-- 📏 Body metric modal -->
-<dialog id="fitMetricModal">
-  <form method="dialog" class="caldm-head">
-    <h3 class="caldm-title">📏 ثبت اندازه‌گیری</h3>
-    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
-  <div class="caldm-body fmm-body"></div>
-  <div class="caldm-foot">
-    <button type="button" id="fmmSaveBtn" class="primary-btn" style="background:var(--color-primary);color:white">💾 ذخیره</button>
-  </div>
-</dialog>
-
 <!-- 🏛 Hall of Fame -->
 <dialog id="hofModal" class="hof-modal">
   <div class="hof-modal-bar">
@@ -5314,9 +5301,6 @@ const DEFAULT = {
       weightUnit: 'kg',     /* 'kg' | 'lb' */
     },
   },
-  /* ── 📏 Body metrics ── */
-  bodyMetrics: [], /* [{date:'YYYY-MM-DD', weight, bodyFatPct?, waist?, chest?, arm?, thigh?, neck?, note?}] */
-  bodyGoals: { targetWeight: null, deadline: null, type: null }, /* type: 'cut'|'maintain'|'bulk' */
   /* ── 🥗 Nutrition ── */
   nutrition: {
     meals: {},          /* { 'YYYY-MM-DD': [{mealType, foods:[{foodId, grams}], time}] } */
@@ -8698,7 +8682,6 @@ const CMD_STATIC_COMMANDS = [
   { id:'hof',        title:'تالار افتخار',             icon:'🏛', kind:'command', sub:'رکوردها و نشان‌های شخصی', run: () => openHallOfFame() },
   { id:'fitness',    title:'تناسب اندام',             icon:'🏋', kind:'command', sub:'برنامه تمرین، جلسه زنده، رکوردها', run: () => { if (typeof switchPage==='function') switchPage('fitness'); } },
   { id:'fit-start',  title:'شروع تمرین امروز',         icon:'🔥', kind:'command', sub:'جلسه تمرین رو همین الان شروع کن', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ openFitSession(false); }catch{} }, 200); } },
-  { id:'fit-metric', title:'ثبت وزن/اندازه',           icon:'📏', kind:'command', sub:'سنجش بدن جدید', run: () => { try { openFitMetricModal(); } catch {} } },
   { id:'nutrition',  title:'تغذیه — وعده‌ها',           icon:'🥗', kind:'command', sub:'ثبت غذا، ماکرو، آب', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ setFitSubTab('nutrition'); }catch{} }, 150); } },
   { id:'tdee',       title:'محاسبه TDEE',               icon:'🎯', kind:'command', sub:'هدف کالری روزانه', run: () => { try { openTDEEModal(); } catch {} } },
   { id:'excel',      title:'خروجی Excel',              icon:'📊', kind:'command', sub:'xlsx با ۴ شیت', run: () => exportToExcel() },
@@ -10450,10 +10433,6 @@ function ensureFitnessState() {
   if (!f.settings || typeof f.settings !== 'object') {
     f.settings = { defaultRestSec: 90, restBellEnabled: true, weightUnit: 'kg' };
   }
-  if (!Array.isArray(state.bodyMetrics)) state.bodyMetrics = [];
-  if (!state.bodyGoals || typeof state.bodyGoals !== 'object') {
-    state.bodyGoals = { targetWeight: null, deadline: null, type: null };
-  }
 }
 
 /* ─── EXERCISE LIBRARY ───
@@ -10713,7 +10692,6 @@ function renderFitness() {
     { id:'plans',     label:'برنامه‌ها', emoji:'📋' },
     { id:'nutrition', label:'تغذیه',     emoji:'🥗' },
     { id:'progress',  label:'پیشرفت',    emoji:'📈' },
-    { id:'metrics',   label:'سنجش',      emoji:'📏' },
   ];
   const tabsHtml = `<div class="fit-subtabs">${subs.map(s =>
     `<button class="fit-subtab ${s.id===_fitSubTab?'active':''}" data-fit-sub="${s.id}">${s.emoji} ${s.label}</button>`
@@ -10724,7 +10702,6 @@ function renderFitness() {
   if (_fitSubTab === 'plans')     body = _renderFitPlans();
   if (_fitSubTab === 'nutrition') body = _renderFitNutrition();
   if (_fitSubTab === 'progress')  body = _renderFitProgress();
-  if (_fitSubTab === 'metrics')   body = _renderFitMetrics();
 
   root.innerHTML = tabsHtml + `<div class="fit-body">${body}</div>`;
 
@@ -10953,70 +10930,6 @@ function _renderFitProgress() {
   return html;
 }
 
-function _renderFitMetrics() {
-  const m = state.bodyMetrics || [];
-  const goal = state.bodyGoals || {};
-  let html = `<div class="fit-section-head">
-    <h3>📏 سنجش بدن</h3>
-    <button class="primary-btn fit-small-btn" id="fitNewMetricBtn">+ ثبت جدید</button>
-  </div>`;
-
-  if (!m.length) {
-    html += `<div class="fit-empty">
-      <div class="fit-empty-emoji">📏</div>
-      <h3>هنوز اندازه‌گیری ثبت نکردی</h3>
-      <p>وزن، درصد چربی، و اندازه‌های بدنی‌ت رو ثبت کن تا پیشرفتت رو ببینی.</p>
-    </div>`;
-    return html;
-  }
-
-  // Latest entry
-  const sorted = [...m].sort((a,b) => a.date < b.date ? -1 : 1);
-  const latest = sorted[sorted.length - 1];
-  const prev = sorted[sorted.length - 2];
-  const weightDelta = prev ? (latest.weight - prev.weight) : null;
-
-  html += `<div class="fit-metric-current">
-    <div class="fit-metric-big">
-      <div class="fit-metric-label">آخرین وزن</div>
-      <div class="fit-metric-val">${toFaDigits(latest.weight)} <span>${state.fitness.settings.weightUnit}</span></div>
-      ${weightDelta !== null ? `<div class="fit-metric-delta ${weightDelta>0?'up':weightDelta<0?'down':''}">${weightDelta>0?'+':''}${toFaDigits(weightDelta.toFixed(1))}</div>` : ''}
-      <div class="fit-metric-date">${toFaDigits(latest.date)}</div>
-    </div>
-    ${latest.bodyFatPct ? `<div class="fit-metric-mini"><div class="fit-metric-label">چربی</div><div class="fit-metric-val">${toFaDigits(latest.bodyFatPct)}<span>٪</span></div></div>` : ''}
-    ${latest.waist ? `<div class="fit-metric-mini"><div class="fit-metric-label">دور کمر</div><div class="fit-metric-val">${toFaDigits(latest.waist)}<span>cm</span></div></div>` : ''}
-    ${latest.chest ? `<div class="fit-metric-mini"><div class="fit-metric-label">دور سینه</div><div class="fit-metric-val">${toFaDigits(latest.chest)}<span>cm</span></div></div>` : ''}
-    ${latest.arm ? `<div class="fit-metric-mini"><div class="fit-metric-label">بازو</div><div class="fit-metric-val">${toFaDigits(latest.arm)}<span>cm</span></div></div>` : ''}
-  </div>`;
-
-  // Goal progress
-  if (goal.targetWeight) {
-    const totalDelta = goal.targetWeight - sorted[0].weight;
-    const curDelta = latest.weight - sorted[0].weight;
-    const pct = totalDelta === 0 ? 100 : Math.min(100, Math.max(0, Math.abs(curDelta) / Math.abs(totalDelta) * 100));
-    html += `<div class="fit-goal-card">
-      <div class="fit-goal-head">🎯 هدف: ${toFaDigits(goal.targetWeight)} ${state.fitness.settings.weightUnit}</div>
-      <div class="fit-goal-bar"><div class="fit-goal-fill" style="width:${pct.toFixed(1)}%"></div></div>
-      <div class="fit-goal-meta">${toFaDigits(pct.toFixed(0))}٪ · ${toFaDigits(Math.abs(latest.weight - goal.targetWeight).toFixed(1))} ${state.fitness.settings.weightUnit} باقی‌مونده</div>
-    </div>`;
-  }
-
-  // Weight history list
-  html += `<div class="fit-section-head" style="margin-top:20px"><h3>📜 تاریخچه</h3></div>
-    <div class="fit-metric-list">`;
-  [...sorted].reverse().slice(0, 20).forEach(entry => {
-    html += `<div class="fit-metric-row">
-      <span class="fit-metric-date">${toFaDigits(entry.date)}</span>
-      <span class="fit-metric-w"><b>${toFaDigits(entry.weight)}</b> ${state.fitness.settings.weightUnit}</span>
-      ${entry.bodyFatPct ? `<span class="fit-metric-bf">${toFaDigits(entry.bodyFatPct)}٪</span>` : '<span></span>'}
-      <button class="ghost-btn fit-tiny-btn fit-danger" data-fit-act="del-metric" data-date="${entry.date}">🗑</button>
-    </div>`;
-  });
-  html += `</div>`;
-
-  return html;
-}
-
 function _wireFitSectionHandlers() {
   // Start workout button
   document.getElementById('fitStartBtn')?.addEventListener('click', () => openFitSession(false));
@@ -11024,7 +10937,6 @@ function _wireFitSectionHandlers() {
   // New plan
   document.getElementById('fitNewPlanBtn')?.addEventListener('click', () => openFitPlanEditor(null));
   // New metric
-  document.getElementById('fitNewMetricBtn')?.addEventListener('click', () => openFitMetricModal());
 
   // Plan/template action buttons
   document.querySelectorAll('[data-fit-act]').forEach(btn => {
@@ -11049,10 +10961,6 @@ function _wireFitSectionHandlers() {
         if (!state.fitness.activePlanId) state.fitness.activePlanId = newPlan.id;
         save(); renderFitness();
         showToast?.('✅ برنامه ساخته شد', { duration: 2000 });
-      } else if (act === 'del-metric') {
-        const d = btn.dataset.date;
-        state.bodyMetrics = state.bodyMetrics.filter(e => e.date !== d);
-        save(); renderFitness();
       }
     });
   });
@@ -11416,49 +11324,6 @@ function openFitSession(isFreeMode) {
 }
 
 /* ─── BODY METRIC MODAL ─── */
-function openFitMetricModal() {
-  ensureFitnessState();
-  const dlg = document.getElementById('fitMetricModal');
-  const body = dlg.querySelector('.fmm-body');
-  body.innerHTML = `
-    <div class="modal-field"><label>تاریخ</label><input id="fmmDate" type="date" class="input-field" value="${_todayKey()}" /></div>
-    <div class="modal-field"><label>وزن (${state.fitness.settings.weightUnit})</label><input id="fmmWeight" type="number" class="input-field" step="0.1" placeholder="مثلاً ۷۵.۲" /></div>
-    <div class="modal-field"><label>درصد چربی (اختیاری)</label><input id="fmmBF" type="number" class="input-field" step="0.1" placeholder="مثلاً ۱۸" /></div>
-    <div class="modal-field-row">
-      <div class="modal-field"><label>دور کمر (cm)</label><input id="fmmWaist" type="number" class="input-field" step="0.5" /></div>
-      <div class="modal-field"><label>دور سینه (cm)</label><input id="fmmChest" type="number" class="input-field" step="0.5" /></div>
-    </div>
-    <div class="modal-field-row">
-      <div class="modal-field"><label>دور بازو (cm)</label><input id="fmmArm" type="number" class="input-field" step="0.5" /></div>
-      <div class="modal-field"><label>دور ران (cm)</label><input id="fmmThigh" type="number" class="input-field" step="0.5" /></div>
-    </div>
-    <div class="modal-field"><label>یادداشت (اختیاری)</label><input id="fmmNote" class="input-field" type="text" /></div>
-  `;
-  dlg.querySelector('#fmmSaveBtn').onclick = () => {
-    const w = +dlg.querySelector('#fmmWeight').value;
-    if (!w) { showToast?.('⚠ وزن لازمه', { duration: 2000 }); return; }
-    const entry = {
-      date: dlg.querySelector('#fmmDate').value || _todayKey(),
-      weight: w,
-      bodyFatPct: +dlg.querySelector('#fmmBF').value || null,
-      waist: +dlg.querySelector('#fmmWaist').value || null,
-      chest: +dlg.querySelector('#fmmChest').value || null,
-      arm:   +dlg.querySelector('#fmmArm').value   || null,
-      thigh: +dlg.querySelector('#fmmThigh').value || null,
-      note:  dlg.querySelector('#fmmNote').value   || '',
-    };
-    // Replace existing for same date if present
-    state.bodyMetrics = (state.bodyMetrics || []).filter(x => x.date !== entry.date);
-    state.bodyMetrics.push(entry);
-    state.bodyMetrics.sort((a,b) => a.date < b.date ? -1 : 1);
-    save();
-    dlg.close();
-    renderFitness();
-    showToast?.('📏 ثبت شد', { duration: 1500 });
-  };
-  dlg.showModal();
-}
-
 
 /* ════════════════════════════════════════════════
    🥗 NUTRITION MODULE — food DB, meal log, macros/micros, TDEE, water
@@ -12085,7 +11950,6 @@ function fitnessInsightCards() {
   ensureFitnessState();
   ensureNutritionState();
   const sessions = state.fitness.sessions || [];
-  const metrics = state.bodyMetrics || [];
   const cards = [];
 
   // Best workout hour (from startedAt if available, else from createdAt)
@@ -12120,25 +11984,6 @@ function fitnessInsightCards() {
       <div class="insight-card-value" style="color:${tone}">${toFaDigits(avg.toFixed(1))}/۱۰</div>
       <div class="insight-card-sub">${avg < 5 ? 'پایینه — استراحت یا خواب بیشتر' : avg >= 8 ? 'عالی! آماده تمرین سنگین‌تر' : 'متعادل — برنامه‌ت خوبه'}</div>
     </div>`);
-  }
-
-  // Weight trend (last 30 days)
-  if (metrics.length >= 2) {
-    const sorted = [...metrics].sort((a,b) => a.date < b.date ? -1 : 1);
-    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
-    const recent = sorted.filter(m => new Date(m.date) >= cutoff);
-    if (recent.length >= 2) {
-      const first = recent[0], last = recent[recent.length-1];
-      const delta = last.weight - first.weight;
-      const dirEmoji = delta > 0.3 ? '📈' : delta < -0.3 ? '📉' : '⚖';
-      const dirColor = delta > 0.3 ? '#ef4444' : delta < -0.3 ? '#22c55e' : '#3b82f6';
-      cards.push(`<div class="insight-card">
-        <div class="insight-card-icon" style="background:${dirColor}22;color:${dirColor}">${dirEmoji}</div>
-        <div class="insight-card-title">روند وزن ۳۰ روز اخیر</div>
-        <div class="insight-card-value" style="color:${dirColor}">${delta > 0 ? '+' : ''}${toFaDigits(delta.toFixed(1))} kg</div>
-        <div class="insight-card-sub">${toFaDigits(recent.length)} ثبت در این بازه</div>
-      </div>`);
-    }
   }
 
   // Workout streak
