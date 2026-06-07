@@ -5498,6 +5498,66 @@ function initFolders() {
   if (!['active','done','all',...folderIds].includes(state.trackFilter)) state.trackFilter = 'active';
 }
 
+/* cleanupOrphans — run once at boot to fix dangling references that build
+   up when users delete accounts / tasks / operations. Without this, the UI
+   shows phantom links, balance calcs reference dead accounts, and recurring
+   rules silently no-op forever. Pure cleanup — never throws, never logs noise. */
+function cleanupOrphans() {
+  let fixed = 0;
+  try {
+    const taskIds = new Set((state.tasks || []).map(t => t.id));
+    const accountIds = new Set((state.moneyAccounts || []).map(a => a.id));
+
+    // 1. operation.taskIds → drop ids that no longer point to a task
+    (state.operations || []).forEach(op => {
+      if (!Array.isArray(op.taskIds)) { op.taskIds = []; return; }
+      const before = op.taskIds.length;
+      op.taskIds = op.taskIds.filter(id => taskIds.has(id));
+      if (op.taskIds.length !== before) fixed += before - op.taskIds.length;
+    });
+
+    // 2. task.operationId pointing to dead op → clear it (task becomes free-floating)
+    const opIds = new Set((state.operations || []).map(o => o.id));
+    (state.tasks || []).forEach(t => {
+      if (t.operationId && !opIds.has(t.operationId)) { t.operationId = null; fixed++; }
+      // 3. task.valueAccountId pointing to dead account → clear money-link
+      if (t.valueAccountId && !accountIds.has(t.valueAccountId)) {
+        t.valueAccountId = null; t.valueAmount = 0; t.valueType = null; t.valueTxId = null;
+        fixed++;
+      }
+    });
+
+    // 4. moneyTransactions.accountId / toAccountId → drop tx if account gone
+    if (Array.isArray(state.moneyTransactions)) {
+      const before = state.moneyTransactions.length;
+      state.moneyTransactions = state.moneyTransactions.filter(tx =>
+        accountIds.has(tx.accountId) &&
+        (tx.type !== 'transfer' || accountIds.has(tx.toAccountId))
+      );
+      fixed += before - state.moneyTransactions.length;
+    }
+
+    // 5. moneyRecurring.accountId / toAccountId → deactivate (don't delete history)
+    (state.moneyRecurring || []).forEach(r => {
+      if (!accountIds.has(r.accountId) || (r.type === 'transfer' && !accountIds.has(r.toAccountId))) {
+        if (r.active) { r.active = false; fixed++; }
+      }
+    });
+
+    // 6. activeTaskId / activeOpId / activeSession pointing to deleted item
+    if (state.activeTaskId && !taskIds.has(state.activeTaskId)) { state.activeTaskId = null; fixed++; }
+    if (state.activeOpId   && !opIds.has(state.activeOpId))     { state.activeOpId = null; fixed++; }
+
+    // 7. fitness.activePlanId pointing to dead plan
+    if (state.fitness?.activePlanId) {
+      const planIds = new Set((state.fitness.plans || []).map(p => p.id));
+      if (!planIds.has(state.fitness.activePlanId)) { state.fitness.activePlanId = null; fixed++; }
+    }
+  } catch (e) { console.warn('[cleanupOrphans] failed', e); }
+  if (fixed > 0) console.log(`[cleanupOrphans] fixed ${fixed} orphan reference(s)`);
+  return fixed;
+}
+
 function isoDateKey(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 
 /* Hourly focus tracking for heatmap — bump from timer ticks (1s per tick).
@@ -6907,16 +6967,37 @@ function renderTrack() {
   document.getElementById('trackEmpty').hidden = tasks.length>0||trackableOps.length>0;
 }
 
+/* render() — boundary so a crash in one page renderer never freezes the
+   whole UI. Each page wrapped in try/catch; failed page logs + shows
+   a recoverable empty state instead of a blank tab. */
+function _safeRender(page, fn) {
+  try { fn(); }
+  catch (e) {
+    console.error(`[render:${page}] crashed`, e);
+    const el = document.getElementById('page-' + page);
+    if (el && !el.querySelector('.render-error-box')) {
+      el.insertAdjacentHTML('afterbegin',
+        `<div class="render-error-box" style="padding:var(--space-4);margin:var(--space-3);border-radius:var(--radius-md);background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.30);color:#ef4444;font-size:.85rem;line-height:1.7">
+          ⚠ خطایی در نمایش این تب رخ داد. خود اپ سالمه — تب رو ببند و دوباره باز کن.
+          <br><small style="opacity:.7">${e.message ? String(e.message).slice(0,200) : 'unknown'}</small>
+        </div>`);
+    }
+  }
+}
 function render() {
-  if (state.currentPage==='plan') renderPlan();
-  if (state.currentPage==='track') renderTrack();
-  if (state.currentPage==='planner') renderPlanner();
-  if (state.currentPage==='fitness') renderFitness();
-  if (state.currentPage==='money') renderMoney();
-  if (state.currentPage==='insight') renderInsight();
-  document.getElementById('pomodoroToggle').style.borderColor = state.pomodoroEnabled?'var(--color-primary)':'transparent';
-  document.getElementById('soundToggle').style.borderColor    = state.soundEnabled?'var(--color-primary)':'transparent';
-  document.getElementById('notifyToggle').style.borderColor   = state.notificationsEnabled?'var(--color-primary)':'transparent';
+  if (state.currentPage==='plan')     _safeRender('plan',     renderPlan);
+  if (state.currentPage==='track')    _safeRender('track',    renderTrack);
+  if (state.currentPage==='planner')  _safeRender('planner',  renderPlanner);
+  if (state.currentPage==='fitness')  _safeRender('fitness',  renderFitness);
+  if (state.currentPage==='money')    _safeRender('money',    renderMoney);
+  if (state.currentPage==='insight')  _safeRender('insight',  renderInsight);
+  // Toolbar pill borders — independent of page renderer; wrap in try/catch
+  // so a missing DOM node never short-circuits the dispatcher above.
+  try {
+    document.getElementById('pomodoroToggle').style.borderColor = state.pomodoroEnabled?'var(--color-primary)':'transparent';
+    document.getElementById('soundToggle').style.borderColor    = state.soundEnabled?'var(--color-primary)':'transparent';
+    document.getElementById('notifyToggle').style.borderColor   = state.notificationsEnabled?'var(--color-primary)':'transparent';
+  } catch {}
 }
 
 /* ══ EVENTS ══ */
@@ -13511,6 +13592,7 @@ document.getElementById('authOfflineLink').addEventListener('click', () => {
 });
 
 initFolders();
+try { cleanupOrphans(); } catch (e) { console.warn('[boot] cleanupOrphans failed', e); }
 normalizeDay();
 // Run any due recurring transactions on app boot (catches up missed days while offline)
 try { processRecurringTransactions({ silent: false }); } catch (e) { console.warn('[recurring] boot failed', e); }
