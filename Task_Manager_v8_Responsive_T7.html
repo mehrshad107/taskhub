@@ -1087,7 +1087,20 @@
        Desktop ignores all of this.
     ══════════════════════════════════════════════ */
     .mobile-only { display: none; }
-    #settingsSheet, #addOpSheet, #mSheetBackdrop, #mFab { display: none; }
+    #addOpSheet, #mSheetBackdrop, #mFab { display: none; }
+    /* Desktop: settings sheet renders as a dropdown panel anchored to the gear
+       icon (top-end of header). Mobile media query overrides this to bottom
+       sheet. `hidden` attribute still controls visibility. */
+    #settingsSheet {
+      position: absolute; top: 60px; inset-inline-start: 14px;
+      width: min(360px, calc(100vw - 28px)); max-height: 70vh;
+      overflow-y: auto;
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+      padding: var(--space-4); z-index: 200;
+      animation: page-fade-in .18s var(--ease-out) both;
+    }
+    #settingsSheet[hidden] { display: none; }
 
     /* Shared sheet content styles (only ever shown on mobile) */
     .sheet-title { font-size: var(--text-lg); font-weight: 800; letter-spacing: -.02em; margin: 0 0 var(--space-4); color: var(--color-text); }
@@ -1465,7 +1478,7 @@
     .folder-tab-emoji { font-size: 1rem; }
 
     /* Folder edit modal */
-    .folder-emoji-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 5px; margin-top:var(--space-3); }
+    .folder-emoji-grid { display: grid; grid-template-columns: repeat(8,1fr); gap: 6px; margin-top:var(--space-3); max-height: 240px; overflow-y: auto; padding-inline-end: 4px; }
     .folder-emoji-opt {
       height: 36px; font-size: 1.1rem;
       border-radius: var(--radius-md); border: 2px solid transparent;
@@ -1515,8 +1528,11 @@
       animation: panel-in 180ms var(--ease-out);
     }
     .profile-emoji-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+      display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
+      max-height: 280px; overflow-y: auto; padding-inline-end: 4px;
     }
+    /* host panels need wider on desktop to fit 8 cols + scroll comfortably */
+    #profilePanel { min-width: 360px; max-width: 92vw; }
     .profile-emoji-opt {
       height: 38px; font-size: 1.25rem;
       border-radius: var(--radius-md); border: 2px solid transparent;
@@ -4365,6 +4381,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
     </div>
+    <!-- Help button: explicit "راهنما" next to gear so users don't have to dig -->
+    <button class="mobile-settings-btn" id="topHelpBtn" title="راهنما و میانبرها" aria-label="راهنما"
+            onclick="document.getElementById('helpModal')?.showModal()"
+            style="font-size:1.05rem;font-weight:800;color:var(--color-primary)">❓</button>
     <!-- Settings entry (now on desktop too — unified menu replaces spread toolbar icons) -->
     <button class="mobile-settings-btn" id="mSettingsBtn" title="تنظیمات" aria-label="تنظیمات">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -4799,7 +4819,7 @@
   </div>
   <div class="modal-field">
     <label>ایموجی</label>
-    <div class="money-chip-row" id="habitEmojiRow"></div>
+    <div class="money-chip-row" id="habitEmojiRow" style="max-height:220px;overflow-y:auto;flex-wrap:wrap"></div>
   </div>
   <div class="modal-field">
     <label>🔔 یادآوری روزانه (اختیاری)</label>
@@ -6256,6 +6276,9 @@ document.addEventListener('click', () => {
   if (!profilePanel.hidden) { profilePanel.hidden = true; renderUserProfile(); }
   const ambientPanel = document.getElementById('ambientPanel');
   if (ambientPanel && !ambientPanel.hidden) ambientPanel.hidden = true;
+  // Settings sheet also closes when clicking outside (desktop dropdown)
+  const setSheet = document.getElementById('settingsSheet');
+  if (setSheet && !setSheet.hidden) setSheet.hidden = true;
 });
 document.getElementById('themePickerPanel').addEventListener('click', ev => ev.stopPropagation());
 
