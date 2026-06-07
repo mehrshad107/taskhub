@@ -6042,8 +6042,11 @@ function startTask(taskId) {
     cur.elapsedSec = cur.timerBaseElapsed + s;
     state.todayFocusSec = state.todayFocusBase + s;
     _bumpFocusHour();
+    try { if (s > 0 && s % 60 === 0) _grantFocusXpIfDue(); } catch {}
     if (cur.elapsedSec >= cur.durationMin * 60) {
-      cur.elapsedSec = cur.durationMin * 60; cur.running = false; cur.timerStartedAt = null; cur.timerBaseElapsed = null;
+      cur.elapsedSec = cur.durationMin * 60;
+      cur.running = false; cur.paused = false;   // reset paused too on auto-finish
+      cur.timerStartedAt = null; cur.timerBaseElapsed = null;
       state.activeTaskId = null; clearInterval(timerHandle); timerHandle = null;
       beep(); notify('تایمر تسک تمام شد', cur.text);
       if (state.pomodoroEnabled) startBreak();
@@ -6082,7 +6085,9 @@ function resumeTimerOnLoad() {
       cur.elapsedSec = cur.timerBaseElapsed + s; state.todayFocusSec = state.todayFocusBase + s; _bumpFocusHour();
       try { if (s > 0 && s % 60 === 0) _grantFocusXpIfDue(); } catch {}
       if (cur.elapsedSec >= cur.durationMin * 60) {
-        cur.elapsedSec = cur.durationMin * 60; cur.running = false; cur.timerStartedAt = null; cur.timerBaseElapsed = null;
+        cur.elapsedSec = cur.durationMin * 60;
+        cur.running = false; cur.paused = false;
+        cur.timerStartedAt = null; cur.timerBaseElapsed = null;
         state.activeTaskId = null; clearInterval(timerHandle); timerHandle = null;
         beep(); notify('تایمر تسک تمام شد', cur.text);
         if (state.pomodoroEnabled) startBreak();
@@ -6718,9 +6723,9 @@ function renderTrack() {
   document.getElementById('trackEmpty').hidden=true;
 
   tasks.forEach(task=>{
-    const total=task.durationMin*60;
-    const left=Math.max(total-task.elapsedSec,0);
-    const pct=Math.min((task.elapsedSec/total)*100,100);
+    const total=Math.max(1, (task.durationMin||0)*60);   // guard ÷0 if durationMin is 0/missing
+    const left=Math.max(total-(task.elapsedSec||0),0);
+    const pct=Math.min(((task.elapsedSec||0)/total)*100,100);
     const pctClass = pct>=70?'high':pct>=35?'mid':'low';
     const pr=getPriority(task.priority||'medium');
     const item=document.createElement('div');
