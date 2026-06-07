@@ -4944,7 +4944,7 @@
   </div>
   <div class="modal-actions">
     <button type="button" class="primary-btn" id="editModalSave">ذخیره</button>
-    <button type="button" class="ghost-btn" id="editModalClose">لغو</button>
+    <button type="button" class="ghost-btn dlg-close-btn" id="editModalClose" data-close="editModal" onclick="closeDialog('editModal');return false;">لغو</button>
   </div>
 </dialog>
 
@@ -6304,13 +6304,20 @@ function openEditTask(taskId) {
 }
 
 function openEditOp(opId) {
-  const op=state.operations.find(o=>o.id===opId); if(!op) return;
-  editModalMode='op'; editModalId=opId;
-  document.getElementById('editModalTitle').textContent='ویرایش عملیات';
+  // opId === null  →  create new operation
+  // opId === 'string' → edit existing
+  let op = null;
+  if (opId) {
+    op = state.operations.find(o=>o.id===opId);
+    if(!op) return;
+  }
+  editModalMode='op'; editModalId = opId || null;
+  document.getElementById('editModalTitle').textContent = op ? 'ویرایش عملیات' : 'عملیات جدید';
   document.getElementById('editTaskFields').hidden=true; document.getElementById('editOpFields').hidden=false;
-  document.getElementById('editOpTitle').value=op.title;
-  document.getElementById('editOpDuration').value=op.durationMin||0;
+  document.getElementById('editOpTitle').value = op ? op.title : '';
+  document.getElementById('editOpDuration').value = op ? (op.durationMin||0) : 0;
   document.getElementById('editModal').showModal();
+  setTimeout(() => document.getElementById('editOpTitle')?.focus(), 80);
 }
 
 function openAddTask(opId) {
@@ -6335,8 +6342,8 @@ function openAddTask(opId) {
   document.getElementById('editModal').showModal();
 }
 
-document.getElementById('editModalClose').addEventListener('click', ()=>document.getElementById('editModal').close());
-document.getElementById('editModal').addEventListener('click', ev=>{ if(ev.target===document.getElementById('editModal'))document.getElementById('editModal').close(); });
+document.getElementById('editModalClose').addEventListener('click', ()=>closeDialog('editModal'));
+document.getElementById('editModal').addEventListener('click', ev=>{ if(ev.target===document.getElementById('editModal'))closeDialog('editModal'); });
 document.getElementById('editModalSave').addEventListener('click', ()=>{
   // Read money-value fields once (shared for create + edit)
   const valueAmt = Math.max(0, parseFloat(document.getElementById('editTaskValue').value) || 0);
@@ -6394,10 +6401,26 @@ document.getElementById('editModalSave').addEventListener('click', ()=>{
       }
     }
   } else if (editModalMode==='op') {
-    const op=state.operations.find(o=>o.id===editModalId);
-    if(op){ const t=document.getElementById('editOpTitle').value.trim(); if(t) op.title=t; op.durationMin=Math.max(0,Number(document.getElementById('editOpDuration').value)||0); }
+    const titleVal = document.getElementById('editOpTitle').value.trim();
+    const durVal = Math.max(0, Number(document.getElementById('editOpDuration').value) || 0);
+    if (editModalId === null) {
+      // Creating new operation
+      if (!titleVal) { document.getElementById('editOpTitle').focus(); return; }
+      state.operations.push({
+        id: crypto.randomUUID(), folder: state.currentFolder, title: titleVal,
+        taskIds: [], durationMin: durVal, elapsedSec: 0, timerStartedAt: null,
+        timerBaseElapsed: 0, running: false, paused: false,
+      });
+      try { trackEvent('task-create'); } catch {}
+    } else {
+      const op = state.operations.find(o => o.id === editModalId);
+      if (op) {
+        if (titleVal) op.title = titleVal;
+        op.durationMin = durVal;
+      }
+    }
   }
-  document.getElementById('editModal').close(); save(); render();
+  closeDialog('editModal'); save(); render();
 });
 
 /* ══ FOLDER MANAGEMENT ══ */
@@ -6602,11 +6625,7 @@ function renderPlan() {
 
     card.querySelector('[data-op-timer]')?.addEventListener('click', ()=>{ if(op.running)pauseOp(); else startOp(op.id); });
     card.querySelector('[data-op-reset]')?.addEventListener('click', ()=>{ if(!confirm('تایمر این عملیات ریست شود؟'))return; if(state.activeOpId===op.id)stopOp(); op.elapsedSec=0;op.paused=false; save();render(); });
-    card.querySelector('[data-rename-op]')?.addEventListener('click', ()=>{
-      const title=prompt('نام جدید عملیات',op.title); if(title===null)return; if(title)op.title=title;
-      const durStr=prompt('مدت زمان عملیات (دقیقه) — 0 برای بدون محدودیت',String(op.durationMin||0)); if(durStr!==null)op.durationMin=Math.max(0,parseInt(durStr)||0);
-      save();render();
-    });
+    card.querySelector('[data-rename-op]')?.addEventListener('click', () => openEditOp(op.id));
     card.querySelector('[data-del-op]')?.addEventListener('click', ()=>{
       if(!confirm(`عملیات "${op.title}" و تسک‌هایش حذف شود؟`))return;
       if(state.activeOpId===op.id)stopOp();
@@ -6867,14 +6886,7 @@ document.querySelectorAll('[data-page]').forEach(btn=>{
 
 // folder tabs و track filters به صورت dynamic توی renderFolderTabs() و renderTrackFilters() ساخته می‌شن
 
-document.getElementById('addOperationBtn').addEventListener('click',()=>{
-  const title=prompt('نام عملیات جدید',''); if(!title) return;
-  const durStr=prompt('مدت زمان عملیات (دقیقه) — خالی یا 0 برای بدون محدودیت:','');
-  const durationMin=durStr&&parseInt(durStr)>0?parseInt(durStr):0;
-  state.operations.push({id:crypto.randomUUID(),folder:state.currentFolder,title,taskIds:[],durationMin,elapsedSec:0,timerStartedAt:null,timerBaseElapsed:0,running:false,paused:false});
-  try { trackEvent('task-create'); } catch {}
-  save();render();
-});
+document.getElementById('addOperationBtn').addEventListener('click', () => openEditOp(null));
 
 document.getElementById('pomodoroToggle').addEventListener('click',()=>{ state.pomodoroEnabled=!state.pomodoroEnabled; save();render(); });
 document.getElementById('soundToggle').addEventListener('click',()=>{ state.soundEnabled=!state.soundEnabled; save();render(); });
