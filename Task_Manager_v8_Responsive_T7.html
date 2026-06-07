@@ -10331,7 +10331,7 @@ function renderFocusChart() {
   const total = values.reduce((s,v)=>s+v, 0);
   const avg = Math.round(total / 30);
   const max = Math.max(...values);
-  const maxDay = days[values.indexOf(max)];
+  const maxDay = max > 0 ? days[values.indexOf(max)] : null;  // no fake "max day" when all zero
   // Compare last 7 vs prev 7
   const last7 = values.slice(-7).reduce((s,v)=>s+v, 0);
   const prev7 = values.slice(-14, -7).reduce((s,v)=>s+v, 0);
@@ -13291,10 +13291,10 @@ function renderInsight() {
   const projIncome  = thisMonthMoney.income  + avgDailyIncome  * daysLeftInMonth;
   const projExpense = thisMonthMoney.expense + avgDailyExpense * daysLeftInMonth;
   const projNet     = projIncome - projExpense;
-  // Project monthly focus
+  // Project monthly focus (uses actual month length, not hard-coded 30)
   const last7Focus = _sumInRange(fMap, weekAgo, today).sum;
   const avgDailyFocus = last7Focus / 7;
-  const projMonthFocus = Math.round(avgDailyFocus * 30);
+  const projMonthFocus = Math.round(avgDailyFocus * monthEnd.getDate());
   const lines = [];
   if (state.moneyAccounts && state.moneyAccounts.length) {
     lines.push(`<div class="insight-row"><span class="insight-row-label">📅 پیش‌بینی پایان ماه (درآمد)</span><span class="insight-row-value">${formatMoney(projIncome)}</span></div>`);
