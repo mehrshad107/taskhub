@@ -2957,15 +2957,6 @@
     .fit-metric-bf { font-size: .72rem; color: var(--color-text-muted); }
 
     /* Plan editor modal */
-    dialog#fitPlanModal, dialog#fitExPickerModal, dialog#fitSessionModal {
-      max-width: 640px; width: 92vw; max-height: 88vh;
-      padding: 0; border: none; border-radius: 16px;
-      background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-      overflow: hidden; display: flex; flex-direction: column;
-    }
-    dialog#fitPlanModal::backdrop,
-    dialog#fitExPickerModal::backdrop,
-    dialog#fitSessionModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
 
     .fpm-day-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
     .fpm-day-tab {
@@ -3200,6 +3191,30 @@
       font-size: .9rem; padding: 2px 4px;
     }
 
+    /* Inline view header — used by every secondary view within fitness
+       sub-tabs (editor, picker, session, recovery, addFood). No popup. */
+    .fit-view-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px var(--space-3); border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(139,92,246,0.10), rgba(59,130,246,0.06));
+      border: 1px solid var(--color-border); margin-bottom: var(--space-3);
+    }
+    [data-theme="dark"] .fit-view-head { background: linear-gradient(135deg, rgba(139,92,246,0.22), rgba(59,130,246,0.15)); }
+    .fit-back-btn {
+      width: 36px; height: 36px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border); background: var(--color-surface);
+      color: var(--color-text); font-size: 1.3rem; font-weight: 800;
+      cursor: pointer; display: grid; place-items: center; flex-shrink: 0;
+      transform: scaleX(-1);
+    }
+    [data-theme="dark"] .fit-back-btn { background: rgba(255,255,255,0.06); color: #f5f5f5; }
+    .fit-back-btn:hover { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .fit-view-title { margin: 0; flex: 1; font-size: 1rem; font-weight: 800; color: var(--color-text); }
+    [data-theme="dark"] .fit-view-title { color: #f5f5f5; }
+    .fit-view-body { display: flex; flex-direction: column; gap: var(--space-3); }
+    .fit-view-foot { display: flex; gap: 8px; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-border); }
+    .fit-view-foot button { min-height: 42px; }
+
     /* Inline TDEE block (replaces the old modal) */
     .nutri-tdee-block {
       margin-top: var(--space-3);
@@ -3226,15 +3241,6 @@
     }
 
     /* Food picker modal — reuses .fxp- classes from fitness */
-    dialog#nutriAddFoodModal {
-      max-width: 640px; width: 92vw; max-height: 88vh;
-      padding: 0; border: none; border-radius: 16px;
-      background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-      overflow: hidden; display: flex; flex-direction: column;
-    }
-    dialog#nutriAddFoodModal::backdrop {
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
-    }
     .naf-search-row, .naf-cat-row { margin-bottom: 10px; }
     .naf-cat-row { display: flex; flex-wrap: wrap; gap: 4px; }
     .naf-selected {
@@ -3274,21 +3280,9 @@
     [data-theme="dark"] .tdee-macros span { background: rgba(255,255,255,0.08); }
 
     @media (max-width: 768px) {
-      dialog#nutriAddFoodModal, dialog#recoveryModal {
-        position: fixed; inset: auto 0 0 0; width: 100%; max-width: 100%;
-        max-height: 88vh; border-radius: 16px 16px 0 0;
-        animation: sheet-up .3s var(--ease-out) forwards;
-      }
     }
 
     /* ── 🛌 Recovery prompt ── */
-    dialog#recoveryModal {
-      max-width: 460px; width: 92vw; max-height: 86vh;
-      padding: 0; border: none; border-radius: 16px;
-      background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-      overflow: hidden; display: flex; flex-direction: column;
-    }
-    dialog#recoveryModal::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
     .rec-section { margin-bottom: var(--space-4); }
     .rec-label {
       display: flex; justify-content: space-between; align-items: center;
@@ -4759,63 +4753,6 @@
      NOTE: close button uses inline onclick (NOT form[method=dialog]) because
      the form-submit approach was unreliable on mobile. The window-level capture
      listener in setupBulletproofDialogClose() is a backup safety net. -->
-<dialog id="fitPlanModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">✏ ویرایش برنامه</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="fitPlanModal" aria-label="بستن"
-            onclick="closeDialog('fitPlanModal');return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </div>
-  <div class="caldm-body fpm-body"></div>
-  <div class="caldm-foot">
-    <button type="button" id="fpmSaveBtn" class="primary-btn" style="background:var(--color-primary);color:white">💾 ذخیره</button>
-  </div>
-</dialog>
-
-<!-- 🏋 Fitness — Exercise picker -->
-<dialog id="fitExPickerModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">📚 انتخاب تمرین</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="fitExPickerModal" aria-label="بستن"
-            onclick="closeDialog('fitExPickerModal');return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </div>
-  <div class="caldm-body fxp-body"></div>
-</dialog>
-
-<!-- 🏋 Fitness — Live session -->
-<dialog id="fitSessionModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">🔥 جلسه تمرین</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="fitSessionModal" aria-label="بستن"
-            onclick="closeDialog('fitSessionModal');return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </div>
-  <div class="caldm-body fsm-body"></div>
-</dialog>
-
-<!-- 🛌 Recovery prompt modal (after workout) -->
-<dialog id="recoveryModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">🛌 چطور بود؟</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="recoveryModal" aria-label="رد کن"
-            onclick="closeDialog('recoveryModal');return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </div>
-  <div class="caldm-body rec-body"></div>
-</dialog>
-
-<!-- 🥗 Nutrition — Add food modal -->
-<dialog id="nutriAddFoodModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">🍽 افزودن غذا</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="nutriAddFoodModal" aria-label="بستن"
-            onclick="closeDialog('nutriAddFoodModal');return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </div>
-  <div class="caldm-body naf-body"></div>
-</dialog>
-
 <!-- 🏛 Hall of Fame -->
 <dialog id="hofModal" class="hof-modal">
   <div class="hof-modal-bar">
@@ -8723,7 +8660,7 @@ const CMD_STATIC_COMMANDS = [
   { id:'notif-test', title:'ارسال یادآوری تست',       icon:'🧪', kind:'command', run: () => fireReminder('🔔 تست یادآوری TaskHub', 'اگر این پیام رو دیدی، یادآوری‌ها کار می‌کنن!', 'test-' + Date.now()) },
   { id:'hof',        title:'تالار افتخار',             icon:'🏛', kind:'command', sub:'رکوردها و نشان‌های شخصی', run: () => openHallOfFame() },
   { id:'fitness',    title:'تناسب اندام',             icon:'🏋', kind:'command', sub:'برنامه تمرین، جلسه زنده، رکوردها', run: () => { if (typeof switchPage==='function') switchPage('fitness'); } },
-  { id:'fit-start',  title:'شروع تمرین امروز',         icon:'🔥', kind:'command', sub:'جلسه تمرین رو همین الان شروع کن', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ openFitSession(false); }catch{} }, 200); } },
+  { id:'fit-start',  title:'شروع تمرین امروز',         icon:'🔥', kind:'command', sub:'جلسه تمرین رو همین الان شروع کن', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ enterFitSession(false); }catch{} }, 200); } },
   { id:'nutrition',  title:'تغذیه — وعده‌ها',           icon:'🥗', kind:'command', sub:'ثبت غذا، ماکرو، آب', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ setFitSubTab('nutrition'); }catch{} }, 150); } },
   { id:'tdee',       title:'محاسبه TDEE',               icon:'🎯', kind:'command', sub:'هدف کالری روزانه', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ setFitSubTab('nutrition'); _tdeeExpanded=true; renderFitness(); }catch{} }, 150); } },
   { id:'excel',      title:'خروجی Excel',              icon:'📊', kind:'command', sub:'xlsx با ۴ شیت', run: () => exportToExcel() },
@@ -10721,10 +10658,29 @@ const FITNESS_TEMPLATES = [
 /* ─── Fitness sub-tab routing (in-page tabs inside #page-fitness) ─── */
 let _fitSubTab = 'today';   // 'today' | 'plans' | 'nutrition' | 'progress'
 let _tdeeExpanded = false;  // inline TDEE form open/closed
+
+/* In-tab view stack — every sub-tab can show a secondary "view" (editor,
+   picker, session, etc.) INSIDE itself instead of opening a popup. The
+   secondary view replaces the sub-tab content; user gets a back arrow. */
+let _fitView = { plans: 'list', nutrition: 'dashboard', today: 'today' };
+let _fitEditingPlanId = null;     // plans → editor view: which plan
+let _fitEditingDay = 0;           // plans → editor view: which day tab
+let _fitEditingDraft = null;      // plans → editor view: the editable copy
+let _fitAddingFoodToMeal = null;  // nutrition → addFood view: meal type
+let _fitPickerCb = null;          // any sub-tab → picker view: onPick callback
+
+function setFitView(subtab, view) {
+  _fitView[subtab] = view;
+  renderFitness();
+  // Scroll back to top of fitness root for clarity on view change
+  try { document.getElementById('fitnessRoot')?.scrollIntoView({ behavior:'smooth', block:'start' }); } catch {}
+}
 function setFitSubTab(name) {
   if (typeof closeAllDialogs === 'function') closeAllDialogs();
   _fitSubTab = name;
   _tdeeExpanded = false;       // collapse inline TDEE on sub-tab switch
+  // Reset every sub-tab to its default view so nothing is left mid-edit
+  _fitView = { plans: 'list', nutrition: 'dashboard', today: 'today' };
   renderFitness();
 }
 
@@ -10743,10 +10699,21 @@ function renderFitness() {
   ).join('')}</div>`;
 
   let body = '';
-  if (_fitSubTab === 'today')     body = _renderFitToday();
-  if (_fitSubTab === 'plans')     body = _renderFitPlans();
-  if (_fitSubTab === 'nutrition') body = _renderFitNutrition();
-  if (_fitSubTab === 'progress')  body = _renderFitProgress();
+  if (_fitSubTab === 'today') {
+    if (_fitView.today === 'session')       body = _renderFitSessionView();
+    else if (_fitView.today === 'recovery') body = _renderFitRecoveryView();
+    else if (_fitView.today === 'picker')   body = _renderFitPickerView('today');
+    else                                    body = _renderFitToday();
+  } else if (_fitSubTab === 'plans') {
+    if (_fitView.plans === 'editor')        body = _renderFitPlanEditor();
+    else if (_fitView.plans === 'picker')   body = _renderFitPickerView('plans');
+    else                                    body = _renderFitPlans();
+  } else if (_fitSubTab === 'nutrition') {
+    if (_fitView.nutrition === 'addFood')   body = _renderFitAddFoodView();
+    else                                    body = _renderFitNutrition();
+  } else if (_fitSubTab === 'progress') {
+    body = _renderFitProgress();
+  }
 
   root.innerHTML = tabsHtml + `<div class="fit-body">${body}</div>`;
 
@@ -10755,9 +10722,15 @@ function renderFitness() {
     b.addEventListener('click', () => setFitSubTab(b.dataset.fitSub));
   });
 
-  // Section-specific wiring after innerHTML set
+  // Wire all view-specific handlers
   _wireFitSectionHandlers();
-  if (_fitSubTab === 'nutrition') _wireNutritionHandlers();
+  if (_fitSubTab === 'nutrition' && _fitView.nutrition === 'dashboard') _wireNutritionHandlers();
+  if (_fitSubTab === 'nutrition' && _fitView.nutrition === 'addFood')   _wireAddFoodView();
+  if (_fitSubTab === 'plans'     && _fitView.plans === 'editor')        _wirePlanEditorView();
+  if (_fitSubTab === 'plans'     && _fitView.plans === 'picker')        _wirePickerView('plans');
+  if (_fitSubTab === 'today'     && _fitView.today === 'picker')        _wirePickerView('today');
+  if (_fitSubTab === 'today'     && _fitView.today === 'session')       _wireSessionView();
+  if (_fitSubTab === 'today'     && _fitView.today === 'recovery')      _wireRecoveryView();
 }
 
 function _todayKey() { return new Date().toISOString().slice(0,10); }
@@ -10791,7 +10764,7 @@ function _renderFitToday() {
       <div class="fit-empty-emoji">😴</div>
       <h3>${wdName} — روز استراحت</h3>
       <p>برنامه «${e(plan.name)}» برای امروز تمرینی نداره. خوب استراحت کن!</p>
-      <button class="ghost-btn" type="button" onclick="openFitSession(true)">شروع تمرین آزاد</button>
+      <button class="ghost-btn" type="button" onclick="enterFitSession(true)">شروع تمرین آزاد</button>
     </div>`;
   } else {
     html += `<div class="fit-today-head">
@@ -10977,10 +10950,10 @@ function _renderFitProgress() {
 
 function _wireFitSectionHandlers() {
   // Start workout button
-  document.getElementById('fitStartBtn')?.addEventListener('click', () => openFitSession(false));
-  document.getElementById('fitResumeBtn')?.addEventListener('click', () => openFitSession(false));
+  document.getElementById('fitStartBtn')?.addEventListener('click', () => enterFitSession(false));
+  document.getElementById('fitResumeBtn')?.addEventListener('click', () => enterFitSession(false));
   // New plan
-  document.getElementById('fitNewPlanBtn')?.addEventListener('click', () => openFitPlanEditor(null));
+  document.getElementById('fitNewPlanBtn')?.addEventListener('click', () => enterPlanEditor(null));
   // New metric
 
   // Plan/template action buttons
@@ -10993,7 +10966,7 @@ function _wireFitSectionHandlers() {
         state.fitness.activePlanId = planId; save(); renderFitness();
         showToast?.('⭐ برنامه فعال شد', { duration: 2000 });
       } else if (act === 'edit') {
-        openFitPlanEditor(planId);
+        enterPlanEditor(planId);
       } else if (act === 'delete') {
         if (!confirm('این برنامه حذف بشه؟')) return;
         state.fitness.plans = state.fitness.plans.filter(p => p.id !== planId);
@@ -11012,362 +10985,9 @@ function _wireFitSectionHandlers() {
 }
 
 /* ─── PLAN EDITOR MODAL ─── */
-function openFitPlanEditor(planId) {
-  ensureFitnessState();
-  const dlg = document.getElementById('fitPlanModal');
-  if (!dlg) return;
-  let plan;
-  if (planId) {
-    plan = state.fitness.plans.find(p => p.id === planId);
-    if (!plan) return;
-  } else {
-    plan = { id: crypto.randomUUID(), name: 'برنامه جدید', days: {0:[],1:[],2:[],3:[],4:[],5:[],6:[]}, createdAt: new Date().toISOString() };
-  }
-  // Deep clone for safe edit; commit on save
-  const draft = JSON.parse(JSON.stringify(plan));
-  let curDay = 0;
-
-  function renderEditor() {
-    const body = dlg.querySelector('.fpm-body');
-    body.innerHTML = `
-      <div class="modal-field">
-        <label>نام برنامه</label>
-        <input id="fpmName" class="input-field" type="text" value="${e(draft.name)}" />
-      </div>
-      <div class="modal-field">
-        <label>روز هفته</label>
-        <div class="fpm-day-tabs">
-          ${[0,1,2,3,4,5,6].map(d =>
-            `<button type="button" class="fpm-day-tab ${d===curDay?'active':''}" data-day="${d}">
-               ${FA_JWEEKDAYS_LONG[d]}
-               ${(draft.days[d]||[]).length ? `<span class="fpm-day-count">${toFaDigits(draft.days[d].length)}</span>` : ''}
-             </button>`
-          ).join('')}
-        </div>
-      </div>
-      <div class="fpm-day-content">
-        ${(draft.days[curDay] || []).length === 0
-          ? `<div class="fpm-empty">روز ${FA_JWEEKDAYS_LONG[curDay]} استراحته — تمرینی اضافه نشده.</div>`
-          : `<div class="fpm-ex-list">
-              ${draft.days[curDay].map((row, i) => {
-                const ex = getExerciseById(row.exId) || { name_fa:'?', emoji:'❓' };
-                return `<div class="fpm-ex-row" data-idx="${i}">
-                  <span class="fpm-ex-emoji">${ex.emoji}</span>
-                  <span class="fpm-ex-name">${e(ex.name_fa)}</span>
-                  <div class="fpm-ex-fields">
-                    <input type="number" class="fpm-mini" data-f="sets" value="${row.sets}" min="1" max="20" />
-                    <span>ست</span>
-                    <input type="number" class="fpm-mini" data-f="reps" value="${row.reps}" min="1" max="999" />
-                    <span>تکرار</span>
-                    <input type="number" class="fpm-mini" data-f="weight" value="${row.weight}" min="0" step="0.5" />
-                    <span>${state.fitness.settings.weightUnit}</span>
-                    <input type="number" class="fpm-mini" data-f="rest" value="${row.rest}" min="0" max="600" step="15" />
-                    <span>ث</span>
-                  </div>
-                  <button type="button" class="ghost-btn fpm-del" title="حذف">✕</button>
-                </div>`;
-              }).join('')}
-            </div>`}
-        <button type="button" class="ghost-btn fpm-add-ex" id="fpmAddEx">+ افزودن تمرین</button>
-      </div>
-    `;
-
-    body.querySelector('#fpmName').addEventListener('input', ev => { draft.name = ev.target.value; });
-    body.querySelectorAll('.fpm-day-tab').forEach(b => b.addEventListener('click', () => {
-      curDay = +b.dataset.day; renderEditor();
-    }));
-    body.querySelectorAll('.fpm-ex-row').forEach(row => {
-      const idx = +row.dataset.idx;
-      row.querySelectorAll('.fpm-mini').forEach(inp => {
-        inp.addEventListener('change', () => {
-          const f = inp.dataset.f;
-          draft.days[curDay][idx][f] = +inp.value || 0;
-        });
-      });
-      row.querySelector('.fpm-del').addEventListener('click', () => {
-        draft.days[curDay].splice(idx, 1); renderEditor();
-      });
-    });
-    body.querySelector('#fpmAddEx')?.addEventListener('click', () => {
-      openFitExercisePicker(exId => {
-        if (!exId) return;
-        draft.days[curDay].push({ exId, sets:3, reps:10, weight:0, rest: state.fitness.settings.defaultRestSec });
-        renderEditor();
-      });
-    });
-  }
-  renderEditor();
-
-  // Save handler
-  const saveBtn = dlg.querySelector('#fpmSaveBtn');
-  saveBtn.onclick = () => {
-    if (!draft.name.trim()) draft.name = 'برنامه بی‌نام';
-    const existing = state.fitness.plans.findIndex(p => p.id === draft.id);
-    if (existing >= 0) state.fitness.plans[existing] = draft;
-    else state.fitness.plans.push(draft);
-    if (!state.fitness.activePlanId) state.fitness.activePlanId = draft.id;
-    save(); renderFitness();
-    closeDialog(dlg);
-    showToast?.('💾 برنامه ذخیره شد', { duration: 1800 });
-  };
-
-  dlg.showModal();
-}
-
 /* ─── EXERCISE PICKER MODAL ─── */
-function openFitExercisePicker(onPick) {
-  const dlg = document.getElementById('fitExPickerModal');
-  if (!dlg) return;
-  let filter = '', cat = 'all';
-
-  function renderList() {
-    const body = dlg.querySelector('.fxp-body');
-    const all = getAllExercises();
-    const q = filter.toLowerCase().trim();
-    const filtered = all.filter(x => {
-      if (cat !== 'all' && x.cat !== cat) return false;
-      if (!q) return true;
-      return (x.name_fa + ' ' + x.name_en + ' ' + (x.muscle||'')).toLowerCase().includes(q);
-    });
-    body.innerHTML = `
-      <div class="fxp-search-row">
-        <input id="fxpSearch" class="input-field" placeholder="جستجو تمرین..." value="${e(filter)}" autocomplete="off" />
-      </div>
-      <div class="fxp-cat-row">
-        <button type="button" class="fxp-cat ${cat==='all'?'active':''}" data-cat="all">همه</button>
-        ${Object.entries(FIT_CAT_LABELS).map(([k,v]) =>
-          `<button type="button" class="fxp-cat ${cat===k?'active':''}" data-cat="${k}" style="--cat-color:${v.color}">${v.emoji} ${v.fa}</button>`
-        ).join('')}
-      </div>
-      <div class="fxp-list">
-        ${filtered.slice(0, 80).map(ex =>
-          `<button type="button" class="fxp-item" data-ex-id="${ex.id}">
-            <span class="fxp-emoji">${ex.emoji}</span>
-            <span class="fxp-info">
-              <span class="fxp-name">${e(ex.name_fa)}</span>
-              <span class="fxp-meta">${e(ex.muscle)} · ${e(ex.equip)}</span>
-            </span>
-          </button>`
-        ).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>'}
-      </div>
-    `;
-    const inp = body.querySelector('#fxpSearch');
-    inp.addEventListener('input', () => { filter = inp.value; renderList(); inp.focus(); });
-    body.querySelectorAll('.fxp-cat').forEach(b => b.addEventListener('click', () => { cat = b.dataset.cat; renderList(); }));
-    body.querySelectorAll('.fxp-item').forEach(b => b.addEventListener('click', () => {
-      closeDialog(dlg); onPick(b.dataset.exId);
-    }));
-  }
-  renderList();
-  dlg.showModal();
-}
-
 /* ─── LIVE SESSION MODAL ─── */
 let _fitRestTimer = null;
-function openFitSession(isFreeMode) {
-  ensureFitnessState();
-  const f = state.fitness;
-  let sess;
-  if (f.activeSession && f.activeSession.date === _todayKey()) {
-    sess = f.activeSession;
-  } else {
-    const plan = f.plans.find(p => p.id === f.activePlanId);
-    const wd = _todayWeekdayJalali();
-    const planEx = (!isFreeMode && plan && plan.days[wd]) ? plan.days[wd] : [];
-    sess = {
-      id: crypto.randomUUID(),
-      date: _todayKey(),
-      planId: plan?.id || null,
-      planDay: wd,
-      name: plan ? `${plan.name} — ${FA_JWEEKDAYS_LONG[wd]}` : 'جلسه آزاد',
-      exercises: planEx.map(p => ({
-        exId: p.exId,
-        sets: Array.from({length: p.sets}, () => ({ reps: p.reps, weight: p.weight, done: false })),
-      })),
-      durationSec: 0,
-      startedAt: Date.now(),
-    };
-    f.activeSession = sess;
-    save();
-  }
-
-  const dlg = document.getElementById('fitSessionModal');
-  let restRemaining = 0;
-
-  function renderSess() {
-    const body = dlg.querySelector('.fsm-body');
-    const mins = Math.floor(sess.durationSec / 60);
-    const secs = sess.durationSec % 60;
-    const completedSets = sess.exercises.reduce((s, ex) => s + ex.sets.filter(x => x.done).length, 0);
-    const totalSets = sess.exercises.reduce((s, ex) => s + ex.sets.length, 0);
-    body.innerHTML = `
-      <div class="fsm-stats-bar">
-        <span>⏱ ${toFaDigits(mins)}:${toFaDigits(String(secs).padStart(2,'0'))}</span>
-        <span>✓ ${toFaDigits(completedSets)}/${toFaDigits(totalSets)} ست</span>
-      </div>
-      ${restRemaining > 0 ? `
-        <div class="fsm-rest" id="fsmRest">
-          <div class="fsm-rest-label">⏳ استراحت</div>
-          <div class="fsm-rest-time">${toFaDigits(Math.floor(restRemaining/60))}:${toFaDigits(String(restRemaining%60).padStart(2,'0'))}</div>
-          <button type="button" class="ghost-btn" id="fsmSkipRest">رد کن</button>
-        </div>` : ''}
-      ${sess.exercises.length === 0 ? `
-        <div class="fsm-empty">
-          <p>هیچ تمرینی نیست — می‌تونی الان اضافه کنی:</p>
-          <button class="primary-btn" type="button" id="fsmAddFromLib">+ افزودن تمرین</button>
-        </div>
-      ` : sess.exercises.map((ex, exI) => {
-        const meta = getExerciseById(ex.exId) || { name_fa:'?', emoji:'❓' };
-        return `<div class="fsm-ex-block">
-          <div class="fsm-ex-head">
-            <span class="fsm-ex-emoji">${meta.emoji}</span>
-            <span class="fsm-ex-name">${e(meta.name_fa)}</span>
-          </div>
-          <div class="fsm-set-list">
-            ${ex.sets.map((set, sI) => `
-              <div class="fsm-set ${set.done?'done':''}">
-                <span class="fsm-set-num">${toFaDigits(sI+1)}</span>
-                <input type="number" class="fsm-set-inp" data-ex="${exI}" data-s="${sI}" data-f="weight" value="${set.weight}" step="0.5" />
-                <span>${state.fitness.settings.weightUnit}</span>
-                <span class="fsm-x">×</span>
-                <input type="number" class="fsm-set-inp" data-ex="${exI}" data-s="${sI}" data-f="reps" value="${set.reps}" />
-                <span>تکرار</span>
-                <button type="button" class="fsm-set-check" data-ex="${exI}" data-s="${sI}">${set.done ? '✓' : '○'}</button>
-              </div>
-            `).join('')}
-            <button type="button" class="ghost-btn fit-tiny-btn" data-add-set="${exI}">+ ست</button>
-          </div>
-        </div>`;
-      }).join('')}
-      <div class="fsm-foot-actions">
-        ${sess.exercises.length > 0 ? `<button type="button" class="ghost-btn" id="fsmAddMore">+ تمرین دیگه</button>` : ''}
-        <button type="button" class="primary-btn fit-danger-btn" id="fsmFinishBtn">🏁 پایان جلسه</button>
-      </div>
-    `;
-
-    // Wire inputs
-    body.querySelectorAll('.fsm-set-inp').forEach(inp => {
-      inp.addEventListener('change', () => {
-        const exI = +inp.dataset.ex, sI = +inp.dataset.s, f = inp.dataset.f;
-        sess.exercises[exI].sets[sI][f] = +inp.value || 0;
-        save();
-      });
-    });
-    body.querySelectorAll('.fsm-set-check').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const exI = +btn.dataset.ex, sI = +btn.dataset.s;
-        const set = sess.exercises[exI].sets[sI];
-        set.done = !set.done;
-        save();
-        if (set.done) {
-          // Start rest timer
-          startRestTimer(state.fitness.settings.defaultRestSec);
-        }
-        renderSess();
-      });
-    });
-    body.querySelectorAll('[data-add-set]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const exI = +btn.dataset.addSet;
-        const last = sess.exercises[exI].sets[sess.exercises[exI].sets.length - 1] || { reps:10, weight:0 };
-        sess.exercises[exI].sets.push({ reps:last.reps, weight:last.weight, done:false });
-        save(); renderSess();
-      });
-    });
-    body.querySelector('#fsmAddMore')?.addEventListener('click', () => {
-      openFitExercisePicker(exId => {
-        if (!exId) return;
-        sess.exercises.push({ exId, sets:[{reps:10, weight:0, done:false}] });
-        save(); renderSess();
-      });
-    });
-    body.querySelector('#fsmAddFromLib')?.addEventListener('click', () => {
-      openFitExercisePicker(exId => {
-        if (!exId) return;
-        sess.exercises.push({ exId, sets:[{reps:10, weight:0, done:false}] });
-        save(); renderSess();
-      });
-    });
-    body.querySelector('#fsmSkipRest')?.addEventListener('click', stopRestTimer);
-    body.querySelector('#fsmFinishBtn')?.addEventListener('click', finishSession);
-  }
-
-  function startRestTimer(sec) {
-    stopRestTimer();
-    restRemaining = sec;
-    renderSess();
-    _fitRestTimer = setInterval(() => {
-      restRemaining--;
-      const el = dlg.querySelector('.fsm-rest-time');
-      if (el) el.textContent = `${toFaDigits(Math.floor(restRemaining/60))}:${toFaDigits(String(restRemaining%60).padStart(2,'0'))}`;
-      if (restRemaining <= 0) {
-        stopRestTimer();
-        if (state.fitness.settings.restBellEnabled) {
-          try { playBeep(); } catch {}
-        }
-      }
-    }, 1000);
-  }
-  function stopRestTimer() {
-    if (_fitRestTimer) clearInterval(_fitRestTimer);
-    _fitRestTimer = null;
-    restRemaining = 0;
-    renderSess();
-  }
-  function playBeep() {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator(); const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = 880; gain.gain.value = 0.18;
-      osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 220);
-    } catch {}
-  }
-
-  // Duration timer (live)
-  const durTimer = setInterval(() => {
-    if (!dlg.open) return;
-    sess.durationSec = Math.floor((Date.now() - sess.startedAt) / 1000);
-    const statsBar = dlg.querySelector('.fsm-stats-bar');
-    if (statsBar) {
-      const mins = Math.floor(sess.durationSec / 60);
-      const secs = sess.durationSec % 60;
-      statsBar.firstElementChild.textContent = `⏱ ${toFaDigits(mins)}:${toFaDigits(String(secs).padStart(2,'0'))}`;
-    }
-  }, 1000);
-
-  function finishSession() {
-    if (!confirm('جلسه تمرین تموم بشه و ذخیره بشه؟')) return;
-    clearInterval(durTimer);
-    stopRestTimer();
-    sess.durationSec = Math.floor((Date.now() - sess.startedAt) / 1000);
-    closeDialog(dlg);
-    // Show recovery prompt FIRST; saving happens after user fills (or skips).
-    openRecoveryPrompt(sess, () => {
-      state.fitness.sessions.push(JSON.parse(JSON.stringify(sess)));
-      state.fitness.activeSession = null;
-      save();
-      // Reward + insights
-      try { grantXP?.(50, 'workout-done'); } catch {}
-      try { checkBadges?.(); } catch {}
-      try { trackEvent?.('workout-done'); } catch {}
-      // Check for overtraining warning
-      try {
-        const warn = detectOvertraining();
-        if (warn) showToast?.('⚠ ' + warn, { variant: 'warn', duration: 5000 });
-      } catch {}
-      renderFitness();
-      showToast?.('💪 جلسه ذخیره شد! +۵۰ XP', { variant: 'success', duration: 2800 });
-    });
-  }
-
-  // Close handlers
-  dlg.addEventListener('close', () => clearInterval(durTimer), { once: true });
-
-  renderSess();
-  dlg.showModal();
-}
-
 /* ─── BODY METRIC MODAL ─── */
 
 /* ════════════════════════════════════════════════
@@ -11688,7 +11308,11 @@ function _wireNutritionHandlers() {
   });
   // Add-food per meal
   document.querySelectorAll('[data-add-meal]').forEach(btn => {
-    btn.addEventListener('click', () => openNutriAddFood(btn.dataset.addMeal));
+    btn.addEventListener('click', () => {
+      _fitAddingFoodToMeal = btn.dataset.addMeal;
+      _fitView.nutrition = 'addFood';
+      renderFitness();
+    });
   });
   // Delete food
   document.querySelectorAll('.nutri-food-del').forEach(btn => {
@@ -11801,93 +11425,6 @@ function renderTDEEInline(host) {
 }
 
 /* ── Food picker for meal ── */
-function openNutriAddFood(mealType) {
-  const dlg = document.getElementById('nutriAddFoodModal');
-  if (!dlg) return;
-  let filter = '', cat = 'all', selectedId = null, grams = 100;
-
-  function renderPicker() {
-    const body = dlg.querySelector('.naf-body');
-    const all = getAllFoods();
-    const q = filter.toLowerCase().trim();
-    const filtered = all.filter(x => {
-      if (cat !== 'all' && x.cat !== cat) return false;
-      if (!q) return true;
-      return (x.name_fa + ' ' + x.name_en).toLowerCase().includes(q);
-    });
-    const sel = selectedId ? getFoodById(selectedId) : null;
-    body.innerHTML = `
-      <div class="naf-search-row">
-        <input id="nafSearch" class="input-field" placeholder="جستجو غذا..." value="${e(filter)}" autocomplete="off" />
-      </div>
-      <div class="naf-cat-row">
-        <button type="button" class="fxp-cat ${cat==='all'?'active':''}" data-cat="all">همه</button>
-        ${Object.entries(NUTRI_CAT_LABELS).map(([k,v]) =>
-          `<button type="button" class="fxp-cat ${cat===k?'active':''}" data-cat="${k}" style="--cat-color:${v.color}">${v.emoji} ${v.fa}</button>`
-        ).join('')}
-      </div>
-      ${sel ? `
-        <div class="naf-selected">
-          <div class="naf-sel-head">
-            <span class="naf-sel-emoji">${sel.emoji}</span>
-            <span class="naf-sel-name">${e(sel.name_fa)}</span>
-            <button type="button" class="ghost-btn fit-tiny-btn" id="nafClear">تغییر</button>
-          </div>
-          <div class="naf-sel-macros">
-            <span>${toFaDigits(Math.round(sel.cal*grams/100))} کالری</span>
-            <span>P ${toFaDigits((sel.p*grams/100).toFixed(1))}</span>
-            <span>C ${toFaDigits((sel.c*grams/100).toFixed(1))}</span>
-            <span>F ${toFaDigits((sel.f*grams/100).toFixed(1))}</span>
-          </div>
-          <div class="modal-field">
-            <label>گرم (مقدار)</label>
-            <input id="nafGrams" type="number" class="input-field" value="${grams}" min="1" step="5" />
-          </div>
-          <button type="button" class="primary-btn" id="nafSaveBtn" style="width:100%;background:var(--color-primary);color:white;min-height:44px">✓ افزودن به ${MEAL_TYPES.find(m=>m.id===mealType).label}</button>
-        </div>
-      ` : `
-        <div class="fxp-list">
-          ${filtered.slice(0, 80).map(fd =>
-            `<button type="button" class="fxp-item" data-food-id="${fd.id}">
-              <span class="fxp-emoji">${fd.emoji}</span>
-              <span class="fxp-info">
-                <span class="fxp-name">${e(fd.name_fa)}</span>
-                <span class="fxp-meta">${toFaDigits(fd.cal)} کال/۱۰۰g · P${toFaDigits(fd.p)} C${toFaDigits(fd.c)} F${toFaDigits(fd.f)}</span>
-              </span>
-            </button>`
-          ).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>'}
-        </div>
-      `}
-    `;
-    const inp = body.querySelector('#nafSearch');
-    inp?.addEventListener('input', () => { filter = inp.value; renderPicker(); inp.focus(); });
-    body.querySelectorAll('.fxp-cat').forEach(b => b.addEventListener('click', () => { cat = b.dataset.cat; renderPicker(); }));
-    body.querySelectorAll('.fxp-item').forEach(b => b.addEventListener('click', () => { selectedId = b.dataset.foodId; renderPicker(); }));
-    body.querySelector('#nafClear')?.addEventListener('click', () => { selectedId = null; renderPicker(); });
-    body.querySelector('#nafGrams')?.addEventListener('input', ev => { grams = +ev.target.value || 0; renderPicker(); });
-    body.querySelector('#nafSaveBtn')?.addEventListener('click', () => {
-      if (!selectedId || grams <= 0) return;
-      const k = _todayKey();
-      ensureNutritionState();
-      if (!state.nutrition.meals[k]) state.nutrition.meals[k] = [];
-      let meal = state.nutrition.meals[k].find(m => m.mealType === mealType);
-      if (!meal) {
-        meal = { mealType, foods: [], time: new Date().toISOString() };
-        state.nutrition.meals[k].push(meal);
-      }
-      meal.foods.push({ foodId: selectedId, grams });
-      save();
-      try { trackEvent?.('meal-log'); } catch {}
-      try { grantXP?.(5, 'meal-log'); } catch {}
-      closeDialog(dlg);
-      renderFitness();
-      showToast?.('🍽 ثبت شد', { duration: 1500 });
-    });
-  }
-  renderPicker();
-  dlg.showModal();
-}
-
 /* ── TDEE Calculator modal (Mifflin-St Jeor) ── */
 
 /* ════════════════════════════════════════════════
@@ -11898,56 +11435,6 @@ function openNutriAddFood(mealType) {
 /* Post-workout recovery prompt. Called after user finishes a session.
    Mutates `sess` to add: recoveryScore (1-10), mood ('🔥'|'😄'|'🙂'|'😐'|'😴'),
    sleepH (hours). Then calls onDone(). 'Skip' also calls onDone(). */
-function openRecoveryPrompt(sess, onDone) {
-  const dlg = document.getElementById('recoveryModal');
-  if (!dlg) { onDone(); return; }
-  const body = dlg.querySelector('.rec-body');
-
-  let recovery = sess.recoveryScore || 7;
-  let mood = sess.mood || '🙂';
-  let sleep = sess.sleepH || 7;
-
-  function renderPrompt() {
-    body.innerHTML = `
-      <div class="rec-section">
-        <div class="rec-label">⚡ چقدر سر حال هستی؟ <span class="rec-val">${toFaDigits(recovery)}/۱۰</span></div>
-        <input type="range" id="recRange" min="1" max="10" value="${recovery}" class="rec-range" />
-        <div class="rec-range-labels"><span>خسته</span><span>عالی</span></div>
-      </div>
-      <div class="rec-section">
-        <div class="rec-label">😊 خلق امروز</div>
-        <div class="rec-mood-row">
-          ${['😴','😐','🙂','😄','🔥'].map(m =>
-            `<button type="button" class="rec-mood-btn ${m===mood?'active':''}" data-mood="${m}">${m}</button>`
-          ).join('')}
-        </div>
-      </div>
-      <div class="rec-section">
-        <div class="rec-label">🛌 دیشب چند ساعت خوابیدی؟ <span class="rec-val">${toFaDigits(sleep)} ساعت</span></div>
-        <input type="range" id="recSleep" min="3" max="12" step="0.5" value="${sleep}" class="rec-range" />
-        <div class="rec-range-labels"><span>۳</span><span>۱۲</span></div>
-      </div>
-      <div class="rec-foot">
-        <button type="button" class="ghost-btn" id="recSkipBtn">رد کن</button>
-        <button type="button" class="primary-btn" id="recSaveBtn" style="background:var(--color-primary);color:white;min-height:42px">✓ ذخیره</button>
-      </div>
-    `;
-    body.querySelector('#recRange').addEventListener('input', e => { recovery = +e.target.value; renderPrompt(); });
-    body.querySelector('#recSleep').addEventListener('input', e => { sleep = +e.target.value; renderPrompt(); });
-    body.querySelectorAll('.rec-mood-btn').forEach(btn => btn.addEventListener('click', () => { mood = btn.dataset.mood; renderPrompt(); }));
-    body.querySelector('#recSaveBtn').addEventListener('click', () => {
-      sess.recoveryScore = recovery;
-      sess.mood = mood;
-      sess.sleepH = sleep;
-      closeDialog(dlg);
-      onDone();
-    });
-    body.querySelector('#recSkipBtn').addEventListener('click', () => { closeDialog(dlg); onDone(); });
-  }
-  renderPrompt();
-  dlg.showModal();
-}
-
 /* Detect overtraining: returns warning string or null.
    Rules:
    1. ≥5 days consecutive workouts (no rest day) → 'برای ریکاوری ۱-۲ روز استراحت کن'
@@ -12099,6 +11586,539 @@ function fitnessInsightCards() {
   }
 
   return cards.join('');
+}
+
+
+/* ════════════════════════════════════════════════
+   🏋 FITNESS INLINE VIEWS — no popups, view-stack within sub-tabs
+   Each "view" renders a full page of content INSIDE the sub-tab body.
+   A header bar with a back arrow lets the user return to the default
+   view. No <dialog>, no overlay, no popup.
+════════════════════════════════════════════════ */
+
+/* Shared inline view header (back arrow + title). */
+function _viewHeader(title, backAction = 'default') {
+  return `<div class="fit-view-head">
+    <button type="button" class="fit-back-btn" data-fit-back="${backAction}" aria-label="بازگشت">→</button>
+    <h3 class="fit-view-title">${e(title)}</h3>
+  </div>`;
+}
+
+/* Wire the back button. */
+function _wireFitBack(subtab) {
+  document.querySelectorAll('[data-fit-back]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _fitView[subtab] = ({plans:'list', nutrition:'dashboard', today:'today'}[subtab]);
+      renderFitness();
+    });
+  });
+}
+
+/* ─── PLANS → editor view ─── */
+function _renderFitPlanEditor() {
+  const draft = _fitEditingDraft;
+  if (!draft) return _renderFitPlans();
+  const curDay = _fitEditingDay;
+
+  let html = _viewHeader(draft.id && state.fitness.plans.find(p=>p.id===draft.id)?.name ? 'ویرایش برنامه' : 'برنامه جدید', 'list');
+  html += `<div class="fit-view-body">
+    <div class="modal-field">
+      <label>نام برنامه</label>
+      <input id="fpeName" class="input-field" type="text" value="${e(draft.name)}" />
+    </div>
+    <div class="modal-field">
+      <label>روز هفته</label>
+      <div class="fpm-day-tabs">
+        ${[0,1,2,3,4,5,6].map(d =>
+          `<button type="button" class="fpm-day-tab ${d===curDay?'active':''}" data-fpe-day="${d}">
+             ${FA_JWEEKDAYS_LONG[d]}
+             ${(draft.days[d]||[]).length ? `<span class="fpm-day-count">${toFaDigits(draft.days[d].length)}</span>` : ''}
+           </button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="fpm-day-content">
+      ${(draft.days[curDay] || []).length === 0
+        ? `<div class="fpm-empty">روز ${FA_JWEEKDAYS_LONG[curDay]} استراحته — تمرینی اضافه نشده.</div>`
+        : `<div class="fpm-ex-list">
+            ${draft.days[curDay].map((row, i) => {
+              const ex = getExerciseById(row.exId) || { name_fa:'?', emoji:'❓' };
+              return `<div class="fpm-ex-row" data-fpe-idx="${i}">
+                <span class="fpm-ex-emoji">${ex.emoji}</span>
+                <span class="fpm-ex-name">${e(ex.name_fa)}</span>
+                <div class="fpm-ex-fields">
+                  <input type="number" class="fpm-mini" data-fpe-f="sets" value="${row.sets}" min="1" max="20" />
+                  <span>ست</span>
+                  <input type="number" class="fpm-mini" data-fpe-f="reps" value="${row.reps}" min="1" max="999" />
+                  <span>تکرار</span>
+                  <input type="number" class="fpm-mini" data-fpe-f="weight" value="${row.weight}" min="0" step="0.5" />
+                  <span>${state.fitness.settings.weightUnit}</span>
+                  <input type="number" class="fpm-mini" data-fpe-f="rest" value="${row.rest}" min="0" max="600" step="15" />
+                  <span>ث</span>
+                </div>
+                <button type="button" class="ghost-btn fpm-del" data-fpe-del="${i}" title="حذف">✕</button>
+              </div>`;
+            }).join('')}
+          </div>`}
+      <button type="button" class="ghost-btn fpm-add-ex" id="fpeAddEx">+ افزودن تمرین</button>
+    </div>
+    <div class="fit-view-foot">
+      <button type="button" class="ghost-btn" data-fit-back="list">انصراف</button>
+      <button type="button" class="primary-btn" id="fpeSaveBtn" style="background:var(--color-primary);color:white;flex:1">💾 ذخیره</button>
+    </div>
+  </div>`;
+  return html;
+}
+
+function _wirePlanEditorView() {
+  const draft = _fitEditingDraft;
+  if (!draft) return;
+  _wireFitBack('plans');
+  document.getElementById('fpeName')?.addEventListener('input', ev => { draft.name = ev.target.value; });
+  document.querySelectorAll('[data-fpe-day]').forEach(b => {
+    b.addEventListener('click', () => { _fitEditingDay = +b.dataset.fpeDay; renderFitness(); });
+  });
+  document.querySelectorAll('.fpm-ex-row').forEach(row => {
+    const idx = +row.dataset.fpeIdx;
+    row.querySelectorAll('.fpm-mini').forEach(inp => {
+      inp.addEventListener('change', () => {
+        draft.days[_fitEditingDay][idx][inp.dataset.fpeF] = +inp.value || 0;
+      });
+    });
+  });
+  document.querySelectorAll('[data-fpe-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      draft.days[_fitEditingDay].splice(+btn.dataset.fpeDel, 1); renderFitness();
+    });
+  });
+  document.getElementById('fpeAddEx')?.addEventListener('click', () => {
+    // Go to picker view, then come back here when picked
+    _fitPickerCb = (exId) => {
+      draft.days[_fitEditingDay].push({ exId, sets:3, reps:10, weight:0, rest: state.fitness.settings.defaultRestSec });
+      _fitView.plans = 'editor';
+      renderFitness();
+    };
+    _fitView.plans = 'picker';
+    renderFitness();
+  });
+  document.getElementById('fpeSaveBtn')?.addEventListener('click', () => {
+    if (!draft.name.trim()) draft.name = 'برنامه بی‌نام';
+    const idx = state.fitness.plans.findIndex(p => p.id === draft.id);
+    if (idx >= 0) state.fitness.plans[idx] = draft;
+    else state.fitness.plans.push(draft);
+    if (!state.fitness.activePlanId) state.fitness.activePlanId = draft.id;
+    save();
+    _fitEditingDraft = null; _fitEditingPlanId = null;
+    _fitView.plans = 'list';
+    renderFitness();
+    showToast?.('💾 برنامه ذخیره شد', { duration: 1800, variant:'success' });
+  });
+}
+
+/* Helper: enter the editor view (called from plan list or "+ new plan" btn). */
+function enterPlanEditor(planId) {
+  ensureFitnessState();
+  let plan;
+  if (planId) plan = state.fitness.plans.find(p => p.id === planId);
+  if (!plan) plan = { id: crypto.randomUUID(), name:'برنامه جدید', days:{0:[],1:[],2:[],3:[],4:[],5:[],6:[]}, createdAt: new Date().toISOString() };
+  _fitEditingPlanId = plan.id;
+  _fitEditingDraft = JSON.parse(JSON.stringify(plan));
+  _fitEditingDay = 0;
+  _fitView.plans = 'editor';
+  renderFitness();
+}
+
+/* ─── EXERCISE PICKER (inline view) ─── */
+function _renderFitPickerView(subtab) {
+  let html = _viewHeader('📚 انتخاب تمرین', subtab === 'plans' ? 'editor' : 'today');
+  html += `<div class="fit-view-body">
+    <div class="naf-search-row"><input id="fxpvSearch" class="input-field" placeholder="جستجو تمرین..." autocomplete="off" /></div>
+    <div class="naf-cat-row">
+      <button type="button" class="fxp-cat active" data-fxpv-cat="all">همه</button>
+      ${Object.entries(FIT_CAT_LABELS).map(([k,v]) =>
+        `<button type="button" class="fxp-cat" data-fxpv-cat="${k}" style="--cat-color:${v.color}">${v.emoji} ${v.fa}</button>`
+      ).join('')}
+    </div>
+    <div class="fxp-list" id="fxpvList"></div>
+  </div>`;
+  return html;
+}
+
+function _wirePickerView(subtab) {
+  _wireFitBack(subtab);
+  let filter = '', cat = 'all';
+  const list = document.getElementById('fxpvList');
+  function repaint() {
+    const all = getAllExercises();
+    const q = filter.toLowerCase().trim();
+    const filtered = all.filter(x => {
+      if (cat !== 'all' && x.cat !== cat) return false;
+      if (!q) return true;
+      return (x.name_fa + ' ' + x.name_en + ' ' + (x.muscle||'')).toLowerCase().includes(q);
+    });
+    list.innerHTML = filtered.slice(0, 100).map(ex =>
+      `<button type="button" class="fxp-item" data-fxpv-id="${ex.id}">
+        <span class="fxp-emoji">${ex.emoji}</span>
+        <span class="fxp-info">
+          <span class="fxp-name">${e(ex.name_fa)}</span>
+          <span class="fxp-meta">${e(ex.muscle)} · ${e(ex.equip)}</span>
+        </span>
+      </button>`).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>';
+    list.querySelectorAll('[data-fxpv-id]').forEach(b => b.addEventListener('click', () => {
+      const cb = _fitPickerCb;
+      _fitPickerCb = null;
+      if (cb) cb(b.dataset.fxpvId);
+    }));
+  }
+  document.getElementById('fxpvSearch')?.addEventListener('input', ev => { filter = ev.target.value; repaint(); });
+  document.querySelectorAll('[data-fxpv-cat]').forEach(b => b.addEventListener('click', () => {
+    cat = b.dataset.fxpvCat;
+    document.querySelectorAll('[data-fxpv-cat]').forEach(x => x.classList.toggle('active', x.dataset.fxpvCat===cat));
+    repaint();
+  }));
+  repaint();
+}
+
+/* ─── NUTRITION → addFood inline view ─── */
+function _renderFitAddFoodView() {
+  const mealLabel = MEAL_TYPES.find(m => m.id === _fitAddingFoodToMeal)?.label || 'وعده';
+  let html = _viewHeader('🍽 افزودن غذا به ' + mealLabel, 'dashboard');
+  html += `<div class="fit-view-body" id="addFoodBody"></div>`;
+  return html;
+}
+
+function _wireAddFoodView() {
+  _wireFitBack('nutrition');
+  let filter = '', cat = 'all', selectedId = null, grams = 100;
+  const mealType = _fitAddingFoodToMeal;
+  const body = document.getElementById('addFoodBody');
+  function render() {
+    const all = getAllFoods();
+    const q = filter.toLowerCase().trim();
+    const filtered = all.filter(x => {
+      if (cat !== 'all' && x.cat !== cat) return false;
+      if (!q) return true;
+      return (x.name_fa + ' ' + x.name_en).toLowerCase().includes(q);
+    });
+    const sel = selectedId ? getFoodById(selectedId) : null;
+    body.innerHTML = `
+      <div class="naf-search-row"><input id="afvSearch" class="input-field" placeholder="جستجو غذا..." value="${e(filter)}" autocomplete="off" /></div>
+      <div class="naf-cat-row">
+        <button type="button" class="fxp-cat ${cat==='all'?'active':''}" data-afv-cat="all">همه</button>
+        ${Object.entries(NUTRI_CAT_LABELS).map(([k,v]) =>
+          `<button type="button" class="fxp-cat ${cat===k?'active':''}" data-afv-cat="${k}" style="--cat-color:${v.color}">${v.emoji} ${v.fa}</button>`
+        ).join('')}
+      </div>
+      ${sel ? `
+        <div class="naf-selected">
+          <div class="naf-sel-head">
+            <span class="naf-sel-emoji">${sel.emoji}</span>
+            <span class="naf-sel-name">${e(sel.name_fa)}</span>
+            <button type="button" class="ghost-btn fit-tiny-btn" id="afvClear">تغییر</button>
+          </div>
+          <div class="naf-sel-macros">
+            <span>${toFaDigits(Math.round(sel.cal*grams/100))} کالری</span>
+            <span>P ${toFaDigits((sel.p*grams/100).toFixed(1))}</span>
+            <span>C ${toFaDigits((sel.c*grams/100).toFixed(1))}</span>
+            <span>F ${toFaDigits((sel.f*grams/100).toFixed(1))}</span>
+          </div>
+          <div class="modal-field">
+            <label>گرم (مقدار)</label>
+            <input id="afvGrams" type="number" class="input-field" value="${grams}" min="1" step="5" />
+          </div>
+          <button type="button" class="primary-btn" id="afvSaveBtn" style="width:100%;background:var(--color-primary);color:white;min-height:44px">✓ افزودن</button>
+        </div>
+      ` : `
+        <div class="fxp-list">
+          ${filtered.slice(0, 80).map(fd =>
+            `<button type="button" class="fxp-item" data-afv-id="${fd.id}">
+              <span class="fxp-emoji">${fd.emoji}</span>
+              <span class="fxp-info">
+                <span class="fxp-name">${e(fd.name_fa)}</span>
+                <span class="fxp-meta">${toFaDigits(fd.cal)} کال/۱۰۰g · P${toFaDigits(fd.p)} C${toFaDigits(fd.c)} F${toFaDigits(fd.f)}</span>
+              </span>
+            </button>`).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>'}
+        </div>
+      `}
+    `;
+    const inp = body.querySelector('#afvSearch');
+    inp?.addEventListener('input', () => { filter = inp.value; render(); inp.focus(); });
+    body.querySelectorAll('[data-afv-cat]').forEach(b => b.addEventListener('click', () => { cat = b.dataset.afvCat; render(); }));
+    body.querySelectorAll('[data-afv-id]').forEach(b => b.addEventListener('click', () => { selectedId = b.dataset.afvId; render(); }));
+    body.querySelector('#afvClear')?.addEventListener('click', () => { selectedId = null; render(); });
+    body.querySelector('#afvGrams')?.addEventListener('input', ev => { grams = +ev.target.value || 0; render(); });
+    body.querySelector('#afvSaveBtn')?.addEventListener('click', () => {
+      if (!selectedId || grams <= 0) return;
+      const k = _todayKey();
+      ensureNutritionState();
+      if (!state.nutrition.meals[k]) state.nutrition.meals[k] = [];
+      let meal = state.nutrition.meals[k].find(m => m.mealType === mealType);
+      if (!meal) {
+        meal = { mealType, foods: [], time: new Date().toISOString() };
+        state.nutrition.meals[k].push(meal);
+      }
+      meal.foods.push({ foodId: selectedId, grams });
+      save();
+      try { trackEvent?.('meal-log'); } catch {}
+      try { grantXP?.(5, 'meal-log'); } catch {}
+      _fitAddingFoodToMeal = null;
+      _fitView.nutrition = 'dashboard';
+      renderFitness();
+      showToast?.('🍽 ثبت شد', { duration: 1500, variant:'success' });
+    });
+  }
+  render();
+}
+
+/* ─── TODAY → live session view ─── */
+let _fitSessionDurTimer = null;
+let _fitSessionRestRemaining = 0;
+let _fitSessionRestTimer = null;
+
+function _renderFitSessionView() {
+  ensureFitnessState();
+  const f = state.fitness;
+  const sess = f.activeSession;
+  if (!sess) { _fitView.today = 'today'; return _renderFitToday(); }
+
+  const mins = Math.floor(sess.durationSec / 60);
+  const secs = sess.durationSec % 60;
+  const completedSets = sess.exercises.reduce((s, ex) => s + ex.sets.filter(x => x.done).length, 0);
+  const totalSets = sess.exercises.reduce((s, ex) => s + ex.sets.length, 0);
+
+  let html = _viewHeader('🔥 جلسه تمرین فعال', 'today');
+  html += `<div class="fit-view-body">
+    <div class="fsm-stats-bar">
+      <span>⏱ ${toFaDigits(mins)}:${toFaDigits(String(secs).padStart(2,'0'))}</span>
+      <span>✓ ${toFaDigits(completedSets)}/${toFaDigits(totalSets)} ست</span>
+    </div>
+    ${_fitSessionRestRemaining > 0 ? `
+      <div class="fsm-rest" id="fsmRestBox">
+        <div class="fsm-rest-label">⏳ استراحت</div>
+        <div class="fsm-rest-time">${toFaDigits(Math.floor(_fitSessionRestRemaining/60))}:${toFaDigits(String(_fitSessionRestRemaining%60).padStart(2,'0'))}</div>
+        <button type="button" class="ghost-btn" id="fsvSkipRest">رد کن</button>
+      </div>` : ''}
+    ${sess.exercises.length === 0 ? `
+      <div class="fsm-empty">
+        <p>هیچ تمرینی نیست — می‌تونی الان اضافه کنی:</p>
+        <button class="primary-btn" type="button" id="fsvAddFirst">+ افزودن تمرین</button>
+      </div>
+    ` : sess.exercises.map((ex, exI) => {
+      const meta = getExerciseById(ex.exId) || { name_fa:'?', emoji:'❓' };
+      return `<div class="fsm-ex-block">
+        <div class="fsm-ex-head">
+          <span class="fsm-ex-emoji">${meta.emoji}</span>
+          <span class="fsm-ex-name">${e(meta.name_fa)}</span>
+        </div>
+        <div class="fsm-set-list">
+          ${ex.sets.map((set, sI) => `
+            <div class="fsm-set ${set.done?'done':''}">
+              <span class="fsm-set-num">${toFaDigits(sI+1)}</span>
+              <input type="number" class="fsm-set-inp" data-fsv-ex="${exI}" data-fsv-s="${sI}" data-fsv-f="weight" value="${set.weight}" step="0.5" />
+              <span>${state.fitness.settings.weightUnit}</span>
+              <span class="fsm-x">×</span>
+              <input type="number" class="fsm-set-inp" data-fsv-ex="${exI}" data-fsv-s="${sI}" data-fsv-f="reps" value="${set.reps}" />
+              <span>تکرار</span>
+              <button type="button" class="fsm-set-check" data-fsv-check-ex="${exI}" data-fsv-check-s="${sI}">${set.done ? '✓' : '○'}</button>
+            </div>`).join('')}
+          <button type="button" class="ghost-btn fit-tiny-btn" data-fsv-add-set="${exI}">+ ست</button>
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="fit-view-foot">
+      <button type="button" class="ghost-btn" id="fsvAddMore">+ تمرین دیگه</button>
+      <button type="button" class="primary-btn fit-danger-btn" id="fsvFinishBtn" style="flex:1">🏁 پایان جلسه</button>
+    </div>
+  </div>`;
+  return html;
+}
+
+function _wireSessionView() {
+  _wireFitBack('today');
+  const sess = state.fitness.activeSession;
+  if (!sess) return;
+
+  // Live duration ticker
+  if (_fitSessionDurTimer) clearInterval(_fitSessionDurTimer);
+  _fitSessionDurTimer = setInterval(() => {
+    if (_fitView.today !== 'session' || !state.fitness.activeSession) {
+      clearInterval(_fitSessionDurTimer); _fitSessionDurTimer = null; return;
+    }
+    state.fitness.activeSession.durationSec = Math.floor((Date.now() - state.fitness.activeSession.startedAt) / 1000);
+    const bar = document.querySelector('.fsm-stats-bar > span:first-child');
+    if (bar) {
+      const m = Math.floor(state.fitness.activeSession.durationSec / 60);
+      const s = state.fitness.activeSession.durationSec % 60;
+      bar.textContent = `⏱ ${toFaDigits(m)}:${toFaDigits(String(s).padStart(2,'0'))}`;
+    }
+  }, 1000);
+
+  function startRest(sec) {
+    if (_fitSessionRestTimer) clearInterval(_fitSessionRestTimer);
+    _fitSessionRestRemaining = sec;
+    renderFitness();
+    _fitSessionRestTimer = setInterval(() => {
+      _fitSessionRestRemaining--;
+      const el = document.querySelector('.fsm-rest-time');
+      if (el) el.textContent = `${toFaDigits(Math.floor(_fitSessionRestRemaining/60))}:${toFaDigits(String(_fitSessionRestRemaining%60).padStart(2,'0'))}`;
+      if (_fitSessionRestRemaining <= 0) {
+        clearInterval(_fitSessionRestTimer); _fitSessionRestTimer = null;
+        _fitSessionRestRemaining = 0;
+        if (state.fitness.settings.restBellEnabled) { try { _fitPlayBeep(); } catch {} }
+        renderFitness();
+      }
+    }, 1000);
+  }
+  function stopRest() {
+    if (_fitSessionRestTimer) clearInterval(_fitSessionRestTimer);
+    _fitSessionRestTimer = null; _fitSessionRestRemaining = 0;
+    renderFitness();
+  }
+
+  document.querySelectorAll('.fsm-set-inp').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const exI = +inp.dataset.fsvEx, sI = +inp.dataset.fsvS;
+      sess.exercises[exI].sets[sI][inp.dataset.fsvF] = +inp.value || 0;
+      save();
+    });
+  });
+  document.querySelectorAll('[data-fsv-check-ex]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const exI = +btn.dataset.fsvCheckEx, sI = +btn.dataset.fsvCheckS;
+      const set = sess.exercises[exI].sets[sI];
+      set.done = !set.done;
+      save();
+      if (set.done) startRest(state.fitness.settings.defaultRestSec);
+      else renderFitness();
+    });
+  });
+  document.querySelectorAll('[data-fsv-add-set]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const exI = +btn.dataset.fsvAddSet;
+      const last = sess.exercises[exI].sets[sess.exercises[exI].sets.length - 1] || { reps:10, weight:0 };
+      sess.exercises[exI].sets.push({ reps:last.reps, weight:last.weight, done:false });
+      save(); renderFitness();
+    });
+  });
+  document.getElementById('fsvAddMore')?.addEventListener('click', () => {
+    _fitPickerCb = (exId) => {
+      sess.exercises.push({ exId, sets:[{reps:10, weight:0, done:false}] });
+      save();
+      _fitView.today = 'session';
+      renderFitness();
+    };
+    _fitView.today = 'picker';
+    renderFitness();
+  });
+  document.getElementById('fsvAddFirst')?.addEventListener('click', () => document.getElementById('fsvAddMore')?.click());
+  document.getElementById('fsvSkipRest')?.addEventListener('click', stopRest);
+  document.getElementById('fsvFinishBtn')?.addEventListener('click', () => {
+    if (!confirm('جلسه تمرین تموم بشه و ذخیره بشه؟')) return;
+    if (_fitSessionDurTimer) { clearInterval(_fitSessionDurTimer); _fitSessionDurTimer = null; }
+    stopRest();
+    sess.durationSec = Math.floor((Date.now() - sess.startedAt) / 1000);
+    _fitView.today = 'recovery';   // ask recovery questions inline
+    renderFitness();
+  });
+}
+
+function _fitPlayBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880; gain.gain.value = 0.18;
+    osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 220);
+  } catch {}
+}
+
+/* Enter session: replaces openFitSession. */
+function enterFitSession(isFreeMode) {
+  ensureFitnessState();
+  const f = state.fitness;
+  if (!f.activeSession || f.activeSession.date !== _todayKey()) {
+    const plan = f.plans.find(p => p.id === f.activePlanId);
+    const wd = _todayWeekdayJalali();
+    const planEx = (!isFreeMode && plan && plan.days[wd]) ? plan.days[wd] : [];
+    f.activeSession = {
+      id: crypto.randomUUID(), date: _todayKey(),
+      planId: plan?.id || null, planDay: wd,
+      name: plan ? `${plan.name} — ${FA_JWEEKDAYS_LONG[wd]}` : 'جلسه آزاد',
+      exercises: planEx.map(p => ({
+        exId: p.exId,
+        sets: Array.from({length: p.sets}, () => ({ reps: p.reps, weight: p.weight, done: false })),
+      })),
+      durationSec: 0, startedAt: Date.now(),
+    };
+    save();
+  }
+  _fitView.today = 'session';
+  renderFitness();
+}
+
+/* ─── TODAY → recovery view (post-session questions) ─── */
+let _recRecovery = 7, _recMood = '🙂', _recSleep = 7;
+
+function _renderFitRecoveryView() {
+  let html = _viewHeader('🛌 چطور بود؟', 'today');
+  html += `<div class="fit-view-body">
+    <div class="rec-section">
+      <div class="rec-label">⚡ چقدر سر حال هستی؟ <span class="rec-val">${toFaDigits(_recRecovery)}/۱۰</span></div>
+      <input type="range" id="recvRange" min="1" max="10" value="${_recRecovery}" class="rec-range" />
+      <div class="rec-range-labels"><span>خسته</span><span>عالی</span></div>
+    </div>
+    <div class="rec-section">
+      <div class="rec-label">😊 خلق امروز</div>
+      <div class="rec-mood-row">
+        ${['😴','😐','🙂','😄','🔥'].map(m =>
+          `<button type="button" class="rec-mood-btn ${m===_recMood?'active':''}" data-recv-mood="${m}">${m}</button>`).join('')}
+      </div>
+    </div>
+    <div class="rec-section">
+      <div class="rec-label">🛌 دیشب چند ساعت خوابیدی؟ <span class="rec-val">${toFaDigits(_recSleep)} ساعت</span></div>
+      <input type="range" id="recvSleep" min="3" max="12" step="0.5" value="${_recSleep}" class="rec-range" />
+      <div class="rec-range-labels"><span>۳</span><span>۱۲</span></div>
+    </div>
+    <div class="fit-view-foot">
+      <button type="button" class="ghost-btn" id="recvSkip">رد کن</button>
+      <button type="button" class="primary-btn" id="recvSave" style="background:var(--color-primary);color:white;flex:1;min-height:42px">✓ ذخیره و پایان</button>
+    </div>
+  </div>`;
+  return html;
+}
+
+function _wireRecoveryView() {
+  _wireFitBack('today');
+  document.getElementById('recvRange')?.addEventListener('input', e => { _recRecovery = +e.target.value; renderFitness(); });
+  document.getElementById('recvSleep')?.addEventListener('input', e => { _recSleep    = +e.target.value; renderFitness(); });
+  document.querySelectorAll('[data-recv-mood]').forEach(b => b.addEventListener('click', () => { _recMood = b.dataset.recvMood; renderFitness(); }));
+
+  function finishWithRecovery(saveRecovery) {
+    const sess = state.fitness.activeSession;
+    if (!sess) return;
+    if (saveRecovery) {
+      sess.recoveryScore = _recRecovery;
+      sess.mood          = _recMood;
+      sess.sleepH        = _recSleep;
+    }
+    state.fitness.sessions.push(JSON.parse(JSON.stringify(sess)));
+    state.fitness.activeSession = null;
+    save();
+    try { grantXP?.(50, 'workout-done'); } catch {}
+    try { checkBadges?.(); } catch {}
+    try { trackEvent?.('workout-done'); } catch {}
+    try {
+      const warn = detectOvertraining();
+      if (warn) showToast?.('⚠ ' + warn, { variant:'warn', duration:5000 });
+    } catch {}
+    // Reset prompt state and return to today view
+    _recRecovery = 7; _recMood = '🙂'; _recSleep = 7;
+    _fitView.today = 'today';
+    renderFitness();
+    showToast?.('💪 جلسه ذخیره شد! +۵۰ XP', { variant:'success', duration: 2800 });
+  }
+  document.getElementById('recvSkip')?.addEventListener('click', () => finishWithRecovery(false));
+  document.getElementById('recvSave')?.addEventListener('click', () => finishWithRecovery(true));
 }
 
 

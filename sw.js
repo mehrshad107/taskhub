@@ -3,7 +3,7 @@
    - Network-first for navigation (so updates reach the user fast)
    - Stale-while-revalidate for Google Fonts CSS
    Bump CACHE_VERSION any time the HTML changes to bust the old cache. */
-const CACHE_VERSION = 'taskhub-v9-30';
+const CACHE_VERSION = 'taskhub-v9-31';
 const CACHE_NAME = `taskhub-${CACHE_VERSION}`;
 
 const APP_SHELL = [
