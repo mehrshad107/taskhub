@@ -6547,6 +6547,14 @@ let editTaskValueAccountId = null;  // selected account id in edit modal
 /* ── Toast notifications (with optional undo) ── */
 function showToast(msg, opts) {
   opts = opts || {};
+  // i18n: auto-translate full-message exact match if not Persian
+  try {
+    if (typeof buildFaMap === 'function' && getLang() !== 'fa') {
+      const map = buildFaMap();
+      const key = String(msg).replace(/<[^>]+>/g, '').trim();
+      if (map[key] && map[key][getLang()]) msg = map[key][getLang()];
+    }
+  } catch {}
   let stack = document.getElementById('toastStack');
   if (!stack) {
     // Lazy-create the stack if HTML didn't include it (defensive).
@@ -6943,7 +6951,7 @@ function renderPlan() {
               try {
                 const d = new Date(task.reminderAt);
                 const passed = d.getTime() < Date.now();
-                const fmt = d.toLocaleDateString('fa-IR', { month:'short', day:'numeric' }) + ' ' + d.toLocaleTimeString('fa-IR', { hour:'2-digit', minute:'2-digit' });
+                const fmt = d.toLocaleDateString(getLocale(), { month:'short', day:'numeric' }) + ' ' + d.toLocaleTimeString(getLocale(), { hour:'2-digit', minute:'2-digit' });
                 return `<span class="pill" style="background:${passed?'rgba(239,68,68,.15)':'rgba(245,158,11,.18)'};color:${passed?'#ef4444':'#f59e0b'};border-color:${passed?'#ef4444':'#f59e0b'}" title="${passed?'گذشت':'یادآوری'}">⏰ ${fmt}</span>`;
               } catch { return ''; }
             })() : ''}
@@ -7245,6 +7253,9 @@ function render() {
     document.getElementById('soundToggle').style.borderColor    = state.soundEnabled?'var(--color-primary)':'transparent';
     document.getElementById('notifyToggle').style.borderColor   = state.notificationsEnabled?'var(--color-primary)':'transparent';
   } catch {}
+  // i18n auto-translate pass — swaps Persian strings to current lang after render.
+  // No-op when lang === 'fa'. Safe: only exact-match leaf text nodes are replaced.
+  try { if (typeof translateRendered === 'function') translateRendered(); } catch {}
 }
 
 /* ══ EVENTS ══ */
@@ -7815,6 +7826,115 @@ const I18N = {
   'btn.close':        { fa:'بستن',   en:'Close',  fr:'Fermer',      ru:'Закрыть' },
   'btn.add':          { fa:'افزودن',en:'Add',    fr:'Ajouter',     ru:'Добавить' },
   'btn.back':         { fa:'بازگشت',en:'Back',   fr:'Retour',      ru:'Назад' },
+  'btn.confirm':      { fa:'تایید',  en:'Confirm',fr:'Confirmer',   ru:'Подтвердить' },
+  'btn.new':          { fa:'جدید',   en:'New',    fr:'Nouveau',     ru:'Новый' },
+  'btn.done':         { fa:'انجام شد',en:'Done',  fr:'Terminé',     ru:'Готово' },
+  'btn.start':        { fa:'شروع',   en:'Start',  fr:'Démarrer',    ru:'Старт' },
+  'btn.stop':         { fa:'توقف',   en:'Stop',   fr:'Arrêter',     ru:'Стоп' },
+  'btn.reset':        { fa:'ریست',   en:'Reset',  fr:'Réinitialiser',ru:'Сброс' },
+  'btn.search':       { fa:'جستجو',  en:'Search', fr:'Rechercher',  ru:'Поиск' },
+  'btn.copy':         { fa:'کپی',    en:'Copy',   fr:'Copier',      ru:'Копировать' },
+  'btn.share':        { fa:'اشتراک',en:'Share',  fr:'Partager',    ru:'Поделиться' },
+  'btn.print':        { fa:'چاپ',    en:'Print',  fr:'Imprimer',    ru:'Печать' },
+  'btn.import':       { fa:'بارگذاری',en:'Import',fr:'Importer',   ru:'Импорт' },
+  'btn.export':       { fa:'دریافت', en:'Export', fr:'Exporter',    ru:'Экспорт' },
+  // Plan tab
+  'plan.folders':     { fa:'پوشه‌ها', en:'Folders',fr:'Dossiers',  ru:'Папки' },
+  'plan.new.folder':  { fa:'+ پوشه جدید',en:'+ New folder',fr:'+ Nouveau dossier',ru:'+ Новая папка' },
+  'plan.new.op':      { fa:'+ عملیات جدید',en:'+ New operation',fr:'+ Nouvelle opération',ru:'+ Новая операция' },
+  'plan.ops.of':      { fa:'عملیات های',en:'Operations of',fr:'Opérations de',ru:'Операции'},
+  'plan.folder.personal':{ fa:'کار های شخصی',en:'Personal',fr:'Personnel',ru:'Личное' },
+  'plan.folder.daily':{ fa:'کار های روزانه',en:'Daily',fr:'Quotidien',ru:'Ежедневное' },
+  'plan.folder.work': { fa:'کار های شغل',en:'Work',fr:'Travail',ru:'Работа' },
+  'plan.subtasks':    { fa:'زیرتسک‌ها',en:'Subtasks',fr:'Sous-tâches',ru:'Подзадачи' },
+  'plan.add.sub':     { fa:'+ افزودن زیرتسک',en:'+ Add subtask',fr:'+ Ajouter sous-tâche',ru:'+ Добавить подзадачу' },
+  'plan.empty':       { fa:'هنوز عملیاتی نداری. اولین عملیات رو اضافه کن!',en:"No operations yet. Add your first one!",fr:"Aucune opération. Ajoutez la première !",ru:'Нет операций. Добавьте первую!' },
+  // Planner tab
+  'planner.habits':   { fa:'عادت‌سنج',en:'Habits',fr:'Habitudes',ru:'Привычки' },
+  'planner.goals':    { fa:'اهداف',  en:'Goals',  fr:'Objectifs',  ru:'Цели' },
+  'planner.notes':    { fa:'یادداشت‌ها',en:'Notes',fr:'Notes',    ru:'Заметки' },
+  'planner.today':    { fa:'امروز',  en:'Today',  fr:"Aujourd'hui",ru:'Сегодня' },
+  'planner.week':     { fa:'این هفته',en:'This week',fr:'Cette semaine',ru:'На этой неделе' },
+  'planner.add.habit':{ fa:'+ عادت جدید',en:'+ New habit',fr:'+ Nouvelle habitude',ru:'+ Новая привычка' },
+  'planner.add.goal': { fa:'+ هدف جدید',en:'+ New goal',fr:'+ Nouvel objectif',ru:'+ Новая цель' },
+  'planner.add.note': { fa:'+ یادداشت جدید',en:'+ New note',fr:'+ Nouvelle note',ru:'+ Новая заметка' },
+  'planner.streak':   { fa:'استریک',en:'Streak',  fr:'Série',      ru:'Серия' },
+  'planner.day':      { fa:'روز',    en:'day',    fr:'jour',       ru:'день' },
+  'planner.days':     { fa:'روز',    en:'days',   fr:'jours',      ru:'дней' },
+  // Money tab
+  'money.balance':    { fa:'موجودی', en:'Balance',fr:'Solde',      ru:'Баланс' },
+  'money.income':     { fa:'درآمد',  en:'Income', fr:'Revenu',     ru:'Доход' },
+  'money.expense':    { fa:'هزینه',  en:'Expense',fr:'Dépense',    ru:'Расход' },
+  'money.accounts':   { fa:'حساب‌ها',en:'Accounts',fr:'Comptes',  ru:'Счета' },
+  'money.tx':         { fa:'تراکنش‌ها',en:'Transactions',fr:'Transactions',ru:'Транзакции' },
+  'money.budget':     { fa:'بودجه', en:'Budget',  fr:'Budget',     ru:'Бюджет' },
+  'money.recurring':  { fa:'تکرارشونده',en:'Recurring',fr:'Récurrent',ru:'Регулярные' },
+  'money.category':   { fa:'دسته‌بندی',en:'Category',fr:'Catégorie',ru:'Категория' },
+  'money.amount':     { fa:'مبلغ',  en:'Amount',  fr:'Montant',    ru:'Сумма' },
+  'money.date':       { fa:'تاریخ', en:'Date',    fr:'Date',       ru:'Дата' },
+  'money.note':       { fa:'یادداشت',en:'Note',  fr:'Note',       ru:'Заметка' },
+  'money.add.tx':     { fa:'+ تراکنش جدید',en:'+ New transaction',fr:'+ Nouvelle transaction',ru:'+ Новая транзакция' },
+  'money.add.account':{ fa:'+ حساب جدید',en:'+ New account',fr:'+ Nouveau compte',ru:'+ Новый счёт' },
+  'money.month':      { fa:'این ماه',en:'This month',fr:'Ce mois',ru:'В этом месяце' },
+  'money.toman':      { fa:'تومان', en:'IRT',     fr:'IRT',        ru:'IRT' },
+  // Fitness tab
+  'fit.plan':         { fa:'برنامه',en:'Plan',    fr:'Programme',  ru:'План' },
+  'fit.today':        { fa:'امروز', en:'Today',   fr:"Aujourd'hui",ru:'Сегодня' },
+  'fit.progress':     { fa:'پیشرفت',en:'Progress',fr:'Progrès',    ru:'Прогресс' },
+  'fit.nutrition':    { fa:'تغذیه', en:'Nutrition',fr:'Nutrition', ru:'Питание' },
+  'fit.exercises':    { fa:'تمرین‌ها',en:'Exercises',fr:'Exercices',ru:'Упражнения' },
+  'fit.sets':         { fa:'ست',    en:'Sets',    fr:'Séries',     ru:'Подходы' },
+  'fit.reps':         { fa:'تکرار', en:'Reps',    fr:'Reps',       ru:'Повторы' },
+  'fit.weight':       { fa:'وزنه',  en:'Weight',  fr:'Poids',      ru:'Вес' },
+  'fit.rest':         { fa:'استراحت',en:'Rest',  fr:'Repos',       ru:'Отдых' },
+  'fit.start.workout':{ fa:'شروع تمرین',en:'Start workout',fr:'Démarrer',ru:'Начать тренировку' },
+  'fit.finish':       { fa:'پایان تمرین',en:'Finish workout',fr:'Terminer',ru:'Завершить' },
+  'fit.calories':     { fa:'کالری', en:'Calories',fr:'Calories',   ru:'Калории' },
+  'fit.protein':      { fa:'پروتئین',en:'Protein',fr:'Protéines', ru:'Белки' },
+  'fit.carbs':        { fa:'کربو',  en:'Carbs',   fr:'Glucides',   ru:'Углеводы' },
+  'fit.fat':          { fa:'چربی',  en:'Fat',     fr:'Lipides',    ru:'Жиры' },
+  'fit.water':        { fa:'آب',    en:'Water',   fr:'Eau',        ru:'Вода' },
+  'fit.meals':        { fa:'وعده‌ها',en:'Meals', fr:'Repas',      ru:'Приёмы пищи' },
+  'fit.add.food':     { fa:'+ افزودن غذا',en:'+ Add food',fr:'+ Ajouter',ru:'+ Добавить еду' },
+  'fit.tdee':         { fa:'محاسبه TDEE',en:'TDEE calculator',fr:'Calcul TDEE',ru:'Расчёт TDEE' },
+  // Track tab
+  'track.focus':      { fa:'تمرکز', en:'Focus',   fr:'Focus',      ru:'Фокус' },
+  'track.heatmap':    { fa:'نقشه گرما',en:'Heatmap',fr:'Carte thermique',ru:'Тепловая карта' },
+  'track.streak':     { fa:'استریک',en:'Streak',  fr:'Série',      ru:'Серия' },
+  'track.hours':      { fa:'ساعت',  en:'hours',   fr:'heures',     ru:'часов' },
+  'track.minutes':    { fa:'دقیقه', en:'minutes', fr:'minutes',    ru:'минут' },
+  'track.all':        { fa:'همه',   en:'All',     fr:'Tous',       ru:'Все' },
+  'track.today':      { fa:'امروز', en:'Today',   fr:"Aujourd'hui",ru:'Сегодня' },
+  'track.week':       { fa:'هفته',  en:'Week',    fr:'Semaine',    ru:'Неделя' },
+  'track.month':      { fa:'ماه',   en:'Month',   fr:'Mois',       ru:'Месяц' },
+  'track.completed':  { fa:'انجام شده',en:'Completed',fr:'Terminés',ru:'Выполнено' },
+  // Insight tab
+  'insight.summary':  { fa:'خلاصه', en:'Summary', fr:'Résumé',     ru:'Сводка' },
+  'insight.patterns': { fa:'الگوها',en:'Patterns',fr:'Tendances',  ru:'Шаблоны' },
+  'insight.weekly':   { fa:'گزارش هفتگی',en:'Weekly report',fr:'Rapport hebdo',ru:'Недельный отчёт' },
+  'insight.about.me': { fa:'شناخت من',en:'About me',fr:'À propos de moi',ru:'Обо мне' },
+  'insight.suggest':  { fa:'پیشنهادها',en:'Suggestions',fr:'Suggestions',ru:'Предложения' },
+  'insight.records':  { fa:'رکوردها',en:'Records',fr:'Records',  ru:'Рекорды' },
+  'insight.level':    { fa:'سطح',   en:'Level',   fr:'Niveau',     ru:'Уровень' },
+  'insight.xp':       { fa:'تجربه', en:'XP',      fr:'XP',         ru:'Опыт' },
+  'insight.badges':   { fa:'نشان‌ها',en:'Badges', fr:'Badges',    ru:'Значки' },
+  // Toasts / messages
+  'msg.saved':        { fa:'ذخیره شد',en:'Saved',fr:'Enregistré',ru:'Сохранено' },
+  'msg.deleted':      { fa:'حذف شد', en:'Deleted',fr:'Supprimé', ru:'Удалено' },
+  'msg.copied':       { fa:'کپی شد', en:'Copied',fr:'Copié',    ru:'Скопировано' },
+  'msg.error':        { fa:'خطا',    en:'Error', fr:'Erreur',   ru:'Ошибка' },
+  'msg.confirm.del':  { fa:'مطمئنی می‌خوای حذف کنی؟',en:'Are you sure you want to delete?',fr:'Voulez-vous vraiment supprimer?',ru:'Точно удалить?' },
+  'msg.empty':        { fa:'خالی',   en:'Empty', fr:'Vide',     ru:'Пусто' },
+  'msg.loading':      { fa:'در حال بارگذاری...',en:'Loading...',fr:'Chargement...',ru:'Загрузка...' },
+  // Time
+  'time.now':         { fa:'الان',  en:'now',    fr:'maintenant',ru:'сейчас' },
+  'time.minute':      { fa:'دقیقه', en:'min',    fr:'min',       ru:'мин' },
+  'time.hour':        { fa:'ساعت',  en:'hr',     fr:'h',         ru:'ч' },
+  'time.day':         { fa:'روز',   en:'day',    fr:'jour',      ru:'день' },
+  'time.week':        { fa:'هفته',  en:'week',   fr:'semaine',   ru:'неделя' },
+  'time.month':       { fa:'ماه',   en:'month',  fr:'mois',      ru:'месяц' },
+  'time.year':        { fa:'سال',   en:'year',   fr:'année',     ru:'год' },
+  'time.ago':         { fa:'پیش',   en:'ago',    fr:'il y a',    ru:'назад' },
 };
 
 function getLang() { return (state && state.lang && LANGS[state.lang]) ? state.lang : 'fa'; }
@@ -7856,6 +7976,51 @@ function setLang(lang) {
   document.documentElement.dir = meta.dir;
   applyTranslations();
   try { save(); render(); } catch {}
+  try { translateRendered(); } catch {}
+}
+
+/* ════════════════════════════════════════════════
+   AUTO-TRANSLATOR — walks DOM after every render, swaps Persian
+   leaf text nodes matching FA_MAP entries. Zero touches to render
+   functions. Safe because we only replace EXACT-match text content
+   on leaf text nodes (not substrings).
+═══════════════════════════════════════════════════ */
+let FA_MAP = null;  // lazily built fa → {en,fr,ru}
+function buildFaMap() {
+  if (FA_MAP) return FA_MAP;
+  FA_MAP = Object.create(null);
+  for (const key in I18N) {
+    const e = I18N[key];
+    if (!e || !e.fa) continue;
+    // Skip very short strings (1-2 chars) to avoid false positives like "از", "به"
+    if (e.fa.length < 3) continue;
+    FA_MAP[e.fa] = { en: e.en || e.fa, fr: e.fr || e.fa, ru: e.ru || e.fa };
+  }
+  return FA_MAP;
+}
+
+function translateRendered() {
+  const lang = getLang();
+  if (lang === 'fa') return;  // no-op for fa
+  const map = buildFaMap();
+  // Walk all text nodes, swap exact matches
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+  let n;
+  const nodes = [];
+  while ((n = walker.nextNode())) nodes.push(n);
+  for (const node of nodes) {
+    const raw = node.nodeValue;
+    if (!raw) continue;
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    const hit = map[trimmed];
+    if (hit && hit[lang]) {
+      // Preserve surrounding whitespace
+      const leading = raw.match(/^\s*/)[0];
+      const trailing = raw.match(/\s*$/)[0];
+      node.nodeValue = leading + hit[lang] + trailing;
+    }
+  }
 }
 
 /* toFaDigits — kept name for compatibility, now lang-aware. In fa returns
@@ -7863,6 +8028,13 @@ function setLang(lang) {
 function toFaDigits(n) {
   if (getLang() !== 'fa') return String(n);
   return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+/* Locale string for date/number formatters. Pulls from LANGS[currentLang].
+   Used in place of hardcoded 'fa-IR' so swapping language swaps date format. */
+function getLocale() {
+  const l = getLang();
+  return (LANGS[l] && LANGS[l].locale) || 'fa-IR';
 }
 
 /* ════════════════════════════════════════════════
@@ -8911,7 +9083,7 @@ function _previewNextDue() {
   return startStr; // first run = the date in the field; afterwards advanceRecurring handles it
 }
 function formatPersianDate(iso) {
-  try { return new Date(iso + 'T00:00:00').toLocaleDateString('fa-IR', { year:'numeric', month:'long', day:'numeric' }); }
+  try { return new Date(iso + 'T00:00:00').toLocaleDateString(getLocale(), { year:'numeric', month:'long', day:'numeric' }); }
   catch { return iso; }
 }
 function advanceRecurringDate(currentIso, freq, dayOfMonth, dayOfWeek) {
@@ -9086,7 +9258,7 @@ function processRecurringTransactions({ silent = true } = {}) {
   if (created > 0) {
     save();
     if (!silent) {
-      showToast(`🔁 ${created.toLocaleString('fa-IR')} تراکنش تکرارشونده ثبت شد`, { variant:'money', duration: 3500 });
+      showToast(`🔁 ${created.toLocaleString(getLocale())} تراکنش تکرارشونده ثبت شد`, { variant:'money', duration: 3500 });
     }
   }
   return created;
@@ -9095,7 +9267,7 @@ function processRecurringTransactions({ silent = true } = {}) {
 function recurringDescription(r) {
   if (r.frequency === 'daily') return 'هر روز';
   if (r.frequency === 'weekly') return `هر ${DAYS_OF_WEEK_FA[r.dayOfWeek ?? 6]}`;
-  return `هر ماه روز ${(r.dayOfMonth || 1).toLocaleString('fa-IR')}`;
+  return `هر ماه روز ${(r.dayOfMonth || 1).toLocaleString(getLocale())}`;
 }
 
 function renderRecurringList() {
@@ -9116,7 +9288,7 @@ function renderRecurringList() {
       <div class="rec-emoji">${emoji}</div>
       <div class="rec-main">
         <div class="rec-title">
-          <span class="rec-amount ${amtClass}">${(r.amount||0).toLocaleString('fa-IR')} ت</span>
+          <span class="rec-amount ${amtClass}">${(r.amount||0).toLocaleString(getLocale())} ت</span>
           <span style="opacity:.6">·</span>
           <span>${recurringDescription(r)}</span>
           ${r.active ? '' : '<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--color-border);color:var(--color-text-muted)">⏸ متوقف</span>'}
@@ -9179,7 +9351,7 @@ function refreshRecurringBadge() {
   ensureMoneyState();
   const b = document.getElementById('recurringCountBadge'); if (!b) return;
   const n = (state.moneyRecurring || []).filter(r => r.active).length;
-  if (n > 0) { b.hidden = false; b.textContent = n.toLocaleString('fa-IR'); }
+  if (n > 0) { b.hidden = false; b.textContent = n.toLocaleString(getLocale()); }
   else { b.hidden = true; }
 }
 
@@ -9905,7 +10077,7 @@ function _updateTaskReminderHint() {
   try {
     const d = new Date(val);
     if (isNaN(d)) { hint.textContent = 'فرمت زمان نامعتبر.'; return; }
-    const fmt = d.toLocaleDateString('fa-IR', { year:'numeric', month:'long', day:'numeric' }) + ' — ' + d.toLocaleTimeString('fa-IR', { hour:'2-digit', minute:'2-digit' });
+    const fmt = d.toLocaleDateString(getLocale(), { year:'numeric', month:'long', day:'numeric' }) + ' — ' + d.toLocaleTimeString(getLocale(), { hour:'2-digit', minute:'2-digit' });
     if (d.getTime() < Date.now()) hint.textContent = '⚠ زمان انتخابی در گذشته‌ست — یادآوری ارسال نمی‌شه. زمان آینده انتخاب کن.';
     else hint.textContent = '⏰ یادآوری در: ' + fmt;
   } catch { hint.textContent = ''; }
@@ -13269,7 +13441,7 @@ function importStateFromFile(ev) {
       if (Array.isArray(imported.moneyTransactions)) summary.push(`${imported.moneyTransactions.length} تراکنش`);
       if (Array.isArray(imported.moneyAccounts))     summary.push(`${imported.moneyAccounts.length} حساب`);
       const summaryText = summary.length ? summary.join(' · ') : 'بدون داده';
-      const exportedAt  = payload.exportedAt ? new Date(payload.exportedAt).toLocaleString('fa-IR') : 'نامشخص';
+      const exportedAt  = payload.exportedAt ? new Date(payload.exportedAt).toLocaleString(getLocale()) : 'نامشخص';
 
       const confirmMsg = `بازیابی پشتیبان:\n\n${summaryText}\nزمان خروجی: ${exportedAt}\n\nهمهٔ داده‌های فعلی با این فایل جایگزین می‌شن. مطمئنی؟`;
       if (!confirm(confirmMsg)) { input.value = ''; return; }
@@ -14355,7 +14527,16 @@ try {
     document.documentElement.dir = LANGS[state.lang].dir;
   }
   applyTranslations();
+  if (typeof translateRendered === 'function') translateRendered();
 } catch (e) { console.warn('[boot] i18n init failed', e); }
+// Hook showModal so opening a static modal re-runs translator first
+try {
+  const _orig = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function() {
+    try { if (typeof translateRendered === 'function') translateRendered(); } catch {}
+    return _orig.apply(this, arguments);
+  };
+} catch {}
 renderUserProfile();
 refreshQuickCaptureBadge();
 
