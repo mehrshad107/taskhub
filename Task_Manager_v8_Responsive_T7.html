@@ -6779,6 +6779,7 @@ function renderTrack() {
 
   const list=document.getElementById('trackingList'); list.innerHTML='';
   document.getElementById('trackEmpty').hidden=true;
+  const trackFrag = document.createDocumentFragment();
 
   tasks.forEach(task=>{
     const total=Math.max(1, (task.durationMin||0)*60);   // guard ÷0 if durationMin is 0/missing
@@ -6861,7 +6862,7 @@ function renderTrack() {
       if(state.onBreak){stopTimer();return;}
       if(task.running)pauseTimer(); else startTask(task.id);
     });
-    list.appendChild(item);
+    trackFrag.appendChild(item);
   });
 
   const trackableOps=state.operations.filter(op=>{
@@ -6899,8 +6900,9 @@ function renderTrack() {
       </div>`;
     item.querySelector('[data-edit-op-btn]')?.addEventListener('click',()=>openEditOp(op.id));
     item.querySelector('[data-op-track]').addEventListener('click',()=>{ if(op.running)pauseOp(); else startOp(op.id); });
-    list.appendChild(item);
+    trackFrag.appendChild(item);
   });
+  list.appendChild(trackFrag);   // single reflow for both task + op rows
 
   document.getElementById('trackEmpty').hidden = tasks.length>0||trackableOps.length>0;
 }
@@ -8135,10 +8137,11 @@ function renderMoney() {
   document.getElementById('moneyStatExpense').textContent = formatMoney(expense);
   document.getElementById('moneyStatNet').textContent     = formatMoney(income - expense);
 
-  // Accounts grid
+  // Accounts grid — batch via DocumentFragment (single reflow)
   const grid = document.getElementById('accountsGrid');
   grid.innerHTML = '';
   document.getElementById('accountsEmpty').hidden = state.moneyAccounts.length > 0;
+  const accFrag = document.createDocumentFragment();
   state.moneyAccounts.forEach(acc => {
     const t = getMoneyAccountType(acc.type);
     const bal = moneyAccountBalance(acc.id);
@@ -8152,8 +8155,9 @@ function renderMoney() {
       </div>
       <div class="account-balance ${bal<0?'negative':''}">${formatMoney(bal)}<span class="account-currency">تومان</span></div>`;
     card.addEventListener('click', () => openAccountModal(acc.id));
-    grid.appendChild(card);
+    accFrag.appendChild(card);
   });
+  grid.appendChild(accFrag);
 
   // Budgets (per-category monthly limits + burn-rate)
   renderMoneyBudgets();
@@ -8175,7 +8179,8 @@ function renderMoney() {
     filtersEl.appendChild(btn);
   });
 
-  // Transactions list (most recent first, capped to 80 for perf)
+  // Transactions list (most recent first, capped to 80 for perf).
+  // Build via DocumentFragment so we trigger one reflow, not 80.
   const list = document.getElementById('txList');
   list.innerHTML = '';
   const txs = [...state.moneyTransactions]
@@ -8183,6 +8188,7 @@ function renderMoney() {
     .sort((a,b) => (b.date||'').localeCompare(a.date||''))
     .slice(0, 80);
   document.getElementById('txEmpty').hidden = txs.length > 0;
+  const txFrag = document.createDocumentFragment();
   txs.forEach(tx => {
     const acc = state.moneyAccounts.find(a => a.id === tx.accountId);
     const accName = acc ? acc.name : '—';
@@ -8215,8 +8221,9 @@ function renderMoney() {
       });
       setTimeout(() => renderMoney(), 260); // wait for slide-out animation
     });
-    list.appendChild(item);
+    txFrag.appendChild(item);
   });
+  list.appendChild(txFrag);
 }
 
 /* ── Account modal ── */
