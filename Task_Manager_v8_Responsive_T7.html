@@ -4306,13 +4306,13 @@
         <div id="profilePanel" class="profile-panel profile-panel-brand" hidden></div>
       </div>
     </div>
-    <nav class="page-tabs" aria-label="صفحات">
-      <button class="page-tab active" type="button" data-page="plan"><span class="pt-emoji">📋</span><span class="pt-label">ساخت تسک</span></button>
-      <button class="page-tab" type="button" data-page="planner"><span class="pt-emoji">🗓</span><span class="pt-label">پلنر</span></button>
-      <button class="page-tab" type="button" data-page="fitness"><span class="pt-emoji">🏋</span><span class="pt-label">ورزش</span></button>
-      <button class="page-tab" type="button" data-page="track"><span class="pt-emoji">📊</span><span class="pt-label">پیگیری</span></button>
-      <button class="page-tab" type="button" data-page="money"><span class="pt-emoji">💰</span><span class="pt-label">مالی</span></button>
-      <button class="page-tab" type="button" data-page="insight"><span class="pt-emoji">🧠</span><span class="pt-label">بینش</span></button>
+    <nav class="page-tabs" aria-label="pages">
+      <button class="page-tab active" type="button" data-page="plan"   data-i18n="tab.plan"    data-i18n-target=".pt-label"><span class="pt-emoji">📋</span><span class="pt-label">ساخت تسک</span></button>
+      <button class="page-tab" type="button" data-page="planner"        data-i18n="tab.planner" data-i18n-target=".pt-label"><span class="pt-emoji">🗓</span><span class="pt-label">پلنر</span></button>
+      <button class="page-tab" type="button" data-page="fitness"        data-i18n="tab.fitness" data-i18n-target=".pt-label"><span class="pt-emoji">🏋</span><span class="pt-label">ورزش</span></button>
+      <button class="page-tab" type="button" data-page="track"          data-i18n="tab.track"   data-i18n-target=".pt-label"><span class="pt-emoji">📊</span><span class="pt-label">پیگیری</span></button>
+      <button class="page-tab" type="button" data-page="money"          data-i18n="tab.money"   data-i18n-target=".pt-label"><span class="pt-emoji">💰</span><span class="pt-label">مالی</span></button>
+      <button class="page-tab" type="button" data-page="insight"        data-i18n="tab.insight" data-i18n-target=".pt-label"><span class="pt-emoji">🧠</span><span class="pt-label">بینش</span></button>
     </nav>
     <div class="toolbar">
       <button class="icon-btn" id="pomodoroToggle" title="پومودورو">🍅</button>
@@ -5387,7 +5387,7 @@ function getPriority(id)  { return getPriorities().find(p => p.id === id) || PRI
 
 const DEFAULT = {
   operations: [], tasks: [],
-  currentFolder: 'personal', currentPage: 'plan', trackFilter: 'active',
+  lang: 'fa', currentFolder: 'personal', currentPage: 'plan', trackFilter: 'active',
   pomodoroEnabled: false, soundEnabled: true, notificationsEnabled: false,
   breakDurationMin: 5,
   activeTaskId: null, activeOpId: null,
@@ -7595,27 +7595,38 @@ function closeAllSheets() {
 /* ── Settings sheet ── */
 function renderSettingsSheet() {
   const sheet = document.getElementById('settingsSheet');
-  const sw = v => `<span class="set-state ${v?'on':''}">${v?'روشن':'خاموش'}</span>`;
+  const sw = v => `<span class="set-state ${v?'on':''}">${v?t('set.on'):t('set.off')}</span>`;
   const chev = '<span class="set-chev">›</span>';
+  const cur = LANGS[getLang()];
   sheet.innerHTML = `
-    <div class="sheet-title">تنظیمات</div>
-    <div class="set-group-label">ظاهر</div>
-    <button class="set-row" data-act="theme"><span class="set-ic">🎨</span><span class="set-lbl">تم رنگی</span>${chev}</button>
-    <button class="set-row" data-act="bg"><span class="set-ic">🖼️</span><span class="set-lbl">پس‌زمینه</span>${chev}</button>
-    <button class="set-row" data-act="font"><span class="set-ic">🔤</span><span class="set-lbl">اندازه متن</span>${chev}</button>
-    <button class="set-row" data-act="dark"><span class="set-ic">🌙</span><span class="set-lbl">حالت تاریک</span>${sw(theme==='dark')}</button>
-    <button class="set-row" data-act="compact"><span class="set-ic">▦</span><span class="set-lbl">حالت فشرده</span>${sw(state.compactMode)}</button>
-    <div class="set-group-label">تمرکز و صدا</div>
-    <button class="set-row" data-act="pomodoro"><span class="set-ic">🍅</span><span class="set-lbl">پومودورو</span>${sw(state.pomodoroEnabled)}</button>
-    <button class="set-row" data-act="ambient"><span class="set-ic">🎵</span><span class="set-lbl">صدای محیطی</span>${chev}</button>
-    <button class="set-row" data-act="sound"><span class="set-ic">🔔</span><span class="set-lbl">صدای اعلان</span>${sw(state.soundEnabled)}</button>
-    <button class="set-row" data-act="notify"><span class="set-ic">💬</span><span class="set-lbl">نوتیفیکیشن</span>${sw(state.notificationsEnabled)}</button>
-    <div class="set-group-label">حساب کاربری</div>
-    <button class="set-row" data-act="profile"><span class="set-ic">${state.userEmoji||'👤'}</span><span class="set-lbl">${state.userName? e(state.userName) : 'پروفایل'}</span>${chev}</button>
-    <div class="set-group-label">دیگر</div>
-    <button class="set-row" data-act="help"><span class="set-ic">❓</span><span class="set-lbl">راهنما و میانبرها</span>${chev}</button>
-    <button class="set-row" data-act="hof"><span class="set-ic">🏛</span><span class="set-lbl">تالار افتخار</span>${chev}</button>
-    <button class="set-row" data-act="export"><span class="set-ic">💾</span><span class="set-lbl">دانلود پشتیبان</span>${chev}</button>
+    <div class="sheet-title">${t('top.settings')}</div>
+    <div class="set-group-label">${t('set.appearance')}</div>
+    <button class="set-row" data-act="theme"><span class="set-ic">🎨</span><span class="set-lbl">${t('set.theme')}</span>${chev}</button>
+    <button class="set-row" data-act="bg"><span class="set-ic">🖼️</span><span class="set-lbl">${t('set.bg')}</span>${chev}</button>
+    <button class="set-row" data-act="font"><span class="set-ic">🔤</span><span class="set-lbl">${t('set.font')}</span>${chev}</button>
+    <button class="set-row" data-act="dark"><span class="set-ic">🌙</span><span class="set-lbl">${t('set.dark')}</span>${sw(theme==='dark')}</button>
+    <button class="set-row" data-act="compact"><span class="set-ic">▦</span><span class="set-lbl">${t('set.compact')}</span>${sw(state.compactMode)}</button>
+    <button class="set-row" data-act="lang"><span class="set-ic">🌍</span><span class="set-lbl">${t('set.language')}</span><span class="set-state on">${cur.flag} ${e(cur.name)}</span></button>
+    <div class="set-group-label">${t('set.focus')}</div>
+    <button class="set-row" data-act="pomodoro"><span class="set-ic">🍅</span><span class="set-lbl">${t('set.pomodoro')}</span>${sw(state.pomodoroEnabled)}</button>
+    <button class="set-row" data-act="ambient"><span class="set-ic">🎵</span><span class="set-lbl">${t('set.ambient')}</span>${chev}</button>
+    <button class="set-row" data-act="sound"><span class="set-ic">🔔</span><span class="set-lbl">${t('set.sound')}</span>${sw(state.soundEnabled)}</button>
+    <button class="set-row" data-act="notify"><span class="set-ic">💬</span><span class="set-lbl">${t('set.notify')}</span>${sw(state.notificationsEnabled)}</button>
+    <div class="set-group-label">${t('set.account')}</div>
+    <button class="set-row" data-act="profile"><span class="set-ic">${state.userEmoji||'👤'}</span><span class="set-lbl">${state.userName? e(state.userName) : t('set.profile')}</span>${chev}</button>
+    <div class="set-group-label">${t('set.other')}</div>
+    <button class="set-row" data-act="help"><span class="set-ic">❓</span><span class="set-lbl">${t('set.help')}</span>${chev}</button>
+    <button class="set-row" data-act="hof"><span class="set-ic">🏛</span><span class="set-lbl">${t('set.hof')}</span>${chev}</button>
+    <button class="set-row" data-act="export"><span class="set-ic">💾</span><span class="set-lbl">${t('set.export')}</span>${chev}</button>
+    <div id="setLangPicker" hidden style="margin-top:var(--space-3);padding:var(--space-2);background:var(--color-bg);border-radius:var(--radius-md);display:flex;flex-direction:column;gap:6px">
+      ${Object.entries(LANGS).map(([k,v]) => `
+        <button class="set-row" data-lang="${k}" style="${k===getLang()?'background:var(--color-primary-soft)':''}">
+          <span class="set-ic">${v.flag}</span>
+          <span class="set-lbl">${e(v.name)}</span>
+          ${k===getLang() ? '<span class="set-state on">✓</span>' : ''}
+        </button>
+      `).join('')}
+    </div>
   `;
   const pickers = { theme:'themePickerBtn', bg:'bgPickerBtn', font:'fontSizeBtn', ambient:'ambientBtn', profile:'profileBtn' };
   const toggles = { dark:'darkToggle', compact:'compactToggleBtn', pomodoro:'pomodoroToggle', sound:'soundToggle', notify:'notifyToggle' };
@@ -7623,13 +7634,26 @@ function renderSettingsSheet() {
     help:   () => document.getElementById('helpModal')?.showModal(),
     hof:    () => { if (typeof openHallOfFame === 'function') openHallOfFame(); },
     export: () => { if (typeof exportStateAsJSON === 'function') exportStateAsJSON(); },
+    lang:   () => {
+      // Toggle inline language picker — don't close the sheet
+      const picker = document.getElementById('setLangPicker');
+      if (picker) picker.hidden = !picker.hidden;
+    },
   };
   sheet.querySelectorAll('.set-row').forEach(row => {
-    row.addEventListener('click', () => {
+    row.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      // Language picker rows
+      const lk = row.dataset.lang;
+      if (lk) { setLang(lk); renderSettingsSheet(); return; }
       const act = row.dataset.act;
       if (pickers[act]) { sheet.hidden = true; document.getElementById(pickers[act]).click(); }
       else if (toggles[act]) { document.getElementById(toggles[act]).click(); renderSettingsSheet(); }
-      else if (directs[act]) { sheet.hidden = true; try { directs[act](); } catch {} }
+      else if (directs[act]) {
+        // 'lang' keeps sheet open; others close
+        if (act !== 'lang') sheet.hidden = true;
+        try { directs[act](); } catch {}
+      }
     });
   });
 }
@@ -7727,7 +7751,110 @@ function plannerMonthKey(date) {
 const FA_WEEKDAYS = ['یک‌شنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
 const FA_MONTHS   = ['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'];
 
+/* ════════════════════════════════════════════════
+   🌍 i18n — Persian (default), English, French, Russian
+   - state.lang  controls language. Falls back to 'fa'.
+   - Numbers: Persian-Arabic digits only in fa; other langs keep ASCII.
+   - Direction: fa = rtl; en/fr/ru = ltr.
+   - t(key) returns translated string. Unknown key returns the key.
+   - Static HTML strings can carry data-i18n="key" — applyTranslations()
+     swaps textContent for the current lang at boot + on switch.
+════════════════════════════════════════════════ */
+const LANGS = {
+  fa: { name: 'فارسی',   flag: '🇮🇷', dir: 'rtl', locale: 'fa-IR' },
+  en: { name: 'English', flag: '🇬🇧', dir: 'ltr', locale: 'en-US' },
+  fr: { name: 'Français',flag: '🇫🇷', dir: 'ltr', locale: 'fr-FR' },
+  ru: { name: 'Русский', flag: '🇷🇺', dir: 'ltr', locale: 'ru-RU' },
+};
+
+const I18N = {
+  // Tab labels
+  'tab.plan':     { fa:'ساخت تسک',  en:'Plan',     fr:'Plan',     ru:'План'    },
+  'tab.planner':  { fa:'پلنر',      en:'Planner',  fr:'Agenda',   ru:'Планер'  },
+  'tab.fitness':  { fa:'ورزش',      en:'Fitness',  fr:'Fitness',  ru:'Фитнес'  },
+  'tab.track':    { fa:'پیگیری',    en:'Track',    fr:'Suivi',    ru:'Трекер'  },
+  'tab.money':    { fa:'مالی',      en:'Money',    fr:'Finance',  ru:'Деньги'  },
+  'tab.insight':  { fa:'بینش',      en:'Insights', fr:'Aperçus',  ru:'Анализ'  },
+  // Topbar
+  'top.profile':  { fa:'پروفایل',   en:'Profile',  fr:'Profil',   ru:'Профиль' },
+  'top.help':     { fa:'راهنما',    en:'Help',     fr:'Aide',     ru:'Помощь'  },
+  'top.settings': { fa:'تنظیمات',   en:'Settings', fr:'Réglages', ru:'Настройки' },
+  // Settings sheet
+  'set.appearance':   { fa:'ظاهر',          en:'Appearance',  fr:'Apparence',   ru:'Внешний вид' },
+  'set.theme':        { fa:'تم رنگی',       en:'Color theme', fr:'Thème',       ru:'Тема' },
+  'set.bg':           { fa:'پس‌زمینه',      en:'Background',  fr:'Arrière-plan',ru:'Фон' },
+  'set.font':         { fa:'اندازه متن',    en:'Font size',   fr:'Taille texte',ru:'Размер шрифта' },
+  'set.dark':         { fa:'حالت تاریک',    en:'Dark mode',   fr:'Mode sombre', ru:'Тёмный режим' },
+  'set.compact':      { fa:'حالت فشرده',    en:'Compact mode',fr:'Mode compact',ru:'Компактный режим' },
+  'set.focus':        { fa:'تمرکز و صدا',   en:'Focus & sound',fr:'Focus & son',ru:'Фокус и звук' },
+  'set.pomodoro':     { fa:'پومودورو',      en:'Pomodoro',    fr:'Pomodoro',    ru:'Помодоро' },
+  'set.ambient':      { fa:'صدای محیطی',    en:'Ambient sound',fr:'Son ambiant',ru:'Фоновый звук' },
+  'set.sound':        { fa:'صدای اعلان',    en:'Notification sound',fr:'Son de notif',ru:'Звук уведомления' },
+  'set.notify':       { fa:'نوتیفیکیشن',    en:'Notifications',fr:'Notifications',ru:'Уведомления' },
+  'set.account':      { fa:'حساب کاربری',   en:'Account',     fr:'Compte',      ru:'Аккаунт' },
+  'set.profile':      { fa:'پروفایل',       en:'Profile',     fr:'Profil',      ru:'Профиль' },
+  'set.other':        { fa:'دیگر',          en:'Other',       fr:'Autre',       ru:'Прочее' },
+  'set.help':         { fa:'راهنما و میانبرها',en:'Help & shortcuts',fr:'Aide & raccourcis',ru:'Помощь и горячие клавиши' },
+  'set.hof':          { fa:'تالار افتخار',  en:'Hall of Fame',fr:'Panthéon',    ru:'Зал славы' },
+  'set.export':       { fa:'دانلود پشتیبان',en:'Download backup',fr:'Sauvegarde',ru:'Скачать копию' },
+  'set.language':     { fa:'زبان',          en:'Language',    fr:'Langue',      ru:'Язык' },
+  'set.on':           { fa:'روشن',          en:'On',          fr:'Activé',      ru:'Вкл' },
+  'set.off':          { fa:'خاموش',         en:'Off',         fr:'Désactivé',   ru:'Выкл' },
+  // Common buttons
+  'btn.save':         { fa:'ذخیره',  en:'Save',   fr:'Enregistrer', ru:'Сохранить' },
+  'btn.cancel':       { fa:'لغو',    en:'Cancel', fr:'Annuler',     ru:'Отмена' },
+  'btn.delete':       { fa:'حذف',    en:'Delete', fr:'Supprimer',   ru:'Удалить' },
+  'btn.edit':         { fa:'ویرایش',en:'Edit',   fr:'Modifier',    ru:'Изменить' },
+  'btn.close':        { fa:'بستن',   en:'Close',  fr:'Fermer',      ru:'Закрыть' },
+  'btn.add':          { fa:'افزودن',en:'Add',    fr:'Ajouter',     ru:'Добавить' },
+  'btn.back':         { fa:'بازگشت',en:'Back',   fr:'Retour',      ru:'Назад' },
+};
+
+function getLang() { return (state && state.lang && LANGS[state.lang]) ? state.lang : 'fa'; }
+function t(key, fallback) {
+  const entry = I18N[key];
+  if (!entry) return fallback != null ? fallback : key;
+  return entry[getLang()] || entry.fa || key;
+}
+
+/* Apply translations to any element with data-i18n="key" attribute.
+   Run on boot + on language change. */
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    const tr = t(k);
+    // If element has children (e.g. emoji span + label span), only swap text nodes
+    // OR if data-i18n-target attr names a child class.
+    const targetSel = el.getAttribute('data-i18n-target');
+    if (targetSel) {
+      const child = el.querySelector(targetSel);
+      if (child) child.textContent = tr;
+    } else {
+      el.textContent = tr;
+    }
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.getAttribute('data-i18n-title'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+}
+
+function setLang(lang) {
+  if (!LANGS[lang]) return;
+  state.lang = lang;
+  const meta = LANGS[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = meta.dir;
+  applyTranslations();
+  try { save(); render(); } catch {}
+}
+
+/* toFaDigits — kept name for compatibility, now lang-aware. In fa returns
+   Persian-Arabic digits; other langs return original (ASCII). */
 function toFaDigits(n) {
+  if (getLang() !== 'fa') return String(n);
   return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
 }
 
@@ -14214,6 +14341,14 @@ resumeOpOnLoad();
 applyBackground();
 applyFontSize(state.fontSize);
 applyCompact();
+// Apply persisted language: sets lang+dir on <html>, translates static DOM
+try {
+  if (state.lang && LANGS[state.lang]) {
+    document.documentElement.lang = state.lang;
+    document.documentElement.dir = LANGS[state.lang].dir;
+  }
+  applyTranslations();
+} catch (e) { console.warn('[boot] i18n init failed', e); }
 renderUserProfile();
 refreshQuickCaptureBadge();
 
