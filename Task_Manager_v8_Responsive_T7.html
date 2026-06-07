@@ -5467,13 +5467,29 @@ function load() {
   } catch {}
   return JSON.parse(JSON.stringify(DEFAULT));
 }
-function save() {
+/* save() — debounced so hot paths (per-second timer ticks, slider drags)
+   don't synchronously JSON.stringify+localStorage.setItem the entire ~600KB
+   state every call. Flush on tab hide / unload to avoid data loss. */
+let _lsSaveTimer = null;
+let _lsSavePending = false;
+function _flushSave() {
+  if (_lsSaveTimer) { clearTimeout(_lsSaveTimer); _lsSaveTimer = null; }
+  if (!_lsSavePending) return;
+  _lsSavePending = false;
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
-  // Mirror to IndexedDB (debounced, async — doesn't block UI)
+}
+function save() {
+  _lsSavePending = true;
+  if (_lsSaveTimer) clearTimeout(_lsSaveTimer);
+  _lsSaveTimer = setTimeout(_flushSave, 350);
+  // IDB already debounced internally
   scheduleIdbSave();
   // Debounced cloud push if user is signed in
   if (_currentUser && sb) schedulePushToCloud();
 }
+// Flush on tab hide and unload so debounce window can't drop data
+window.addEventListener('beforeunload', _flushSave);
+document.addEventListener('visibilitychange', () => { if (document.hidden) _flushSave(); });
 
 function initFolders() {
   if (!state.folders || !state.folders.length) state.folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
@@ -6043,17 +6059,44 @@ function startTask(taskId) {
     state.todayFocusSec = state.todayFocusBase + s;
     _bumpFocusHour();
     try { if (s > 0 && s % 60 === 0) _grantFocusXpIfDue(); } catch {}
-    if (cur.elapsedSec >= cur.durationMin * 60) {
+    const finishing = cur.elapsedSec >= cur.durationMin * 60;
+    if (finishing) {
       cur.elapsedSec = cur.durationMin * 60;
-      cur.running = false; cur.paused = false;   // reset paused too on auto-finish
+      cur.running = false; cur.paused = false;
       cur.timerStartedAt = null; cur.timerBaseElapsed = null;
       state.activeTaskId = null; clearInterval(timerHandle); timerHandle = null;
       beep(); notify('تایمر تسک تمام شد', cur.text);
       if (state.pomodoroEnabled) startBreak();
     }
-    save(); render();
+    // PERF: full save()+render() every second was burning CPU. Cheap path:
+    // update only the visible focus clock + track progress bar each tick,
+    // do full save+render only on minute boundary or on finish.
+    if (finishing || s % 10 === 0) { save(); render(); }
+    else _liveTickUpdate(cur, s);
   }, 1000);
   save(); render();
+}
+
+/* Lightweight per-second tick: update only the focus clock element + the
+   active task's progress bar, without rebuilding the whole page. */
+function _liveTickUpdate(task, elapsed) {
+  try {
+    const totalSec = (task.durationMin || 0) * 60;
+    const left = Math.max(totalSec - elapsed, 0);
+    const clock = document.getElementById('focusClock');
+    if (clock) clock.textContent = formatClock(left);
+    const focusStat = document.getElementById('statFocus');
+    if (focusStat) focusStat.textContent = Math.floor((state.todayFocusSec || 0) / 60);
+    // Update the progress bar of the active task row in the track list if visible
+    const row = document.querySelector(`.track-item[data-task-id="${task.id}"]`);
+    if (row) {
+      const fill = row.querySelector('.track-progress-bar-fill');
+      if (fill && totalSec > 0) {
+        const pct = Math.min((elapsed / totalSec) * 100, 100);
+        fill.style.width = pct + '%';
+      }
+    }
+  } catch {}
 }
 
 function resumeTimerOnLoad() {
@@ -6084,7 +6127,8 @@ function resumeTimerOnLoad() {
       const s = Math.floor((Date.now() - cur.timerStartedAt) / 1000);
       cur.elapsedSec = cur.timerBaseElapsed + s; state.todayFocusSec = state.todayFocusBase + s; _bumpFocusHour();
       try { if (s > 0 && s % 60 === 0) _grantFocusXpIfDue(); } catch {}
-      if (cur.elapsedSec >= cur.durationMin * 60) {
+      const finishing = cur.elapsedSec >= cur.durationMin * 60;
+      if (finishing) {
         cur.elapsedSec = cur.durationMin * 60;
         cur.running = false; cur.paused = false;
         cur.timerStartedAt = null; cur.timerBaseElapsed = null;
@@ -6092,7 +6136,8 @@ function resumeTimerOnLoad() {
         beep(); notify('تایمر تسک تمام شد', cur.text);
         if (state.pomodoroEnabled) startBreak();
       }
-      save(); render();
+      if (finishing || s % 10 === 0) { save(); render(); }
+      else _liveTickUpdate(cur, s);
     }, 1000);
   }
 }
@@ -6131,10 +6176,21 @@ function startOp(opId) {
     const cur = state.operations.find(o => o.id === state.activeOpId);
     if (!cur) { stopOp(); return; }
     const s=Math.floor((Date.now()-cur.timerStartedAt)/1000); cur.elapsedSec=(cur.timerBaseElapsed||0)+s;
-    if (cur.durationMin && cur.elapsedSec >= cur.durationMin*60) { cur.elapsedSec=cur.durationMin*60; cur.running=false; cur.timerStartedAt=null; cur.timerBaseElapsed=null; state.activeOpId=null; clearInterval(opTimerHandle); opTimerHandle=null; beep(); notify('تایمر عملیات تمام شد', cur.title); }
-    save(); render();
+    const finishing = cur.durationMin && cur.elapsedSec >= cur.durationMin*60;
+    if (finishing) { cur.elapsedSec=cur.durationMin*60; cur.running=false; cur.timerStartedAt=null; cur.timerBaseElapsed=null; state.activeOpId=null; clearInterval(opTimerHandle); opTimerHandle=null; beep(); notify('تایمر عملیات تمام شد', cur.title); }
+    if (finishing || s % 10 === 0) { save(); render(); }
+    else _liveOpTickUpdate(cur, s);
   }, 1000);
   save(); render();
+}
+
+/* Cheap op-timer tick: update focus clock + op progress bar only. */
+function _liveOpTickUpdate(op, elapsed) {
+  try {
+    const totalSec = (op.durationMin || 0) * 60;
+    const clock = document.getElementById('focusClock');
+    if (clock) clock.textContent = totalSec ? formatClock(Math.max(totalSec - elapsed, 0)) : formatClock(elapsed);
+  } catch {}
 }
 
 function resumeOpOnLoad() {
@@ -6147,8 +6203,10 @@ function resumeOpOnLoad() {
   opTimerHandle = setInterval(() => {
     const cur=state.operations.find(o=>o.id===state.activeOpId); if(!cur){stopOp();return;}
     const s=Math.floor((Date.now()-cur.timerStartedAt)/1000); cur.elapsedSec=(cur.timerBaseElapsed||0)+s;
-    if(cur.durationMin&&cur.elapsedSec>=cur.durationMin*60){cur.elapsedSec=cur.durationMin*60;cur.running=false;cur.timerStartedAt=null;cur.timerBaseElapsed=null;state.activeOpId=null;clearInterval(opTimerHandle);opTimerHandle=null;beep();notify('تایمر عملیات تمام شد',cur.title);}
-    save(); render();
+    const finishing = cur.durationMin && cur.elapsedSec >= cur.durationMin*60;
+    if (finishing){cur.elapsedSec=cur.durationMin*60;cur.running=false;cur.timerStartedAt=null;cur.timerBaseElapsed=null;state.activeOpId=null;clearInterval(opTimerHandle);opTimerHandle=null;beep();notify('تایمر عملیات تمام شد',cur.title);}
+    if (finishing || s % 10 === 0) { save(); render(); }
+    else _liveOpTickUpdate(cur, s);
   }, 1000);
 }
 
@@ -6730,6 +6788,7 @@ function renderTrack() {
     const pr=getPriority(task.priority||'medium');
     const item=document.createElement('div');
     item.className=`track-item ${task.running?'running':''}`;
+    item.dataset.taskId = task.id;   // used by _liveTickUpdate to patch progress bar w/o full re-render
     const scheduleText = task.schedule && task.schedule !== 'ندارد' ? task.schedule : null;
     item.innerHTML=`
       <input class="check" type="checkbox" ${task.done?'checked':''} aria-label="تیک زدن تسک">
