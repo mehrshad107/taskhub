@@ -3200,14 +3200,39 @@
       font-size: .9rem; padding: 2px 4px;
     }
 
+    /* Inline TDEE block (replaces the old modal) */
+    .nutri-tdee-block {
+      margin-top: var(--space-3);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+    }
+    [data-theme="dark"] .nutri-tdee-block { background: rgba(255,255,255,0.04); }
+    .nutri-tdee-toggle {
+      width: 100%; padding: 12px var(--space-3);
+      background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(34,197,94,0.05));
+      border: none; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--color-text); font-weight: 700; font-size: .9rem;
+      transition: background .15s;
+    }
+    [data-theme="dark"] .nutri-tdee-toggle { background: linear-gradient(135deg, rgba(139,92,246,0.20), rgba(34,197,94,0.15)); color: #f5f5f5; }
+    .nutri-tdee-toggle:hover { background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(34,197,94,0.12)); }
+    .nutri-tdee-chev { font-size: .8rem; color: var(--color-primary); }
+    .nutri-tdee-body {
+      padding: var(--space-3); border-top: 1px solid var(--color-border);
+      animation: page-fade-in .25s var(--ease-out) both;
+    }
+
     /* Food picker modal — reuses .fxp- classes from fitness */
-    dialog#nutriAddFoodModal, dialog#tdeeModal {
+    dialog#nutriAddFoodModal {
       max-width: 640px; width: 92vw; max-height: 88vh;
       padding: 0; border: none; border-radius: 16px;
       background: var(--color-surface); box-shadow: 0 30px 80px rgba(0,0,0,0.4);
       overflow: hidden; display: flex; flex-direction: column;
     }
-    dialog#nutriAddFoodModal::backdrop, dialog#tdeeModal::backdrop {
+    dialog#nutriAddFoodModal::backdrop {
       background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
     }
     .naf-search-row, .naf-cat-row { margin-bottom: 10px; }
@@ -3249,7 +3274,7 @@
     [data-theme="dark"] .tdee-macros span { background: rgba(255,255,255,0.08); }
 
     @media (max-width: 768px) {
-      dialog#nutriAddFoodModal, dialog#tdeeModal, dialog#recoveryModal {
+      dialog#nutriAddFoodModal, dialog#recoveryModal {
         position: fixed; inset: auto 0 0 0; width: 100%; max-width: 100%;
         max-height: 88vh; border-radius: 16px 16px 0 0;
         animation: sheet-up .3s var(--ease-out) forwards;
@@ -4789,17 +4814,6 @@
             style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
   </div>
   <div class="caldm-body naf-body"></div>
-</dialog>
-
-<!-- 🎯 TDEE calculator modal -->
-<dialog id="tdeeModal">
-  <div class="caldm-head">
-    <h3 class="caldm-title">🎯 محاسبه TDEE (نیاز روزانه)</h3>
-    <button type="button" class="ghost-btn dlg-close-btn" data-close="tdeeModal" aria-label="بستن"
-            onclick="closeDialog('tdeeModal');return false;"
-            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </div>
-  <div class="caldm-body tdee-body"></div>
 </dialog>
 
 <!-- 🏛 Hall of Fame -->
@@ -6890,8 +6904,21 @@ function render() {
 }
 
 /* ══ EVENTS ══ */
+/* Helper: close every open <dialog>. Run on tab switch so a popup opened
+   on one tab can never linger and show on another tab. */
+function closeAllDialogs() {
+  document.querySelectorAll('dialog').forEach(d => {
+    if (d.hasAttribute('open')) {
+      try { d.close(); } catch (e) {}
+      d.removeAttribute('open');
+    }
+  });
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+}
 document.querySelectorAll('[data-page]').forEach(btn=>{
   btn.addEventListener('click',()=>{
+    closeAllDialogs();           // kill any leftover popup from previous tab
     state.currentPage=btn.dataset.page;
     document.querySelectorAll('.page-tab').forEach(b=>b.classList.toggle('active',b.dataset.page===state.currentPage));
     document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+state.currentPage));
@@ -8698,7 +8725,7 @@ const CMD_STATIC_COMMANDS = [
   { id:'fitness',    title:'تناسب اندام',             icon:'🏋', kind:'command', sub:'برنامه تمرین، جلسه زنده، رکوردها', run: () => { if (typeof switchPage==='function') switchPage('fitness'); } },
   { id:'fit-start',  title:'شروع تمرین امروز',         icon:'🔥', kind:'command', sub:'جلسه تمرین رو همین الان شروع کن', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ openFitSession(false); }catch{} }, 200); } },
   { id:'nutrition',  title:'تغذیه — وعده‌ها',           icon:'🥗', kind:'command', sub:'ثبت غذا، ماکرو، آب', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ setFitSubTab('nutrition'); }catch{} }, 150); } },
-  { id:'tdee',       title:'محاسبه TDEE',               icon:'🎯', kind:'command', sub:'هدف کالری روزانه', run: () => { try { openTDEEModal(); } catch {} } },
+  { id:'tdee',       title:'محاسبه TDEE',               icon:'🎯', kind:'command', sub:'هدف کالری روزانه', run: () => { if (typeof switchPage==='function') switchPage('fitness'); setTimeout(()=>{ try{ setFitSubTab('nutrition'); _tdeeExpanded=true; renderFitness(); }catch{} }, 150); } },
   { id:'excel',      title:'خروجی Excel',              icon:'📊', kind:'command', sub:'xlsx با ۴ شیت', run: () => exportToExcel() },
   { id:'theme',      title:'تغییر تم رنگی',          icon:'🎨', kind:'command', run: () => document.getElementById('themePickerBtn')?.click() },
   { id:'dark',       title:'تغییر حالت روشن/تاریک',  icon:'🌙', kind:'command', run: () => document.getElementById('darkToggle')?.click() },
@@ -10692,9 +10719,12 @@ const FITNESS_TEMPLATES = [
 ];
 
 /* ─── Fitness sub-tab routing (in-page tabs inside #page-fitness) ─── */
-let _fitSubTab = 'today';   // 'today' | 'plans' | 'progress' | 'metrics'
+let _fitSubTab = 'today';   // 'today' | 'plans' | 'nutrition' | 'progress'
+let _tdeeExpanded = false;  // inline TDEE form open/closed
 function setFitSubTab(name) {
+  if (typeof closeAllDialogs === 'function') closeAllDialogs();
   _fitSubTab = name;
+  _tdeeExpanded = false;       // collapse inline TDEE on sub-tab switch
   renderFitness();
 }
 
@@ -11588,9 +11618,17 @@ function _renderFitNutrition() {
     </div>
   </div>`;
 
+  // TDEE inline section (no popup — expand/collapse in place)
+  html += `<div class="nutri-tdee-block">
+    <button type="button" class="nutri-tdee-toggle" id="tdeeToggleBtn">
+      <span>🎯 محاسبه TDEE (نیاز کالری روزانه)</span>
+      <span class="nutri-tdee-chev">${_tdeeExpanded ? '▲' : '▼'}</span>
+    </button>
+    ${_tdeeExpanded ? `<div class="nutri-tdee-body" id="tdeeInlineBody"></div>` : ''}
+  </div>`;
+
   // 5 meal cards
-  html += `<div class="fit-section-head" style="margin-top:14px"><h3>🍽 وعده‌های امروز</h3>
-    <button class="ghost-btn fit-tiny-btn" id="nutriTDEEBtn">🎯 TDEE</button></div>
+  html += `<div class="fit-section-head" style="margin-top:14px"><h3>🍽 وعده‌های امروز</h3></div>
     <div class="nutri-meal-list">`;
   MEAL_TYPES.forEach(mt => {
     const meal = todayMeals.find(m => m.mealType === mt.id);
@@ -11668,8 +11706,98 @@ function _wireNutritionHandlers() {
       save(); renderFitness();
     });
   });
-  // TDEE button
-  document.getElementById('nutriTDEEBtn')?.addEventListener('click', openTDEEModal);
+  // Inline TDEE toggle + render
+  document.getElementById('tdeeToggleBtn')?.addEventListener('click', () => {
+    _tdeeExpanded = !_tdeeExpanded;
+    renderFitness();
+  });
+  if (_tdeeExpanded) {
+    const host = document.getElementById('tdeeInlineBody');
+    if (host) renderTDEEInline(host);
+  }
+}
+
+/* Inline TDEE renderer. Mounts the calculator form into the host element
+   (no popup, no dialog). Matches the same Mifflin-St Jeor math the old
+   modal used. */
+function renderTDEEInline(host) {
+  ensureNutritionState();
+  const b = state.nutrition.bodyInfo;
+
+  function render() {
+    let tdee = b.lastTDEE;
+    if (b.gender && b.age && b.heightCm && b.weightKg) {
+      let bmr;
+      if (b.gender === 'male') bmr = 10*b.weightKg + 6.25*b.heightCm - 5*b.age + 5;
+      else                     bmr = 10*b.weightKg + 6.25*b.heightCm - 5*b.age - 161;
+      const mult = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, veryActive:1.9 }[b.activityLevel] || 1.55;
+      tdee = Math.round(bmr * mult);
+      const adj = { cut:-500, maintain:0, bulk:+300 }[b.goalType] || 0;
+      tdee += adj;
+    }
+
+    host.innerHTML = `
+      <div class="modal-field">
+        <label>جنسیت</label>
+        <div class="money-tx-type-row">
+          <button type="button" class="money-tx-type ${b.gender==='male'?'active':''}" data-gen="male">👨 مرد</button>
+          <button type="button" class="money-tx-type ${b.gender==='female'?'active':''}" data-gen="female">👩 زن</button>
+        </div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field"><label>سن</label><input id="tdeeInAge" type="number" class="input-field" value="${b.age||''}" min="1" /></div>
+        <div class="modal-field"><label>قد (cm)</label><input id="tdeeInH" type="number" class="input-field" value="${b.heightCm||''}" min="1" /></div>
+      </div>
+      <div class="modal-field"><label>وزن (kg)</label><input id="tdeeInW" type="number" class="input-field" value="${b.weightKg||''}" min="1" step="0.5" /></div>
+      <div class="modal-field">
+        <label>سطح فعالیت</label>
+        <select id="tdeeInAct" class="input-field" style="height:42px">
+          <option value="sedentary"  ${b.activityLevel==='sedentary'?'selected':''}>کم‌تحرک (پشت میز)</option>
+          <option value="light"      ${b.activityLevel==='light'?'selected':''}>سبک (۱-۳ روز ورزش)</option>
+          <option value="moderate"   ${b.activityLevel==='moderate'?'selected':''}>متوسط (۳-۵ روز ورزش)</option>
+          <option value="active"     ${b.activityLevel==='active'?'selected':''}>فعال (۶-۷ روز ورزش)</option>
+          <option value="veryActive" ${b.activityLevel==='veryActive'?'selected':''}>خیلی فعال (ورزش سنگین روزانه)</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>هدف</label>
+        <div class="money-tx-type-row">
+          <button type="button" class="money-tx-type ${b.goalType==='cut'?'active':''}"      data-goal="cut">📉 کاهش وزن</button>
+          <button type="button" class="money-tx-type ${b.goalType==='maintain'?'active':''}" data-goal="maintain">⚖ حفظ</button>
+          <button type="button" class="money-tx-type ${b.goalType==='bulk'?'active':''}"     data-goal="bulk">📈 افزایش</button>
+        </div>
+      </div>
+      ${tdee ? `<div class="tdee-result">
+        <div class="tdee-num">${toFaDigits(tdee)} <span>کالری/روز</span></div>
+        <div class="tdee-hint">پیشنهاد ماکرو روزانه:</div>
+        <div class="tdee-macros">
+          <span>🥩 ${toFaDigits(Math.round(tdee*0.30/4))}g پروتئین</span>
+          <span>🍚 ${toFaDigits(Math.round(tdee*0.40/4))}g کربو</span>
+          <span>🫒 ${toFaDigits(Math.round(tdee*0.30/9))}g چربی</span>
+        </div>
+        <button type="button" class="primary-btn" id="tdeeInApply" style="margin-top:12px;width:100%;background:var(--color-primary);color:white;min-height:42px">✓ اعمال این هدف‌ها</button>
+      </div>` : `<div class="tdee-hint" style="text-align:center;padding:20px">همه فیلدها رو پر کن تا محاسبه کنیم</div>`}
+    `;
+
+    host.querySelectorAll('[data-gen]').forEach(btn => btn.addEventListener('click', () => { b.gender = btn.dataset.gen; save(); render(); }));
+    host.querySelectorAll('[data-goal]').forEach(btn => btn.addEventListener('click', () => { b.goalType = btn.dataset.goal; save(); render(); }));
+    host.querySelector('#tdeeInAge')?.addEventListener('input', e => { b.age = +e.target.value || null; save(); render(); });
+    host.querySelector('#tdeeInH')?.addEventListener('input',   e => { b.heightCm = +e.target.value || null; save(); render(); });
+    host.querySelector('#tdeeInW')?.addEventListener('input',   e => { b.weightKg = +e.target.value || null; save(); render(); });
+    host.querySelector('#tdeeInAct')?.addEventListener('change',e => { b.activityLevel = e.target.value; save(); render(); });
+    host.querySelector('#tdeeInApply')?.addEventListener('click', () => {
+      b.lastTDEE = tdee;
+      state.nutrition.goals.calories = tdee;
+      state.nutrition.goals.protein  = Math.round(tdee*0.30/4);
+      state.nutrition.goals.carbs    = Math.round(tdee*0.40/4);
+      state.nutrition.goals.fat      = Math.round(tdee*0.30/9);
+      save();
+      _tdeeExpanded = false;
+      renderFitness();
+      showToast?.('🎯 هدف‌های روزانه به‌روزرسانی شد', { duration: 2200, variant:'success' });
+    });
+  }
+  render();
 }
 
 /* ── Food picker for meal ── */
@@ -11761,91 +11889,6 @@ function openNutriAddFood(mealType) {
 }
 
 /* ── TDEE Calculator modal (Mifflin-St Jeor) ── */
-function openTDEEModal() {
-  ensureNutritionState();
-  const dlg = document.getElementById('tdeeModal');
-  const b = state.nutrition.bodyInfo;
-  const body = dlg.querySelector('.tdee-body');
-
-  function renderTDEE() {
-    let tdee = b.lastTDEE;
-    if (b.gender && b.age && b.heightCm && b.weightKg) {
-      // Mifflin-St Jeor BMR
-      let bmr;
-      if (b.gender === 'male') bmr = 10*b.weightKg + 6.25*b.heightCm - 5*b.age + 5;
-      else                     bmr = 10*b.weightKg + 6.25*b.heightCm - 5*b.age - 161;
-      const mult = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, veryActive:1.9 }[b.activityLevel] || 1.55;
-      tdee = Math.round(bmr * mult);
-      // Goal adjustment
-      const adj = { cut:-500, maintain:0, bulk:+300 }[b.goalType] || 0;
-      tdee += adj;
-    }
-
-    body.innerHTML = `
-      <div class="modal-field">
-        <label>جنسیت</label>
-        <div class="money-tx-type-row">
-          <button type="button" class="money-tx-type ${b.gender==='male'?'active':''}" data-gen="male">👨 مرد</button>
-          <button type="button" class="money-tx-type ${b.gender==='female'?'active':''}" data-gen="female">👩 زن</button>
-        </div>
-      </div>
-      <div class="modal-field-row">
-        <div class="modal-field"><label>سن</label><input id="tdeeAge" type="number" class="input-field" value="${b.age||''}" min="1" /></div>
-        <div class="modal-field"><label>قد (cm)</label><input id="tdeeH" type="number" class="input-field" value="${b.heightCm||''}" min="1" /></div>
-      </div>
-      <div class="modal-field"><label>وزن (kg)</label><input id="tdeeW" type="number" class="input-field" value="${b.weightKg||''}" min="1" step="0.5" /></div>
-      <div class="modal-field">
-        <label>سطح فعالیت</label>
-        <select id="tdeeAct" class="input-field" style="height:42px">
-          <option value="sedentary"  ${b.activityLevel==='sedentary'?'selected':''}>کم‌تحرک (پشت میز)</option>
-          <option value="light"      ${b.activityLevel==='light'?'selected':''}>سبک (۱-۳ روز ورزش)</option>
-          <option value="moderate"   ${b.activityLevel==='moderate'?'selected':''}>متوسط (۳-۵ روز ورزش)</option>
-          <option value="active"     ${b.activityLevel==='active'?'selected':''}>فعال (۶-۷ روز ورزش)</option>
-          <option value="veryActive" ${b.activityLevel==='veryActive'?'selected':''}>خیلی فعال (ورزش سنگین روزانه)</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label>هدف</label>
-        <div class="money-tx-type-row">
-          <button type="button" class="money-tx-type ${b.goalType==='cut'?'active':''}"      data-goal="cut">📉 کاهش وزن</button>
-          <button type="button" class="money-tx-type ${b.goalType==='maintain'?'active':''}" data-goal="maintain">⚖ حفظ</button>
-          <button type="button" class="money-tx-type ${b.goalType==='bulk'?'active':''}"     data-goal="bulk">📈 افزایش</button>
-        </div>
-      </div>
-      ${tdee ? `<div class="tdee-result">
-        <div class="tdee-num">${toFaDigits(tdee)} <span>کالری/روز</span></div>
-        <div class="tdee-hint">پیشنهاد ماکرو روزانه:</div>
-        <div class="tdee-macros">
-          <span>🥩 ${toFaDigits(Math.round(tdee*0.30/4))}g پروتئین</span>
-          <span>🍚 ${toFaDigits(Math.round(tdee*0.40/4))}g کربو</span>
-          <span>🫒 ${toFaDigits(Math.round(tdee*0.30/9))}g چربی</span>
-        </div>
-        <button type="button" class="primary-btn" id="tdeeApply" style="margin-top:12px;width:100%;background:var(--color-primary);color:white;min-height:42px">✓ اعمال این هدف‌ها</button>
-      </div>` : `<div class="tdee-hint" style="text-align:center;padding:20px">همه فیلدها رو پر کن تا محاسبه کنیم</div>`}
-    `;
-
-    body.querySelectorAll('[data-gen]').forEach(btn => btn.addEventListener('click', () => { b.gender = btn.dataset.gen; renderTDEE(); }));
-    body.querySelectorAll('[data-goal]').forEach(btn => btn.addEventListener('click', () => { b.goalType = btn.dataset.goal; renderTDEE(); }));
-    body.querySelector('#tdeeAge')?.addEventListener('input', e => { b.age = +e.target.value || null; renderTDEE(); });
-    body.querySelector('#tdeeH')?.addEventListener('input', e => { b.heightCm = +e.target.value || null; renderTDEE(); });
-    body.querySelector('#tdeeW')?.addEventListener('input', e => { b.weightKg = +e.target.value || null; renderTDEE(); });
-    body.querySelector('#tdeeAct')?.addEventListener('change', e => { b.activityLevel = e.target.value; renderTDEE(); });
-    body.querySelector('#tdeeApply')?.addEventListener('click', () => {
-      b.lastTDEE = tdee;
-      state.nutrition.goals.calories = tdee;
-      state.nutrition.goals.protein = Math.round(tdee*0.30/4);
-      state.nutrition.goals.carbs   = Math.round(tdee*0.40/4);
-      state.nutrition.goals.fat     = Math.round(tdee*0.30/9);
-      save();
-      closeDialog(dlg);
-      renderFitness();
-      showToast?.('🎯 هدف‌های روزانه به‌روزرسانی شد', { duration: 2200 });
-    });
-  }
-  renderTDEE();
-  dlg.showModal();
-}
-
 
 /* ════════════════════════════════════════════════
    🏃 ATHLETES PRO — recovery prompt, overtraining detector,
