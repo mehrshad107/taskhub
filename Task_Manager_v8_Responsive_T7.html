@@ -4730,12 +4730,17 @@
   </div>
 </dialog>
 
-<!-- 🏋 Fitness — Plan editor -->
+<!-- 🏋 Fitness — Plan editor
+     NOTE: close button uses inline onclick (NOT form[method=dialog]) because
+     the form-submit approach was unreliable on mobile. The window-level capture
+     listener in setupBulletproofDialogClose() is a backup safety net. -->
 <dialog id="fitPlanModal">
-  <form method="dialog" class="caldm-head">
+  <div class="caldm-head">
     <h3 class="caldm-title">✏ ویرایش برنامه</h3>
-    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="fitPlanModal" aria-label="بستن"
+            onclick="closeDialog('fitPlanModal');return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </div>
   <div class="caldm-body fpm-body"></div>
   <div class="caldm-foot">
     <button type="button" id="fpmSaveBtn" class="primary-btn" style="background:var(--color-primary);color:white">💾 ذخیره</button>
@@ -4744,46 +4749,56 @@
 
 <!-- 🏋 Fitness — Exercise picker -->
 <dialog id="fitExPickerModal">
-  <form method="dialog" class="caldm-head">
+  <div class="caldm-head">
     <h3 class="caldm-title">📚 انتخاب تمرین</h3>
-    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="fitExPickerModal" aria-label="بستن"
+            onclick="closeDialog('fitExPickerModal');return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </div>
   <div class="caldm-body fxp-body"></div>
 </dialog>
 
 <!-- 🏋 Fitness — Live session -->
 <dialog id="fitSessionModal">
-  <form method="dialog" class="caldm-head">
+  <div class="caldm-head">
     <h3 class="caldm-title">🔥 جلسه تمرین</h3>
-    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="fitSessionModal" aria-label="بستن"
+            onclick="closeDialog('fitSessionModal');return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </div>
   <div class="caldm-body fsm-body"></div>
 </dialog>
 
 <!-- 🛌 Recovery prompt modal (after workout) -->
 <dialog id="recoveryModal">
-  <form method="dialog" class="caldm-head">
+  <div class="caldm-head">
     <h3 class="caldm-title">🛌 چطور بود؟</h3>
-    <button type="submit" class="ghost-btn" aria-label="رد کن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="recoveryModal" aria-label="رد کن"
+            onclick="closeDialog('recoveryModal');return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </div>
   <div class="caldm-body rec-body"></div>
 </dialog>
 
 <!-- 🥗 Nutrition — Add food modal -->
 <dialog id="nutriAddFoodModal">
-  <form method="dialog" class="caldm-head">
+  <div class="caldm-head">
     <h3 class="caldm-title">🍽 افزودن غذا</h3>
-    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="nutriAddFoodModal" aria-label="بستن"
+            onclick="closeDialog('nutriAddFoodModal');return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </div>
   <div class="caldm-body naf-body"></div>
 </dialog>
 
 <!-- 🎯 TDEE calculator modal -->
 <dialog id="tdeeModal">
-  <form method="dialog" class="caldm-head">
+  <div class="caldm-head">
     <h3 class="caldm-title">🎯 محاسبه TDEE (نیاز روزانه)</h3>
-    <button type="submit" class="ghost-btn" aria-label="بستن" style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
-  </form>
+    <button type="button" class="ghost-btn dlg-close-btn" data-close="tdeeModal" aria-label="بستن"
+            onclick="closeDialog('tdeeModal');return false;"
+            style="min-height:36px;min-width:44px;padding:0 var(--space-3);font-size:1.2rem;font-weight:700;cursor:pointer">✕</button>
+  </div>
   <div class="caldm-body tdee-body"></div>
 </dialog>
 
@@ -11062,7 +11077,7 @@ function openFitPlanEditor(planId) {
     else state.fitness.plans.push(draft);
     if (!state.fitness.activePlanId) state.fitness.activePlanId = draft.id;
     save(); renderFitness();
-    dlg.close();
+    closeDialog(dlg);
     showToast?.('💾 برنامه ذخیره شد', { duration: 1800 });
   };
 
@@ -11110,7 +11125,7 @@ function openFitExercisePicker(onPick) {
     inp.addEventListener('input', () => { filter = inp.value; renderList(); inp.focus(); });
     body.querySelectorAll('.fxp-cat').forEach(b => b.addEventListener('click', () => { cat = b.dataset.cat; renderList(); }));
     body.querySelectorAll('.fxp-item').forEach(b => b.addEventListener('click', () => {
-      dlg.close(); onPick(b.dataset.exId);
+      closeDialog(dlg); onPick(b.dataset.exId);
     }));
   }
   renderList();
@@ -11296,7 +11311,7 @@ function openFitSession(isFreeMode) {
     clearInterval(durTimer);
     stopRestTimer();
     sess.durationSec = Math.floor((Date.now() - sess.startedAt) / 1000);
-    dlg.close();
+    closeDialog(dlg);
     // Show recovery prompt FIRST; saving happens after user fills (or skips).
     openRecoveryPrompt(sess, () => {
       state.fitness.sessions.push(JSON.parse(JSON.stringify(sess)));
@@ -11736,7 +11751,7 @@ function openNutriAddFood(mealType) {
       save();
       try { trackEvent?.('meal-log'); } catch {}
       try { grantXP?.(5, 'meal-log'); } catch {}
-      dlg.close();
+      closeDialog(dlg);
       renderFitness();
       showToast?.('🍽 ثبت شد', { duration: 1500 });
     });
@@ -11822,7 +11837,7 @@ function openTDEEModal() {
       state.nutrition.goals.carbs   = Math.round(tdee*0.40/4);
       state.nutrition.goals.fat     = Math.round(tdee*0.30/9);
       save();
-      dlg.close();
+      closeDialog(dlg);
       renderFitness();
       showToast?.('🎯 هدف‌های روزانه به‌روزرسانی شد', { duration: 2200 });
     });
@@ -11881,10 +11896,10 @@ function openRecoveryPrompt(sess, onDone) {
       sess.recoveryScore = recovery;
       sess.mood = mood;
       sess.sleepH = sleep;
-      dlg.close();
+      closeDialog(dlg);
       onDone();
     });
-    body.querySelector('#recSkipBtn').addEventListener('click', () => { dlg.close(); onDone(); });
+    body.querySelector('#recSkipBtn').addEventListener('click', () => { closeDialog(dlg); onDone(); });
   }
   renderPrompt();
   dlg.showModal();
@@ -13447,6 +13462,52 @@ applyFontSize(state.fontSize);
 applyCompact();
 renderUserProfile();
 refreshQuickCaptureBadge();
+
+/* ════════════════════════════════════════════════
+   🚪 BULLETPROOF DIALOG CLOSE — global helper + safety nets
+   Lesson learned from the AI modal saga: form[method=dialog] is NOT
+   reliable on mobile. Some touch sequences swallow the submit event.
+   Use inline onclick="closeDialog('id')" on every close button instead,
+   and these layered listeners are the safety net.
+════════════════════════════════════════════════ */
+window.closeDialog = function closeDialog(idOrEl) {
+  const dlg = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  if (!dlg) return;
+  try { dlg.close(); } catch (e) {}
+  // Force-remove the open attribute even if close() threw or returned silently
+  if (dlg.hasAttribute && dlg.hasAttribute('open')) dlg.removeAttribute('open');
+  // Restore scroll lock in case any path set overflow:hidden
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+};
+
+(function setupBulletproofDialogClose() {
+  // Window-level CAPTURE listener: catches any .dlg-close-btn click
+  // even if downstream handlers stopPropagation.
+  window.addEventListener('click', (ev) => {
+    const t = ev.target;
+    if (!t) return;
+    const btn = (t.closest && t.closest('.dlg-close-btn')) || (t.classList && t.classList.contains('dlg-close-btn') ? t : null);
+    if (!btn) return;
+    const id = btn.dataset.close;
+    if (id) closeDialog(id);
+  }, true);
+  // Touch fallback (some Android browsers fire touchend without click for fast taps)
+  window.addEventListener('touchend', (ev) => {
+    const t = ev.target;
+    if (!t) return;
+    const btn = (t.closest && t.closest('.dlg-close-btn'));
+    if (!btn) return;
+    const id = btn.dataset.close;
+    if (id) closeDialog(id);
+  }, { capture: true, passive: true });
+  // Backdrop click → close (for every dialog with .dlg-close-btn inside)
+  document.querySelectorAll('dialog').forEach(dlg => {
+    dlg.addEventListener('click', (ev) => {
+      if (ev.target === dlg) closeDialog(dlg);  // click on backdrop, not content
+    });
+  });
+})();
 
 /* ════════════════════════════════════════════════
    ✨ UX POLISH WIRING — ripple effect + scroll-aware FAB
