@@ -939,6 +939,8 @@
         transform: translateX(-50%);
         width: min(94vw, 360px);
         max-height: 74vh; overflow-y: auto;
+        /* Must sit above page-tabs (z-index 200) and bottom nav. */
+        z-index: 350;
       }
       .profile-panel-brand { left: 50%; right: auto; }
 
@@ -1537,8 +1539,9 @@
       display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
       max-height: 280px; overflow-y: auto; padding-inline-end: 4px;
     }
-    /* host panels need wider on desktop to fit 8 cols + scroll comfortably */
-    #profilePanel { min-width: 360px; max-width: 92vw; }
+    /* host panels need wider on desktop to fit 8 cols + scroll comfortably.
+       min(360px, 92vw) protects ultra-narrow phones from horizontal overflow. */
+    #profilePanel { min-width: min(360px, 92vw); max-width: 92vw; }
     .profile-emoji-opt {
       height: 38px; font-size: 1.25rem;
       border-radius: var(--radius-md); border: 2px solid transparent;
@@ -5664,13 +5667,44 @@ function load() {
 /* save() — debounced so hot paths (per-second timer ticks, slider drags)
    don't synchronously JSON.stringify+localStorage.setItem the entire ~600KB
    state every call. Flush on tab hide / unload to avoid data loss. */
+/* Polyfill crypto.randomUUID for older browsers (Safari <15.4, Chrome <92,
+   Firefox <95). Used by ~20 call sites across the app for entity IDs. */
+(function () {
+  if (typeof crypto === 'undefined') { window.crypto = {}; }
+  if (typeof crypto.randomUUID !== 'function') {
+    crypto.randomUUID = function () {
+      // RFC 4122 v4 — uses crypto.getRandomValues if available, else Math.random.
+      const buf = new Uint8Array(16);
+      if (crypto.getRandomValues) crypto.getRandomValues(buf);
+      else for (let i = 0; i < 16; i++) buf[i] = Math.floor(Math.random() * 256);
+      buf[6] = (buf[6] & 0x0f) | 0x40;  // version 4
+      buf[8] = (buf[8] & 0x3f) | 0x80;  // variant 10
+      const h = Array.from(buf, b => b.toString(16).padStart(2, '0'));
+      return h[0]+h[1]+h[2]+h[3]+'-'+h[4]+h[5]+'-'+h[6]+h[7]+'-'+h[8]+h[9]+'-'+h[10]+h[11]+h[12]+h[13]+h[14]+h[15];
+    };
+  }
+})();
+
 let _lsSaveTimer = null;
 let _lsSavePending = false;
+let _lsQuotaWarned = false;
 function _flushSave() {
   if (_lsSaveTimer) { clearTimeout(_lsSaveTimer); _lsSaveTimer = null; }
   if (!_lsSavePending) return;
   _lsSavePending = false;
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    _lsQuotaWarned = false;  // recovered
+  } catch (err) {
+    // Surface quota exceeded — silently swallowing means user thinks edits
+    // are saved when they're not. IDB still has the data, so primary store
+    // is fine, but we warn so they can download a backup.
+    if (!_lsQuotaWarned) {
+      _lsQuotaWarned = true;
+      try { showToast?.('⚠ حافظهٔ مرورگر پره — یه backup بگیر و کش رو پاک کن', { duration: 6000, variant:'warn' }); } catch {}
+      console.warn('[save] localStorage write failed:', err && err.name);
+    }
+  }
 }
 function save() {
   _lsSavePending = true;
@@ -13963,6 +13997,11 @@ function importStateFromFile(ev) {
 
       // Merge imported state on top of DEFAULT to fill any missing fields
       state = { ...JSON.parse(JSON.stringify(DEFAULT)), ...imported };
+      // Coerce array fields back to arrays if the imported file had wrong types
+      // (corrupted or hand-edited backup). Prevents forEach crashes below.
+      ['tasks','operations','folders','plannerGoals','plannerNotes','habits','moneyAccounts','moneyTransactions','moneyRecurring','inbox','reminders'].forEach(k => {
+        if (!Array.isArray(state[k])) state[k] = Array.isArray(DEFAULT[k]) ? JSON.parse(JSON.stringify(DEFAULT[k])) : [];
+      });
       // Reset live timer fields — they shouldn't carry over
       state.activeTaskId = null; state.activeOpId = null;
       state.tasks.forEach(t => { t.running = false; t.paused = false; t.timerStartedAt = null; });
