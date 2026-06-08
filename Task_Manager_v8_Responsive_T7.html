@@ -6567,7 +6567,10 @@ function showToast(msg, opts) {
   t.className = 'toast toast2 ' + (variant ? variant + ' toast-' + variant : '');
   const duration = opts.duration || 4500;
 
-  const m = document.createElement('div'); m.className = 'toast-msg'; m.innerHTML = msg;
+  // textContent (not innerHTML) — msg often contains user-supplied strings
+  // like habit names or badge titles. innerHTML would let those execute
+  // <script> tags. No caller relies on markup, so plain text is safe.
+  const m = document.createElement('div'); m.className = 'toast-msg'; m.textContent = msg;
   t.appendChild(m);
   let timer = null;
   const dismiss = () => {
@@ -13435,6 +13438,9 @@ function _wireSessionView() {
     if (_fitView.today !== 'session' || !state.fitness.activeSession) {
       clearInterval(_fitSessionDurTimer); _fitSessionDurTimer = null; return;
     }
+    // Defensive: older state may have activeSession without startedAt. Backfill
+    // it so subtraction doesn't yield NaN (which would break the time display).
+    if (!state.fitness.activeSession.startedAt) state.fitness.activeSession.startedAt = Date.now();
     state.fitness.activeSession.durationSec = Math.floor((Date.now() - state.fitness.activeSession.startedAt) / 1000);
     const bar = document.querySelector('.fsm-stats-bar > span:first-child');
     if (bar) {
