@@ -8335,6 +8335,16 @@ function getLocale() {
   return (LANGS[l] && LANGS[l].locale) || 'fa-IR';
 }
 
+/* Localized item name. EXERCISE_LIB + FOOD_LIB items already carry
+   name_fa + name_en. For en/fr/ru we use name_en (no domain-specific
+   French/Russian translations of Iranian foods/exercises). Falls back
+   to name_fa when name_en missing. */
+function itemName(item) {
+  if (!item) return '';
+  if (getLang() === 'fa') return item.name_fa || item.name_en || '';
+  return item.name_en || item.name_fa || '';
+}
+
 /* ════════════════════════════════════════════════
    📅 JALALI (Persian) CALENDAR UTILITY
    - Pure functions, no external deps, no Date.now() in the math itself.
@@ -10876,6 +10886,142 @@ const BADGES = [
   { id:'p-zen',         cat:'personal', emoji:'☯', name:'استاد ذن',        desc:'۱۰۰ روز مدیتیشن پی‌درپی' },
 ];
 
+/* BADGE_I18N — parallel translations of badge name + desc keyed by id.
+   en is hand-authored; fr/ru fall back to en (we don't have native French
+   /Russian translations of every Iranian-context phrase, and English is a
+   reasonable fallback that all three target audiences understand). */
+const BADGE_I18N = {
+  // general
+  'first-task':    { name_en:'First Step',         desc_en:'You finished your first task' },
+  'task-10':       { name_en:'Ten Down',           desc_en:'10 tasks completed' },
+  'task-50':       { name_en:'Fifty Down',         desc_en:'50 tasks completed' },
+  'task-100':      { name_en:'Century',            desc_en:'100 tasks completed' },
+  'task-500':      { name_en:'Five Hundred',       desc_en:'500 tasks completed' },
+  'task-1000':     { name_en:'One Thousand',       desc_en:'1000 tasks completed' },
+  'streak-3':      { name_en:'Three-Day',          desc_en:'3-day habit streak' },
+  'streak-7':      { name_en:'Full Week',          desc_en:'7-day habit streak' },
+  'streak-30':     { name_en:'Full Month',         desc_en:'30-day habit streak' },
+  'streak-100':    { name_en:'Hundred In A Row',   desc_en:'100 days of habit without break' },
+  'streak-365':    { name_en:'One Year Habit',     desc_en:'365 days of habit in a row' },
+  'focus-100':     { name_en:'100 Focus Minutes',  desc_en:'100 total focus minutes' },
+  'focus-1000':    { name_en:'Iron Focus',         desc_en:'1000 total focus minutes' },
+  'focus-10000':   { name_en:'100 Focus Hours',    desc_en:'100 total focus hours' },
+  'focus-50000':   { name_en:'500 Hours',          desc_en:'500 total focus hours' },
+  'early-bird':    { name_en:'Early Bird',         desc_en:'Peak activity in the morning' },
+  'night-owl':     { name_en:'Night Owl',          desc_en:'Peak activity at night' },
+  'install-pwa':   { name_en:'Installed',          desc_en:'You installed TaskHub' },
+  'export-data':   { name_en:'Data Keeper',        desc_en:'First backup taken' },
+  'one-month':     { name_en:'One Month In',       desc_en:'30 days since first use' },
+  'one-year':      { name_en:'One Year In',        desc_en:'365 days since first use' },
+  'level-master':  { name_en:'Master',             desc_en:'Reached Master level' },
+  'level-legend':  { name_en:'Legend',             desc_en:'Reached Legend level' },
+  // fitness
+  'fit-first':     { name_en:'First Workout',      desc_en:'You logged your first session' },
+  'fit-10':        { name_en:'10 Sessions',        desc_en:'10 full workout sessions' },
+  'fit-50':        { name_en:'50 Sessions',        desc_en:'50 workout sessions' },
+  'fit-100':       { name_en:'100 Sessions',       desc_en:'100 sessions — serious athlete' },
+  'fit-streak-7':  { name_en:'Active Week',        desc_en:'7-day workout streak' },
+  'fit-streak-30': { name_en:'Active Month',       desc_en:'30-day workout streak' },
+  'fit-1000min':   { name_en:'1000 Workout Min',   desc_en:'Total workout time' },
+  'fit-pr-50kg':   { name_en:'PR 50kg',            desc_en:'Lifted at least 50 kg in one set' },
+  'fit-pr-100kg':  { name_en:'PR 100kg',           desc_en:'You hit 100 kg!' },
+  'fit-pullup-10': { name_en:'10 Pull-ups',        desc_en:'10 pull-up reps in one set' },
+  'fit-cardio':    { name_en:'Runner',             desc_en:'5 cardio sessions' },
+  'fit-yoga':      { name_en:'Calm',               desc_en:'5 yoga sessions' },
+  'fit-plan':      { name_en:'Planner',            desc_en:'Built a custom workout plan' },
+  'fit-water':     { name_en:'Hydrated',           desc_en:'7-day streak of 8 glasses' },
+  'fit-recovery':  { name_en:'Recovery Pro',       desc_en:'Logged recovery 10 times' },
+  // programming
+  'dev-first':     { name_en:'First Code',         desc_en:'You logged your first dev task' },
+  'dev-10':        { name_en:'10 Code Tasks',      desc_en:'10 coding tasks' },
+  'dev-50':        { name_en:'50 Code Tasks',      desc_en:'Serious developer' },
+  'dev-bug-hunter':{ name_en:'Bug Hunter',         desc_en:'10 tasks with keyword "bug" or "fix"' },
+  'dev-deploy':    { name_en:'Deployer',           desc_en:'Task with keyword "deploy"' },
+  'dev-review':    { name_en:'Reviewer',           desc_en:'Task with keyword "review" or "PR"' },
+  'dev-test':      { name_en:'Test Writer',        desc_en:'Task with keyword "test"' },
+  'dev-doc':       { name_en:'Documenter',         desc_en:'Task with keyword "docs"' },
+  'dev-refactor':  { name_en:'Refactorer',         desc_en:'Task with keyword "refactor"' },
+  'dev-fullstack': { name_en:'Full Stack',         desc_en:'All three: frontend, backend, database' },
+  'dev-open-src':  { name_en:'Open Source',        desc_en:'Task with "open source" or "GitHub"' },
+  'dev-ship':      { name_en:'Product Launch',     desc_en:'Task with "launch"' },
+  // trading
+  'trade-first':   { name_en:'First Trade',        desc_en:'First transaction tagged trade' },
+  'trade-10':      { name_en:'10 Trades',          desc_en:'10 trades logged' },
+  'trade-50':      { name_en:'50 Trades',          desc_en:'Serious trader' },
+  'trade-profit':  { name_en:'Profitable',         desc_en:'One month with positive profit' },
+  'trade-3m':      { name_en:'3 Months Profit',    desc_en:'3 months of profit in a row' },
+  'trade-discipline':{name_en:'Disciplined',       desc_en:'20 tasks with "stop" or "risk"' },
+  'trade-journal': { name_en:'Journal Keeper',     desc_en:'30 days of trade log in a row' },
+  'trade-crypto':  { name_en:'Crypto',             desc_en:'Created a crypto account' },
+  'trade-stocks':  { name_en:'Shareholder',        desc_en:'Transaction tagged "stocks"' },
+  'trade-loss-cut':{ name_en:'Stop-Loss',          desc_en:'Task with "cut loss" or stop' },
+  'trade-portfolio':{name_en:'Portfolio Builder',  desc_en:'Built 3 investment accounts' },
+  'trade-hodl':    { name_en:'Hodler',             desc_en:'Held a position 90+ days' },
+  // content
+  'content-first': { name_en:'First Content',      desc_en:'First content task' },
+  'content-10':    { name_en:'10 Posts',           desc_en:'10 content tasks' },
+  'content-50':    { name_en:'50 Posts',           desc_en:'Active creator' },
+  'content-video': { name_en:'Filmmaker',          desc_en:'Task with "video"' },
+  'content-photo': { name_en:'Photographer',       desc_en:'Task with "photography"' },
+  'content-write': { name_en:'Writer',             desc_en:'Task with "writing" or article' },
+  'content-edit':  { name_en:'Editor',             desc_en:'Task with "edit"' },
+  'content-podcast':{name_en:'Podcaster',          desc_en:'Task with "podcast"' },
+  'content-design':{ name_en:'Designer',           desc_en:'Task with "design"' },
+  'content-publish':{name_en:'Publisher',          desc_en:'Task with "publish"' },
+  'content-viral': { name_en:'Viral',              desc_en:'Task with "viral"' },
+  'content-100k':  { name_en:'100k Followers',     desc_en:'Task with "100k"' },
+  // education
+  'edu-first':     { name_en:'First Lesson',       desc_en:'First education task' },
+  'edu-10':        { name_en:'10 Lessons',         desc_en:'10 study tasks' },
+  'edu-50':        { name_en:'Active Student',     desc_en:'50 study tasks' },
+  'edu-course':    { name_en:'Course Watcher',     desc_en:'Task with "course"' },
+  'edu-book':      { name_en:'Bookworm',           desc_en:'Task with "book"' },
+  'edu-exam':      { name_en:'Exam',               desc_en:'Task with "exam"' },
+  'edu-language':  { name_en:'Language Learner',   desc_en:'Task with "language"' },
+  'edu-cert':      { name_en:'Certificate',        desc_en:'Task with "certificate"' },
+  'edu-teach':     { name_en:'Teacher',            desc_en:'Task with "teach"' },
+  'edu-research':  { name_en:'Researcher',         desc_en:'Task with "research"' },
+  'edu-thesis':    { name_en:'Thesis',             desc_en:'Task with "thesis"' },
+  'edu-master':    { name_en:'Knowledge Master',   desc_en:'100 study tasks' },
+  // accounting
+  'acc-first':     { name_en:'Money Planner',      desc_en:'Built your first account' },
+  'acc-budget':    { name_en:'Budgeter',           desc_en:'Set a monthly budget' },
+  'acc-budget-3m': { name_en:'3 Months on Budget', desc_en:'3 months in a row within budget' },
+  'acc-recurring': { name_en:'Auto',               desc_en:'First recurring transaction' },
+  'acc-100tx':     { name_en:'100 Transactions',   desc_en:'100 transactions logged' },
+  'acc-saver':     { name_en:'Saver',              desc_en:'Savings rate > 20% for a month' },
+  'acc-savings-5m':{ name_en:'5 Months Savings',   desc_en:'5 months of positive savings' },
+  'acc-multi-acc': { name_en:'Multi-Account',      desc_en:'3 active accounts' },
+  'acc-tax':       { name_en:'Tax Filer',          desc_en:'Task with "tax"' },
+  'acc-invoice':   { name_en:'Invoicer',           desc_en:'Task with "invoice"' },
+  'acc-report':    { name_en:'Reporter',           desc_en:'First weekly report' },
+  'acc-debt-free': { name_en:'Debt-Free',          desc_en:'Task with "debt-free"' },
+  // personal
+  'p-meditation':  { name_en:'Meditation',         desc_en:'20 days of meditation habit' },
+  'p-journal':     { name_en:'Journal Writer',     desc_en:'30 days of planner notes' },
+  'p-gratitude':   { name_en:'Grateful',           desc_en:'Task with "gratitude"' },
+  'p-family':      { name_en:'Family Lover',       desc_en:'Task with "family"' },
+  'p-travel':      { name_en:'Traveler',           desc_en:'Task with "travel"' },
+  'p-cook':        { name_en:'Cook',               desc_en:'Task with "cooking"' },
+  'p-music':       { name_en:'Musician',           desc_en:'Task with "music"' },
+  'p-art':         { name_en:'Artist',             desc_en:'Task with "art"' },
+  'p-volunteer':   { name_en:'Volunteer',          desc_en:'Task with "charity" or "volunteer"' },
+  'p-zen':         { name_en:'Zen Master',         desc_en:'100 days of meditation in a row' },
+};
+
+function badgeName(b) {
+  if (!b) return '';
+  if (getLang() === 'fa') return b.name || '';
+  const tr = BADGE_I18N[b.id];
+  return (tr && tr.name_en) || b.name || '';
+}
+function badgeDesc(b) {
+  if (!b) return '';
+  if (getLang() === 'fa') return b.desc || '';
+  const tr = BADGE_I18N[b.id];
+  return (tr && tr.desc_en) || b.desc || '';
+}
+
 /* Keyword map for profession badges. Used by checkBadges() to scan task
    text for matching tokens. */
 const BADGE_KEYWORDS = {
@@ -10976,7 +11122,7 @@ function unlockBadge(id) {
   if (state.badges[id]?.unlocked) return false;
   const b = BADGES.find(x => x.id === id); if (!b) return false;
   state.badges[id] = { unlocked: true, unlockedAt: new Date().toISOString() };
-  showToast(`${b.emoji} نشان جدید: ${b.name}`, { variant:'money', duration: 4500 });
+  showToast(`${b.emoji} ${t('insight.badges','نشان')}: ${badgeName(b)}`, { variant:'money', duration: 4500 });
   return true;
 }
 
@@ -11264,9 +11410,9 @@ function renderHallOfFame() {
       <div class="hof-section-title" style="margin-top:var(--space-5)">🎖 آخرین نشان‌های کسب‌شده</div>
       <div class="hof-recent-badges">
         ${r.recentBadges.map(b => `
-          <div class="hof-badge-card" title="${e(b.desc)}">
+          <div class="hof-badge-card" title="${e(badgeDesc(b))}">
             <div class="hof-badge-emoji">${b.emoji}</div>
-            <div class="hof-badge-name">${e(b.name)}</div>
+            <div class="hof-badge-name">${e(badgeName(b))}</div>
             <div class="hof-badge-when">${formatPersianDate(state.badges[b.id].unlockedAt.slice(0,10))}</div>
           </div>
         `).join('')}
@@ -11290,9 +11436,9 @@ function renderHallOfFame() {
           <div class="hof-cat-grid">
             ${catBadges.map(b => {
               const got = state.badges?.[b.id]?.unlocked;
-              return `<div class="hof-mini-badge ${got?'got':'locked'}" title="${e(b.desc)}">
+              return `<div class="hof-mini-badge ${got?'got':'locked'}" title="${e(badgeDesc(b))}">
                 <div class="hof-mini-emoji">${got ? b.emoji : '🔒'}</div>
-                <div class="hof-mini-name">${e(b.name)}</div>
+                <div class="hof-mini-name">${e(badgeName(b))}</div>
               </div>`;
             }).join('')}
           </div>
@@ -12061,7 +12207,7 @@ function _renderFitToday() {
       html += `<div class="fit-ex-card">
         <div class="fit-ex-emoji">${ex.emoji}</div>
         <div class="fit-ex-info">
-          <div class="fit-ex-name">${e(ex.name_fa)} <span class="fit-ex-en">${e(ex.name_en)}</span></div>
+          <div class="fit-ex-name">${e(itemName(ex))} <span class="fit-ex-en">${getLang()==='fa'?e(ex.name_en):''}</span></div>
           <div class="fit-ex-meta">${e(ex.muscle)} · ${e(ex.equip)}</div>
         </div>
         <div class="fit-ex-prescription">
@@ -12202,7 +12348,7 @@ function _renderFitProgress() {
       html += `<div class="fit-pr-row">
         <span class="fit-pr-emoji">${p.ex.emoji}</span>
         <div class="fit-pr-info">
-          <div class="fit-pr-name">${e(p.ex.name_fa)}</div>
+          <div class="fit-pr-name">${e(itemName(p.ex))}</div>
           <div class="fit-pr-date">${toFaDigits(p.date)}</div>
         </div>
         <div class="fit-pr-num">
@@ -12550,7 +12696,7 @@ function _renderFitNutrition() {
           if (!fd) return '';
           return `<div class="nutri-food-row">
             <span class="nutri-food-emoji">${fd.emoji}</span>
-            <span class="nutri-food-name">${e(fd.name_fa)}</span>
+            <span class="nutri-food-name">${e(itemName(fd))}</span>
             <span class="nutri-food-grams">${toFaDigits(it.grams)}<span>g</span></span>
             <button type="button" class="nutri-food-del" data-meal="${mt.id}" data-fi="${fi}">✕</button>
           </div>`;
@@ -12928,7 +13074,7 @@ function _renderFitPlanEditor() {
               const ex = getExerciseById(row.exId) || { name_fa:'?', emoji:'❓' };
               return `<div class="fpm-ex-row" data-fpe-idx="${i}">
                 <span class="fpm-ex-emoji">${ex.emoji}</span>
-                <span class="fpm-ex-name">${e(ex.name_fa)}</span>
+                <span class="fpm-ex-name">${e(itemName(ex))}</span>
                 <div class="fpm-ex-fields">
                   <input type="number" class="fpm-mini" data-fpe-f="sets" value="${row.sets}" min="1" max="20" />
                   <span>ست</span>
@@ -13043,7 +13189,7 @@ function _wirePickerView(subtab) {
       `<button type="button" class="fxp-item" data-fxpv-id="${ex.id}">
         <span class="fxp-emoji">${ex.emoji}</span>
         <span class="fxp-info">
-          <span class="fxp-name">${e(ex.name_fa)}</span>
+          <span class="fxp-name">${e(itemName(ex))}</span>
           <span class="fxp-meta">${e(ex.muscle)} · ${e(ex.equip)}</span>
         </span>
       </button>`).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>';
@@ -13096,7 +13242,7 @@ function _wireAddFoodView() {
         <div class="naf-selected">
           <div class="naf-sel-head">
             <span class="naf-sel-emoji">${sel.emoji}</span>
-            <span class="naf-sel-name">${e(sel.name_fa)}</span>
+            <span class="naf-sel-name">${e(itemName(sel))}</span>
             <button type="button" class="ghost-btn fit-tiny-btn" id="afvClear">تغییر</button>
           </div>
           <div class="naf-sel-macros">
@@ -13117,7 +13263,7 @@ function _wireAddFoodView() {
             `<button type="button" class="fxp-item" data-afv-id="${fd.id}">
               <span class="fxp-emoji">${fd.emoji}</span>
               <span class="fxp-info">
-                <span class="fxp-name">${e(fd.name_fa)}</span>
+                <span class="fxp-name">${e(itemName(fd))}</span>
                 <span class="fxp-meta">${toFaDigits(fd.cal)} کال/۱۰۰g · P${toFaDigits(fd.p)} C${toFaDigits(fd.c)} F${toFaDigits(fd.f)}</span>
               </span>
             </button>`).join('') || '<div class="fxp-empty">چیزی پیدا نشد.</div>'}
@@ -13191,7 +13337,7 @@ function _renderFitSessionView() {
       return `<div class="fsm-ex-block">
         <div class="fsm-ex-head">
           <span class="fsm-ex-emoji">${meta.emoji}</span>
-          <span class="fsm-ex-name">${e(meta.name_fa)}</span>
+          <span class="fsm-ex-name">${e(itemName(meta))}</span>
         </div>
         <div class="fsm-set-list">
           ${ex.sets.map((set, sI) => `
@@ -13443,10 +13589,10 @@ function renderAchievements() {
       ${BADGES.map(b => {
         const u = !!state.badges[b.id]?.unlocked;
         return `
-          <div class="badge-tile ${u ? 'unlocked' : 'locked'}" title="${e(b.desc)}">
+          <div class="badge-tile ${u ? 'unlocked' : 'locked'}" title="${e(badgeDesc(b))}">
             <div class="bt-emoji">${b.emoji}</div>
-            <div class="bt-name">${e(b.name)}</div>
-            <div class="bt-desc">${e(b.desc)}</div>
+            <div class="bt-name">${e(badgeName(b))}</div>
+            <div class="bt-desc">${e(badgeDesc(b))}</div>
           </div>
         `;
       }).join('')}
