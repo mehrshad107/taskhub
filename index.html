@@ -4,15 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#0a5a6c" />
-<title>TaskHub — مدیریت تسک، مالی، عادت و تمرکز در یک‌جا</title>
-<meta name="description" content="یک اپ کامل و خصوصی برای مدیریت تسک، پلنر، تمرکز، مالی و عادت. آفلاین، فارسی، نصب‌شدنی روی موبایل. هیچ داده‌ای از مرورگرت بیرون نمی‌ره." />
-<meta name="keywords" content="مدیریت تسک, پلنر, تمرکز, پومودورو, عادت سنج, مدیریت مالی, فارسی, آفلاین, PWA, TaskHub" />
+<title data-i18n="meta.title">TaskHub — مدیریت تسک، مالی، عادت و تمرکز در یک‌جا</title>
+<meta name="description" data-i18n-meta="desc" content="یک اپ کامل و خصوصی برای مدیریت تسک، پلنر، تمرکز، مالی و عادت. آفلاین، فارسی، نصب‌شدنی روی موبایل. هیچ داده‌ای از مرورگرت بیرون نمی‌ره." />
+<meta name="keywords" content="مدیریت تسک, پلنر, تمرکز, پومودورو, عادت سنج, مدیریت مالی, فارسی, آفلاین, PWA, TaskHub, task manager, planner, focus, pomodoro, habit tracker, finance manager, offline, French, Russian" />
 <meta name="author" content="TaskHub" />
 
 <!-- Open Graph / Social -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="TaskHub — مدیریت تسک، مالی، عادت و تمرکز" />
-<meta property="og:description" content="یه اپ کامل، فارسی، آفلاین. تسک، مالی، عادت، تمرکز و بینش هوشمند — همه‌چیز یک‌جا." />
+<meta property="og:title" data-i18n-meta="og:title" content="TaskHub — مدیریت تسک، مالی، عادت و تمرکز" />
+<meta property="og:description" data-i18n-meta="og:desc" content="یه اپ کامل، فارسی، آفلاین. تسک، مالی، عادت، تمرکز و بینش هوشمند — همه‌چیز یک‌جا." />
 <meta property="og:image" content="./icon-512.svg" />
 <meta property="og:locale" content="fa_IR" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -56,6 +56,7 @@
   nav.topnav {
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 24px; max-width: 1100px; margin: 0 auto;
+    gap: 12px;
   }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; }
   .brand-icon {
@@ -64,6 +65,19 @@
     display: grid; place-items: center; color: white; font-size: 18px;
     box-shadow: 0 4px 14px rgba(10,90,108,0.5);
   }
+  .nav-end { display: flex; align-items: center; gap: 10px; }
+  .lang-picker {
+    display: inline-flex; gap: 4px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 3px;
+  }
+  .lang-btn {
+    background: transparent; border: none; color: #94a3b8;
+    padding: 6px 10px; border-radius: 7px; font-size: .82rem; font-weight: 600;
+    transition: background .15s ease, color .15s ease;
+  }
+  .lang-btn:hover { color: #e2e8f0; }
+  .lang-btn.active { background: rgba(10,90,108,0.5); color: #fff; }
   .nav-cta {
     background: linear-gradient(135deg, #0a5a6c, #074858);
     color: white; padding: 9px 18px; border-radius: 10px;
@@ -268,6 +282,7 @@
     .btn-primary, .btn-secondary { justify-content: center; }
     section.features { padding: 60px 16px 30px; }
     .feature { padding: 22px; }
+    .lang-picker { display: none; }
   }
   @media (max-width: 420px) {
     .mockup-body { grid-template-columns: 1fr; }
@@ -284,27 +299,35 @@
     <div class="brand-icon">✓</div>
     <span>TaskHub</span>
   </a>
-  <a href="./Task_Manager_v8_Responsive_T7.html" class="nav-cta">ورود به اپ ←</a>
+  <div class="nav-end">
+    <div class="lang-picker" role="tablist" aria-label="Language">
+      <button class="lang-btn active" data-lang="fa" type="button" title="فارسی">FA</button>
+      <button class="lang-btn"        data-lang="en" type="button" title="English">EN</button>
+      <button class="lang-btn"        data-lang="fr" type="button" title="Français">FR</button>
+      <button class="lang-btn"        data-lang="ru" type="button" title="Русский">RU</button>
+    </div>
+    <a href="./Task_Manager_v8_Responsive_T7.html" class="nav-cta" data-i18n="nav.cta">ورود به اپ ←</a>
+  </div>
 </nav>
 
 <header class="hero">
-  <div class="hero-badge">🇮🇷 ساخت ایران · بدون اتصال خارجی</div>
+  <div class="hero-badge" data-i18n="hero.badge">🇮🇷 ساخت ایران · بدون اتصال خارجی</div>
   <h1>
-    یه فضای آروم برای <span class="accent">برنامه‌ریزی، تمرکز و رشد</span>
+    <span data-i18n="hero.title.pre">یه فضای آروم برای </span><span class="accent" data-i18n="hero.title.accent">برنامه‌ریزی، تمرکز و رشد</span>
   </h1>
-  <p class="sub">
+  <p class="sub" data-i18n="hero.sub">
     تسک، پلنر، تمرکز پومودورو، مدیریت مالی، عادت‌سنج و بینش هوشمند — همه‌چیز توی یه اپ.
     آفلاین، خصوصی، فارسی و کاملاً رایگان.
   </p>
   <div class="cta-row">
-    <a href="./Task_Manager_v8_Responsive_T7.html" class="btn-primary">🚀 شروع رایگان</a>
-    <a href="#features" class="btn-secondary">✨ فیچرها رو ببین</a>
+    <a href="./Task_Manager_v8_Responsive_T7.html" class="btn-primary" data-i18n="hero.cta.primary">🚀 شروع رایگان</a>
+    <a href="#features" class="btn-secondary" data-i18n="hero.cta.secondary">✨ فیچرها رو ببین</a>
   </div>
   <div class="hero-meta">
-    <span>✅ بدون نیاز به ثبت‌نام</span>
-    <span>🔒 بدون ارسال داده</span>
-    <span>📲 نصب روی موبایل</span>
-    <span>🌐 کار آفلاین</span>
+    <span data-i18n="hero.meta.noreg">✅ بدون نیاز به ثبت‌نام</span>
+    <span data-i18n="hero.meta.nodata">🔒 بدون ارسال داده</span>
+    <span data-i18n="hero.meta.mobile">📲 نصب روی موبایل</span>
+    <span data-i18n="hero.meta.offline">🌐 کار آفلاین</span>
   </div>
 </header>
 
@@ -317,26 +340,26 @@
     </div>
     <div class="mockup-body">
       <div class="mock-card">
-        <h4>تمرکز امروز</h4>
-        <div class="num">۱۴۲</div>
-        <div class="pct">↑ ۲۳٪ از دیروز</div>
+        <h4 data-i18n="mock.focus">تمرکز امروز</h4>
+        <div class="num" data-i18n="mock.focus.num">۱۴۲</div>
+        <div class="pct" data-i18n="mock.focus.pct">↑ ۲۳٪ از دیروز</div>
       </div>
       <div class="mock-card">
-        <h4>تسک تمام‌شده</h4>
-        <div class="num">۷</div>
-        <div class="pct">از ۹ هدف</div>
+        <h4 data-i18n="mock.done">تسک تمام‌شده</h4>
+        <div class="num" data-i18n="mock.done.num">۷</div>
+        <div class="pct" data-i18n="mock.done.pct">از ۹ هدف</div>
       </div>
       <div class="mock-card">
-        <h4>استریک عادت</h4>
-        <div class="num">🔥 ۱۴</div>
-        <div class="pct">روز پی‌درپی</div>
+        <h4 data-i18n="mock.streak">استریک عادت</h4>
+        <div class="num" data-i18n="mock.streak.num">🔥 ۱۴</div>
+        <div class="pct" data-i18n="mock.streak.pct">روز پی‌درپی</div>
       </div>
       <div class="mock-card task-list">
-        <h4>تسک‌های در دستور کار</h4>
-        <div class="mock-task done"><span class="chk"></span><span>تمرین صبحگاهی</span></div>
-        <div class="mock-task done"><span class="chk"></span><span>مرور ایمیل‌ها</span></div>
-        <div class="mock-task"><span class="chk"></span><span>نوشتن گزارش هفتگی</span></div>
-        <div class="mock-task"><span class="chk"></span><span>تماس با تیم طراحی</span></div>
+        <h4 data-i18n="mock.list">تسک‌های در دستور کار</h4>
+        <div class="mock-task done"><span class="chk"></span><span data-i18n="mock.t1">تمرین صبحگاهی</span></div>
+        <div class="mock-task done"><span class="chk"></span><span data-i18n="mock.t2">مرور ایمیل‌ها</span></div>
+        <div class="mock-task"><span class="chk"></span><span data-i18n="mock.t3">نوشتن گزارش هفتگی</span></div>
+        <div class="mock-task"><span class="chk"></span><span data-i18n="mock.t4">تماس با تیم طراحی</span></div>
       </div>
     </div>
   </div>
@@ -345,63 +368,63 @@
 <!-- Features grid -->
 <section class="features" id="features">
   <div class="section-head">
-    <h2>هرچی برای یه روز پُر و آروم لازمه</h2>
-    <p>یک اپ، یازده ماژول کاربردی — همه روی یه دستگاه، بدون نیاز به اشتراک ماهانه.</p>
+    <h2 data-i18n="feat.head">هرچی برای یه روز پُر و آروم لازمه</h2>
+    <p data-i18n="feat.sub">یک اپ، یازده ماژول کاربردی — همه روی یه دستگاه، بدون نیاز به اشتراک ماهانه.</p>
   </div>
   <div class="features-grid container">
 
     <div class="feature">
       <div class="icon">📋</div>
-      <h3>مدیریت تسک هوشمند</h3>
-      <p>عملیات‌بندی، فولدر، subtask، تایمر داخلی، اتصال تسک به مالی — هر چی نیاز یه روز کاری حرفه‌ای داری.</p>
+      <h3 data-i18n="feat.task.title">مدیریت تسک هوشمند</h3>
+      <p data-i18n="feat.task.body">عملیات‌بندی، فولدر، subtask، تایمر داخلی، اتصال تسک به مالی — هر چی نیاز یه روز کاری حرفه‌ای داری.</p>
     </div>
 
     <div class="feature">
       <div class="icon">🗓</div>
-      <h3>پلنر هفتگی و ماهانه</h3>
-      <p>هدف روزانه، چشم‌انداز ماهانه، تکرارشونده‌ها، یادداشت‌های روزانه و استریک تکمیل هدف.</p>
+      <h3 data-i18n="feat.planner.title">پلنر هفتگی و ماهانه</h3>
+      <p data-i18n="feat.planner.body">هدف روزانه، چشم‌انداز ماهانه، تکرارشونده‌ها، یادداشت‌های روزانه و استریک تکمیل هدف.</p>
     </div>
 
     <div class="feature">
       <div class="icon">⏱</div>
-      <h3>تمرکز و پومودورو</h3>
-      <p>تایمر تمرکز با موسیقی پس‌زمینه، تشخیص شکستن، استراحت خودکار و گزارش زمان واقعی کار.</p>
+      <h3 data-i18n="feat.focus.title">تمرکز و پومودورو</h3>
+      <p data-i18n="feat.focus.body">تایمر تمرکز با موسیقی پس‌زمینه، تشخیص شکستن، استراحت خودکار و گزارش زمان واقعی کار.</p>
     </div>
 
     <div class="feature">
       <div class="icon">💰</div>
-      <h3>مدیریت مالی</h3>
-      <p>چند حساب، تراکنش‌های درآمد/هزینه/انتقال، بودجه ماهانه، burn-rate و تراکنش‌های تکرارشونده.</p>
+      <h3 data-i18n="feat.money.title">مدیریت مالی</h3>
+      <p data-i18n="feat.money.body">چند حساب، تراکنش‌های درآمد/هزینه/انتقال، بودجه ماهانه، burn-rate و تراکنش‌های تکرارشونده.</p>
     </div>
 
     <div class="feature">
       <div class="icon">🔥</div>
-      <h3>عادت‌سنج روزانه</h3>
-      <p>عادت با ایموجی، گرید ۳۰ روزه، استریک، یادآوری ساعتی — همراه شدن با چیزایی که می‌خوای روتین شه.</p>
+      <h3 data-i18n="feat.habit.title">عادت‌سنج روزانه</h3>
+      <p data-i18n="feat.habit.body">عادت با ایموجی، گرید ۳۰ روزه، استریک، یادآوری ساعتی — همراه شدن با چیزایی که می‌خوای روتین شه.</p>
     </div>
 
     <div class="feature">
       <div class="icon">🧠</div>
-      <h3>بینش هوشمند Local</h3>
-      <p>۱۳ تشخیص الگو روی داده‌های خودت: روند هفتگی، الگوهای مالی، پیش‌بینی بودجه و پیشنهادات.</p>
+      <h3 data-i18n="feat.insight.title">بینش هوشمند Local</h3>
+      <p data-i18n="feat.insight.body">۱۳ تشخیص الگو روی داده‌های خودت: روند هفتگی، الگوهای مالی، پیش‌بینی بودجه و پیشنهادات.</p>
     </div>
 
     <div class="feature">
       <div class="icon">🪞</div>
-      <h3>شناخت من</h3>
-      <p>تحلیل رفتاری: ساعت اوج تمرکز، روز پرکار، شخصیت کاری (شب‌زنده‌دار/صبح‌خیز) — همه روی مرورگر تو.</p>
+      <h3 data-i18n="feat.self.title">شناخت من</h3>
+      <p data-i18n="feat.self.body">تحلیل رفتاری: ساعت اوج تمرکز، روز پرکار، شخصیت کاری (شب‌زنده‌دار/صبح‌خیز) — همه روی مرورگر تو.</p>
     </div>
 
     <div class="feature">
       <div class="icon">⚡</div>
-      <h3>ثبت سریع + Command Palette</h3>
-      <p>صندوق inbox، Ctrl+K برای جستجو، میانبرهای کیبورد — هر چی توی ذهنت اومد، یه کلیک سریع.</p>
+      <h3 data-i18n="feat.cmd.title">ثبت سریع + Command Palette</h3>
+      <p data-i18n="feat.cmd.body">صندوق inbox، Ctrl+K برای جستجو، میانبرهای کیبورد — هر چی توی ذهنت اومد، یه کلیک سریع.</p>
     </div>
 
     <div class="feature">
       <div class="icon">📊</div>
-      <h3>گزارش هفتگی قابل اشتراک</h3>
-      <p>یک خلاصه از هفته‌ت با نمودار، آمار و کپی/اشتراک یک‌کلیکی برای فرستادن به دوستت یا چاپ.</p>
+      <h3 data-i18n="feat.report.title">گزارش هفتگی قابل اشتراک</h3>
+      <p data-i18n="feat.report.body">یک خلاصه از هفته‌ت با نمودار، آمار و کپی/اشتراک یک‌کلیکی برای فرستادن به دوستت یا چاپ.</p>
     </div>
 
   </div>
@@ -412,8 +435,8 @@
   <div class="privacy-card">
     <div class="big-icon">🔒</div>
     <div>
-      <h3>داده‌های تو، فقط مال خودته</h3>
-      <p>
+      <h3 data-i18n="priv.title">داده‌های تو، فقط مال خودته</h3>
+      <p data-i18n="priv.body">
         TaskHub هیچ سرور تحلیلی، هیچ tracker و هیچ اتصال خارجی نداره. همهٔ تسک‌ها، تراکنش‌ها و
         عادت‌هات روی مرورگرت ذخیره میشن. می‌تونی هر وقت خواستی backup بگیری یا اپ رو روی
         موبایلت نصب کنی و حتی بدون اینترنت ازش استفاده کنی.
@@ -424,17 +447,17 @@
 
 <!-- Final CTA -->
 <section class="cta-final">
-  <h2>آماده‌ای شروع کنی؟</h2>
-  <p>هیچ ثبت‌نام، هیچ کارت اعتباری، هیچ ایمیل. یه کلیک و رفتی.</p>
+  <h2 data-i18n="ctaf.title">آماده‌ای شروع کنی؟</h2>
+  <p data-i18n="ctaf.body">هیچ ثبت‌نام، هیچ کارت اعتباری، هیچ ایمیل. یه کلیک و رفتی.</p>
   <div class="cta-row">
-    <a href="./Task_Manager_v8_Responsive_T7.html" class="btn-primary">🚀 ورود به TaskHub</a>
+    <a href="./Task_Manager_v8_Responsive_T7.html" class="btn-primary" data-i18n="ctaf.cta">🚀 ورود به TaskHub</a>
   </div>
 </section>
 
 <footer>
-  ساخته شده با <span class="heart">♥</span> در ایران ·
-  ۱۰۰٪ آفلاین · بدون اشتراک ·
-  <a href="./Task_Manager_v8_Responsive_T7.html">باز کردن اپ</a>
+  <span data-i18n="foot.l1">ساخته شده با</span> <span class="heart">♥</span> <span data-i18n="foot.l2">در ایران ·
+  ۱۰۰٪ آفلاین · بدون اشتراک ·</span>
+  <a href="./Task_Manager_v8_Responsive_T7.html" data-i18n="foot.open">باز کردن اپ</a>
 </footer>
 
 <script>
@@ -455,6 +478,133 @@
       }
     });
   });
+
+  // ══════════════════════════════════════════════════════════
+  //   i18n — fa/en/fr/ru. Persists choice to localStorage so the
+  //   main app picks it up on first launch (same key it uses).
+  // ══════════════════════════════════════════════════════════
+  const LAND_I18N = {
+    'meta.title':       { fa:'TaskHub — مدیریت تسک، مالی، عادت و تمرکز در یک‌جا', en:'TaskHub — task, money, habit & focus in one app', fr:'TaskHub — tâches, finances, habitudes & focus en un seul endroit', ru:'TaskHub — задачи, финансы, привычки и фокус в одном приложении' },
+    'nav.cta':          { fa:'ورود به اپ ←',       en:'Open the app →',     fr:"Ouvrir l'app →",      ru:'Открыть приложение →' },
+    'hero.badge':       { fa:'🇮🇷 ساخت ایران · بدون اتصال خارجی', en:'🇮🇷 Built in Iran · No external connections', fr:'🇮🇷 Conçu en Iran · Aucune connexion externe', ru:'🇮🇷 Сделано в Иране · Без внешних подключений' },
+    'hero.title.pre':   { fa:'یه فضای آروم برای ', en:'A calm space for ',    fr:'Un espace calme pour ', ru:'Спокойное место для ' },
+    'hero.title.accent':{ fa:'برنامه‌ریزی، تمرکز و رشد', en:'planning, focus & growth', fr:'planifier, se concentrer & grandir', ru:'планирования, фокуса и роста' },
+    'hero.sub':         { fa:'تسک، پلنر، تمرکز پومودورو، مدیریت مالی، عادت‌سنج و بینش هوشمند — همه‌چیز توی یه اپ. آفلاین، خصوصی، فارسی و کاملاً رایگان.', en:'Tasks, planner, Pomodoro focus, finance, habit tracker and smart insights — all in one app. Offline, private, and completely free.', fr:'Tâches, agenda, focus Pomodoro, finances, suivi d\'habitudes et aperçus intelligents — tout dans une seule app. Hors ligne, privé et gratuit.', ru:'Задачи, планер, Pomodoro, финансы, привычки и аналитика — всё в одном приложении. Офлайн, приватно и бесплатно.' },
+    'hero.cta.primary': { fa:'🚀 شروع رایگان',     en:'🚀 Start free',      fr:'🚀 Commencer',        ru:'🚀 Начать бесплатно' },
+    'hero.cta.secondary':{ fa:'✨ فیچرها رو ببین', en:'✨ See features',     fr:'✨ Voir les fonctionnalités', ru:'✨ Посмотреть функции' },
+    'hero.meta.noreg':  { fa:'✅ بدون نیاز به ثبت‌نام', en:'✅ No sign-up needed', fr:'✅ Sans inscription', ru:'✅ Без регистрации' },
+    'hero.meta.nodata': { fa:'🔒 بدون ارسال داده', en:'🔒 No data sent',    fr:'🔒 Aucune donnée envoyée', ru:'🔒 Без отправки данных' },
+    'hero.meta.mobile': { fa:'📲 نصب روی موبایل', en:'📲 Installable',     fr:'📲 Installable',      ru:'📲 Установка на телефон' },
+    'hero.meta.offline':{ fa:'🌐 کار آفلاین',     en:'🌐 Works offline',   fr:'🌐 Fonctionne hors ligne', ru:'🌐 Работает офлайн' },
+    'mock.focus':       { fa:'تمرکز امروز',        en:'Focus today',         fr:"Focus aujourd'hui",   ru:'Фокус сегодня' },
+    'mock.focus.num':   { fa:'۱۴۲',               en:'142',                 fr:'142',                 ru:'142' },
+    'mock.focus.pct':   { fa:'↑ ۲۳٪ از دیروز',    en:'↑ 23% vs yesterday',  fr:'↑ 23% vs hier',       ru:'↑ 23% к вчера' },
+    'mock.done':        { fa:'تسک تمام‌شده',       en:'Tasks done',          fr:'Tâches faites',       ru:'Задач сделано' },
+    'mock.done.num':    { fa:'۷',                 en:'7',                   fr:'7',                   ru:'7' },
+    'mock.done.pct':    { fa:'از ۹ هدف',          en:'of 9 goals',           fr:'sur 9 objectifs',     ru:'из 9 целей' },
+    'mock.streak':      { fa:'استریک عادت',        en:'Habit streak',        fr:"Série d'habitudes",   ru:'Серия привычек' },
+    'mock.streak.num':  { fa:'🔥 ۱۴',             en:'🔥 14',                fr:'🔥 14',               ru:'🔥 14' },
+    'mock.streak.pct':  { fa:'روز پی‌درپی',        en:'days in a row',       fr:"jours d'affilée",     ru:'дней подряд' },
+    'mock.list':        { fa:'تسک‌های در دستور کار', en:'On the agenda',      fr:"À l'ordre du jour",   ru:'В работе' },
+    'mock.t1':          { fa:'تمرین صبحگاهی',     en:'Morning workout',     fr:'Sport du matin',      ru:'Утренняя тренировка' },
+    'mock.t2':          { fa:'مرور ایمیل‌ها',     en:'Review emails',        fr:'Lire les e-mails',    ru:'Прочесть почту' },
+    'mock.t3':          { fa:'نوشتن گزارش هفتگی', en:'Write weekly report',  fr:'Rapport hebdo',       ru:'Недельный отчёт' },
+    'mock.t4':          { fa:'تماس با تیم طراحی', en:'Call design team',     fr:"Appel équipe design", ru:'Звонок дизайнерам' },
+    'feat.head':        { fa:'هرچی برای یه روز پُر و آروم لازمه', en:'Everything you need for a full, calm day', fr:'Tout pour une journée pleine et sereine', ru:'Всё для насыщенного и спокойного дня' },
+    'feat.sub':         { fa:'یک اپ، یازده ماژول کاربردی — همه روی یه دستگاه، بدون نیاز به اشتراک ماهانه.', en:'One app, eleven practical modules — all on one device, no monthly subscription.', fr:'Une seule app, onze modules — sur un seul appareil, sans abonnement.', ru:'Одно приложение, одиннадцать модулей — на одном устройстве, без подписки.' },
+    'feat.task.title':  { fa:'مدیریت تسک هوشمند', en:'Smart task management', fr:'Gestion de tâches', ru:'Управление задачами' },
+    'feat.task.body':   { fa:'عملیات‌بندی، فولدر، subtask، تایمر داخلی، اتصال تسک به مالی — هر چی نیاز یه روز کاری حرفه‌ای داری.', en:'Operations, folders, subtasks, built-in timer, money-link — everything a serious workday needs.', fr:"Opérations, dossiers, sous-tâches, minuteur intégré, lien finances — tout ce qu'il faut pour une journée pro.", ru:'Операции, папки, подзадачи, таймер, связка с финансами — всё для рабочего дня.' },
+    'feat.planner.title':{ fa:'پلنر هفتگی و ماهانه', en:'Weekly & monthly planner', fr:'Agenda hebdo & mensuel', ru:'Недельный и месячный планер' },
+    'feat.planner.body':{ fa:'هدف روزانه، چشم‌انداز ماهانه، تکرارشونده‌ها، یادداشت‌های روزانه و استریک تکمیل هدف.', en:'Daily goals, monthly outlook, recurring items, daily notes and goal-streaks.', fr:'Objectifs quotidiens, vue mensuelle, récurrents, notes et séries.', ru:'Дневные цели, месячный обзор, повторения, заметки и серии.' },
+    'feat.focus.title': { fa:'تمرکز و پومودورو',  en:'Focus & Pomodoro',    fr:'Focus & Pomodoro',    ru:'Фокус и Помодоро' },
+    'feat.focus.body':  { fa:'تایمر تمرکز با موسیقی پس‌زمینه، تشخیص شکستن، استراحت خودکار و گزارش زمان واقعی کار.', en:'Focus timer with ambient sound, break detection, auto-rest and real-time work stats.', fr:'Minuteur de focus avec son ambiant, détection de pause et statistiques temps réel.', ru:'Таймер фокуса с фоновым звуком, авто-паузы и статистика в реальном времени.' },
+    'feat.money.title': { fa:'مدیریت مالی',       en:'Money management',    fr:'Gestion financière',  ru:'Управление финансами' },
+    'feat.money.body':  { fa:'چند حساب، تراکنش‌های درآمد/هزینه/انتقال، بودجه ماهانه، burn-rate و تراکنش‌های تکرارشونده.', en:'Multiple accounts, income/expense/transfer, monthly budgets, burn-rate and recurring transactions.', fr:'Plusieurs comptes, revenu/dépense/virement, budgets, burn-rate et récurrents.', ru:'Несколько счетов, доход/расход/перевод, бюджеты, burn-rate и регулярные платежи.' },
+    'feat.habit.title': { fa:'عادت‌سنج روزانه',   en:'Daily habit tracker', fr:"Suivi d'habitudes",   ru:'Трекер привычек' },
+    'feat.habit.body':  { fa:'عادت با ایموجی، گرید ۳۰ روزه، استریک، یادآوری ساعتی — همراه شدن با چیزایی که می‌خوای روتین شه.', en:'Emoji habits, 30-day grid, streaks, hourly reminders — companions for what you want to make routine.', fr:'Habitudes avec emoji, grille 30 jours, séries, rappels — pour ce qui doit devenir routine.', ru:'Привычки с эмодзи, 30-дневная сетка, серии, напоминания — для нового образа жизни.' },
+    'feat.insight.title':{ fa:'بینش هوشمند Local', en:'Local smart insights', fr:'Aperçus locaux',    ru:'Локальная аналитика' },
+    'feat.insight.body':{ fa:'۱۳ تشخیص الگو روی داده‌های خودت: روند هفتگی، الگوهای مالی، پیش‌بینی بودجه و پیشنهادات.', en:'13 pattern detectors on your own data: weekly trend, money patterns, budget forecast and suggestions.', fr:"13 détecteurs de motifs sur vos données : tendance hebdo, motifs financiers, prévisions et suggestions.", ru:'13 паттернов по вашим данным: тренды, финансы, прогноз бюджета и подсказки.' },
+    'feat.self.title':  { fa:'شناخت من',         en:'Self-knowledge',      fr:'Connais-toi',         ru:'Самопознание' },
+    'feat.self.body':   { fa:'تحلیل رفتاری: ساعت اوج تمرکز، روز پرکار، شخصیت کاری (شب‌زنده‌دار/صبح‌خیز) — همه روی مرورگر تو.', en:'Behavioral analysis: peak focus hour, busiest day, work persona (night-owl/early-bird) — all in your browser.', fr:'Analyse comportementale : heure de pointe, jour productif, persona (couche-tard/lève-tôt) — tout dans votre navigateur.', ru:'Поведенческий анализ: пиковый час, продуктивный день, тип работника (сова/жаворонок) — всё в браузере.' },
+    'feat.cmd.title':   { fa:'ثبت سریع + Command Palette', en:'Quick capture + Command Palette', fr:'Capture rapide + Palette de commandes', ru:'Быстрая запись + Command Palette' },
+    'feat.cmd.body':    { fa:'صندوق inbox، Ctrl+K برای جستجو، میانبرهای کیبورد — هر چی توی ذهنت اومد، یه کلیک سریع.', en:'Inbox, Ctrl+K search, keyboard shortcuts — whatever pops into your head, one click away.', fr:'Inbox, Ctrl+K, raccourcis clavier — ce qui vous passe par la tête, en un clic.', ru:'Inbox, Ctrl+K, горячие клавиши — мысль фиксируется в один клик.' },
+    'feat.report.title':{ fa:'گزارش هفتگی قابل اشتراک', en:'Shareable weekly report', fr:'Rapport hebdo partageable', ru:'Недельный отчёт' },
+    'feat.report.body': { fa:'یک خلاصه از هفته‌ت با نمودار، آمار و کپی/اشتراک یک‌کلیکی برای فرستادن به دوستت یا چاپ.', en:'A weekly summary with charts, stats and one-click copy/share — send to a friend or print.', fr:'Résumé hebdo avec graphiques, statistiques et partage en un clic.', ru:'Сводка недели с графиками, статистикой и шарингом одной кнопкой.' },
+    'priv.title':       { fa:'داده‌های تو، فقط مال خودته', en:'Your data is yours alone', fr:"Vos données vous appartiennent", ru:'Ваши данные — только ваши' },
+    'priv.body':        { fa:'TaskHub هیچ سرور تحلیلی، هیچ tracker و هیچ اتصال خارجی نداره. همهٔ تسک‌ها، تراکنش‌ها و عادت‌هات روی مرورگرت ذخیره میشن. می‌تونی هر وقت خواستی backup بگیری یا اپ رو روی موبایلت نصب کنی و حتی بدون اینترنت ازش استفاده کنی.', en:'TaskHub has no analytics server, no tracker, no external connection. All your tasks, transactions and habits stay in your browser. Back up any time, install on mobile, use offline.', fr:'TaskHub n\'a aucun serveur d\'analyse, aucun tracker, aucune connexion externe. Toutes vos tâches, transactions et habitudes restent dans votre navigateur. Sauvegarde, installation mobile, usage hors ligne.', ru:'У TaskHub нет аналитики, трекеров и внешних подключений. Все задачи, транзакции и привычки остаются в браузере. Бэкап в любой момент, установка на телефон, работа без интернета.' },
+    'ctaf.title':       { fa:'آماده‌ای شروع کنی؟', en:'Ready to start?',      fr:'Prêt à commencer ?',   ru:'Готовы начать?' },
+    'ctaf.body':        { fa:'هیچ ثبت‌نام، هیچ کارت اعتباری، هیچ ایمیل. یه کلیک و رفتی.', en:'No sign-up, no credit card, no email. One click and you\'re in.', fr:"Pas d'inscription, pas de carte, pas d'e-mail. Un clic et c'est parti.", ru:'Без регистрации, без карт, без e-mail. Один клик — и вы внутри.' },
+    'ctaf.cta':         { fa:'🚀 ورود به TaskHub', en:'🚀 Open TaskHub',     fr:'🚀 Ouvrir TaskHub',   ru:'🚀 Открыть TaskHub' },
+    'foot.l1':          { fa:'ساخته شده با',      en:'Made with',           fr:'Fait avec',           ru:'Сделано с' },
+    'foot.l2':          { fa:'در ایران · ۱۰۰٪ آفلاین · بدون اشتراک ·', en:'in Iran · 100% offline · No subscription ·', fr:'en Iran · 100% hors ligne · Sans abonnement ·', ru:'в Иране · 100% офлайн · Без подписки ·' },
+    'foot.open':        { fa:'باز کردن اپ',       en:'Open the app',        fr:"Ouvrir l'app",        ru:'Открыть приложение' },
+  };
+  const LANG_DIR = { fa:'rtl', en:'ltr', fr:'ltr', ru:'ltr' };
+  const LANG_LOCALE = { fa:'fa_IR', en:'en_US', fr:'fr_FR', ru:'ru_RU' };
+
+  function getStoredLang() {
+    // Same key as the app uses — share preference across pages.
+    try {
+      const raw = localStorage.getItem('taskhub_state');
+      if (raw) { const s = JSON.parse(raw); if (s && s.lang && LAND_I18N['hero.sub'][s.lang]) return s.lang; }
+    } catch {}
+    try { const ll = localStorage.getItem('taskhub_landing_lang'); if (ll && LANG_DIR[ll]) return ll; } catch {}
+    // Fallback: browser language
+    const nav = (navigator.language || 'fa').slice(0, 2);
+    return LANG_DIR[nav] ? nav : 'fa';
+  }
+
+  function setLandLang(lang) {
+    if (!LANG_DIR[lang]) return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = LANG_DIR[lang];
+    // Update meta og:locale
+    const ogLoc = document.querySelector('meta[property="og:locale"]');
+    if (ogLoc) ogLoc.setAttribute('content', LANG_LOCALE[lang] || 'fa_IR');
+    // Swap visible text by data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      const entry = LAND_I18N[k];
+      if (entry && entry[lang]) {
+        // For <title> swap textContent; for elements with html-allowed content, use textContent too (we kept everything plain text on purpose)
+        if (el.tagName === 'TITLE') el.textContent = entry[lang];
+        else el.textContent = entry[lang];
+      }
+    });
+    // Swap meta description/og by data-i18n-meta="key"
+    document.querySelectorAll('[data-i18n-meta]').forEach(el => {
+      const k = el.getAttribute('data-i18n-meta');
+      const map = {
+        'desc':     { fa:'یک اپ کامل و خصوصی برای مدیریت تسک، پلنر، تمرکز، مالی و عادت. آفلاین، فارسی، نصب‌شدنی روی موبایل. هیچ داده‌ای از مرورگرت بیرون نمی‌ره.', en:'A complete private app for tasks, planner, focus, money and habits. Offline, installable on mobile. No data leaves your browser.', fr:'Une app complète et privée pour les tâches, agenda, focus, finances et habitudes. Hors ligne, installable. Aucune donnée ne quitte votre navigateur.', ru:'Полное приватное приложение для задач, планера, фокуса, финансов и привычек. Офлайн, устанавливается на телефон. Данные не покидают браузер.' },
+        'og:title': { fa:'TaskHub — مدیریت تسک، مالی، عادت و تمرکز', en:'TaskHub — Task, money, habit & focus', fr:'TaskHub — Tâches, finances, habitudes & focus', ru:'TaskHub — Задачи, финансы, привычки и фокус' },
+        'og:desc':  { fa:'یه اپ کامل، فارسی، آفلاین. تسک، مالی، عادت، تمرکز و بینش هوشمند — همه‌چیز یک‌جا.', en:'A complete offline app — tasks, money, habits, focus and smart insights, all in one.', fr:'Une app complète hors ligne — tâches, finances, habitudes, focus et aperçus.', ru:'Полное офлайн-приложение — задачи, финансы, привычки, фокус и аналитика.' },
+      };
+      const e = map[k];
+      if (e && e[lang]) el.setAttribute('content', e[lang]);
+    });
+    // Update lang picker active state
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    // Persist landing-side choice
+    try { localStorage.setItem('taskhub_landing_lang', lang); } catch {}
+    // Also write into app state so the main app boots in same lang
+    try {
+      const raw = localStorage.getItem('taskhub_state');
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && typeof s === 'object') { s.lang = lang; localStorage.setItem('taskhub_state', JSON.stringify(s)); }
+      } else {
+        localStorage.setItem('taskhub_state', JSON.stringify({ lang }));
+      }
+    } catch {}
+  }
+
+  // Wire picker
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => setLandLang(b.dataset.lang));
+  });
+
+  // Apply persisted/inferred language on load
+  setLandLang(getStoredLang());
 </script>
 
 </body>
