@@ -7985,16 +7985,292 @@ function setLang(lang) {
    functions. Safe because we only replace EXACT-match text content
    on leaf text nodes (not substrings).
 ═══════════════════════════════════════════════════ */
+/* EXTRA_FA — big hand-built lookup. Each entry: fa → {en, fr, ru}.
+   Covers ~300 most-visible UI strings (buttons, labels, headings, status
+   words) that don't fit the I18N key/value system. Auto-translator merges
+   this into FA_MAP at build time. */
+const EXTRA_FA = {
+  // Action buttons
+  'افزودن':                   { en:'Add',           fr:'Ajouter',         ru:'Добавить' },
+  'افزودن تراکنش جدید':       { en:'Add new transaction',fr:'Nouvelle transaction',ru:'Новая транзакция' },
+  'افزودن حساب مالی':         { en:'Add account',   fr:'Nouveau compte',  ru:'Новый счёт' },
+  'افزودن عادت جدید':         { en:'Add new habit', fr:'Nouvelle habitude',ru:'Новая привычка' },
+  'افزودن عملیات':            { en:'Add operation', fr:'Ajouter opération',ru:'Добавить операцию' },
+  'افزودن عملیات جدید':       { en:'Add new operation',fr:'Nouvelle opération',ru:'Новая операция' },
+  'افزودن هدف':               { en:'Add goal',      fr:'Ajouter objectif',ru:'Добавить цель' },
+  'افزودن هدف روزانه':        { en:'Add daily goal',fr:'Objectif quotidien',ru:'Цель на день' },
+  '+ افزودن تمرین':           { en:'+ Add exercise',fr:'+ Ajouter exercice',ru:'+ Добавить упражнение' },
+  '+ افزودن زیرتسک':          { en:'+ Add subtask', fr:'+ Sous-tâche',    ru:'+ Подзадача' },
+  '+ افزودن عملیات':          { en:'+ Add operation',fr:'+ Opération',    ru:'+ Операция' },
+  '+ افزودن غذا':             { en:'+ Add food',    fr:'+ Aliment',       ru:'+ Еда' },
+  '+ برنامه جدید':            { en:'+ New plan',    fr:'+ Programme',     ru:'+ План' },
+  '+ تراکنش جدید':            { en:'+ New transaction',fr:'+ Transaction',ru:'+ Транзакция' },
+  '+ تعیین هدف روزانه':       { en:'+ Set daily goal',fr:'+ Objectif',    ru:'+ Цель' },
+  '+ تمرین دیگه':             { en:'+ More exercise',fr:'+ Exercice',     ru:'+ Упражнение' },
+  '+ ثبت تراکنش':             { en:'+ Log transaction',fr:'+ Transaction',ru:'+ Транзакция' },
+  '+ حساب جدید':              { en:'+ New account', fr:'+ Compte',        ru:'+ Счёт' },
+  '+ ست':                     { en:'+ Set',         fr:'+ Série',         ru:'+ Подход' },
+  '+ سفارشی':                 { en:'+ Custom',      fr:'+ Personnalisé',  ru:'+ Своё' },
+  '+ عادت جدید':              { en:'+ New habit',   fr:'+ Habitude',      ru:'+ Привычка' },
+  '+ عملیات جدید':            { en:'+ New operation',fr:'+ Opération',    ru:'+ Операция' },
+  '+ غذا':                    { en:'+ Food',        fr:'+ Aliment',       ru:'+ Еда' },
+  '+ هدف':                    { en:'+ Goal',        fr:'+ Objectif',      ru:'+ Цель' },
+  '+ هدف جدید':               { en:'+ New goal',    fr:'+ Objectif',      ru:'+ Цель' },
+  '+ هدف ماهانه':             { en:'+ Monthly goal',fr:'+ Mensuel',       ru:'+ Месячная цель' },
+  '+ هدف هفتگی':              { en:'+ Weekly goal', fr:'+ Hebdo',         ru:'+ Недельная цель' },
+  '+ پوشه جدید':              { en:'+ New folder',  fr:'+ Dossier',       ru:'+ Папка' },
+  '+ یادداشت جدید':           { en:'+ New note',    fr:'+ Note',          ru:'+ Заметка' },
+  // Generic UI words
+  'انجام شد':                 { en:'Done',          fr:'Terminé',         ru:'Готово' },
+  'انجام شده':                { en:'Completed',     fr:'Terminé',         ru:'Выполнено' },
+  'انجام شده؟':               { en:'Done?',         fr:'Terminé ?',       ru:'Готово?' },
+  'انصراف':                   { en:'Cancel',        fr:'Annuler',         ru:'Отмена' },
+  'انتخاب':                   { en:'Select',        fr:'Choisir',         ru:'Выбрать' },
+  'بازگشت':                   { en:'Back',          fr:'Retour',          ru:'Назад' },
+  'تغییر':                    { en:'Change',        fr:'Modifier',        ru:'Изменить' },
+  'تغییر نام':                { en:'Rename',        fr:'Renommer',        ru:'Переименовать' },
+  'ویرایش':                   { en:'Edit',          fr:'Modifier',        ru:'Изменить' },
+  'حذف':                      { en:'Delete',        fr:'Supprimer',       ru:'Удалить' },
+  'ذخیره':                    { en:'Save',          fr:'Enregistrer',     ru:'Сохранить' },
+  'لغو':                      { en:'Cancel',        fr:'Annuler',         ru:'Отмена' },
+  'بستن':                     { en:'Close',         fr:'Fermer',          ru:'Закрыть' },
+  'بازآرا':                   { en:'Rearrange',     fr:'Réorganiser',     ru:'Переставить' },
+  'بروزرسانی':                { en:'Update',        fr:'Mettre à jour',   ru:'Обновить' },
+  'بارگذاری':                 { en:'Loading',       fr:'Chargement',      ru:'Загрузка' },
+  'تایید':                    { en:'Confirm',       fr:'Confirmer',       ru:'Подтвердить' },
+  'رد کن':                    { en:'Skip',          fr:'Passer',          ru:'Пропустить' },
+  'اشتراک':                   { en:'Share',         fr:'Partager',        ru:'Поделиться' },
+  'اشتراک‌گذاری':             { en:'Share',         fr:'Partager',        ru:'Поделиться' },
+  'کپی':                      { en:'Copy',          fr:'Copier',          ru:'Копировать' },
+  'چاپ':                      { en:'Print',         fr:'Imprimer',        ru:'Печать' },
+  // Times / calendar
+  'امروز':                    { en:'Today',         fr:"Aujourd'hui",     ru:'Сегодня' },
+  'دیروز':                    { en:'Yesterday',     fr:'Hier',            ru:'Вчера' },
+  'فردا':                     { en:'Tomorrow',      fr:'Demain',          ru:'Завтра' },
+  'این هفته':                 { en:'This week',     fr:'Cette semaine',   ru:'На этой неделе' },
+  'این ماه':                  { en:'This month',    fr:'Ce mois',         ru:'В этом месяце' },
+  'هفته':                     { en:'Week',          fr:'Semaine',         ru:'Неделя' },
+  'ماه':                      { en:'Month',         fr:'Mois',            ru:'Месяц' },
+  'سال':                      { en:'Year',          fr:'Année',           ru:'Год' },
+  'روز':                      { en:'Day',           fr:'Jour',            ru:'День' },
+  'ساعت':                     { en:'Hour',          fr:'Heure',           ru:'Час' },
+  'دقیقه':                    { en:'minute',        fr:'minute',          ru:'минута' },
+  'ثانیه':                    { en:'second',        fr:'seconde',         ru:'секунда' },
+  'الان':                     { en:'Now',           fr:'Maintenant',      ru:'Сейчас' },
+  'فعال':                     { en:'Active',        fr:'Actif',           ru:'Активно' },
+  'غیرفعال':                  { en:'Inactive',      fr:'Inactif',         ru:'Неактивно' },
+  // Plan tab
+  'برنامه':                   { en:'Plan',          fr:'Programme',       ru:'План' },
+  'برنامه‌ها':                { en:'Plans',         fr:'Programmes',      ru:'Планы' },
+  'برنامه‌های من':            { en:'My plans',      fr:'Mes programmes',  ru:'Мои планы' },
+  'برنامه جدید':              { en:'New plan',      fr:'Nouveau programme',ru:'Новый план' },
+  'برنامه بی‌نام':            { en:'Unnamed plan',  fr:'Programme sans nom',ru:'Без названия' },
+  'برنامه‌ریز':               { en:'Planner',       fr:'Agenda',          ru:'Планер' },
+  'برنامه‌ریز مالی':          { en:'Money planner', fr:'Planificateur financier',ru:'Финансовый планер' },
+  'پوشه‌ها':                  { en:'Folders',       fr:'Dossiers',        ru:'Папки' },
+  'تسک':                      { en:'Task',          fr:'Tâche',           ru:'Задача' },
+  'تسک‌ها':                   { en:'Tasks',         fr:'Tâches',          ru:'Задачи' },
+  'زیرتسک':                   { en:'Subtask',       fr:'Sous-tâche',      ru:'Подзадача' },
+  'زیرتسک‌ها':                { en:'Subtasks',      fr:'Sous-tâches',     ru:'Подзадачи' },
+  'عنوان':                    { en:'Title',         fr:'Titre',           ru:'Название' },
+  'عنوان تسک':                { en:'Task title',    fr:'Titre de tâche',  ru:'Название задачи' },
+  'عنوان عملیات':             { en:'Operation title',fr:"Titre d'opération",ru:'Название операции' },
+  'مدت زمان':                 { en:'Duration',      fr:'Durée',           ru:'Длительность' },
+  'مدت زمان (دقیقه)':         { en:'Duration (min)',fr:'Durée (min)',     ru:'Длительность (мин)' },
+  'مسئول':                    { en:'Assignee',      fr:'Responsable',     ru:'Исполнитель' },
+  'زمان‌بندی':                { en:'Schedule',      fr:'Horaire',         ru:'Расписание' },
+  'اولویت':                   { en:'Priority',      fr:'Priorité',        ru:'Приоритет' },
+  'تگ‌ها':                    { en:'Tags',          fr:'Tags',            ru:'Теги' },
+  'یادآوری':                  { en:'Reminder',      fr:'Rappel',          ru:'Напоминание' },
+  'یادآوری (اختیاری)':        { en:'Reminder (optional)',fr:'Rappel (optionnel)',ru:'Напоминание (опц.)' },
+  'ارزش پولی':                { en:'Money value',   fr:'Valeur',          ru:'Денежная ценность' },
+  'نامشخص':                   { en:'Unknown',       fr:'Inconnu',         ru:'Неизвестно' },
+  'ندارد':                    { en:'None',          fr:'Aucun',           ru:'Нет' },
+  'بدون محدودیت':             { en:'Unlimited',     fr:'Illimité',        ru:'Без лимита' },
+  'بدون دسته':                { en:'Uncategorized', fr:'Non classé',      ru:'Без категории' },
+  'بدون داده':                { en:'No data',       fr:'Aucune donnée',   ru:'Нет данных' },
+  // Money
+  'موجودی':                   { en:'Balance',       fr:'Solde',           ru:'Баланс' },
+  'موجودی:':                  { en:'Balance:',      fr:'Solde :',         ru:'Баланс:' },
+  'درآمد':                    { en:'Income',        fr:'Revenu',          ru:'Доход' },
+  'هزینه':                    { en:'Expense',       fr:'Dépense',         ru:'Расход' },
+  'حساب':                     { en:'Account',       fr:'Compte',          ru:'Счёт' },
+  'حساب‌ها':                  { en:'Accounts',      fr:'Comptes',         ru:'Счета' },
+  'تراکنش':                   { en:'Transaction',   fr:'Transaction',     ru:'Транзакция' },
+  'تراکنش‌ها':                { en:'Transactions',  fr:'Transactions',    ru:'Транзакции' },
+  'تراکنش تکرارشونده':        { en:'Recurring',     fr:'Récurrent',       ru:'Регулярная' },
+  'تکرارشونده':               { en:'Recurring',     fr:'Récurrent',       ru:'Регулярное' },
+  'بودجه':                    { en:'Budget',        fr:'Budget',          ru:'Бюджет' },
+  'مبلغ':                     { en:'Amount',        fr:'Montant',         ru:'Сумма' },
+  'دسته':                     { en:'Category',      fr:'Catégorie',       ru:'Категория' },
+  'دسته‌بندی':                { en:'Category',      fr:'Catégorie',       ru:'Категория' },
+  'یادداشت':                  { en:'Note',          fr:'Note',            ru:'Заметка' },
+  'تاریخ':                    { en:'Date',          fr:'Date',            ru:'Дата' },
+  'بانکی':                    { en:'Bank',          fr:'Banque',          ru:'Банк' },
+  'نقدی':                     { en:'Cash',          fr:'Espèces',         ru:'Наличные' },
+  'انتقال':                   { en:'Transfer',      fr:'Virement',        ru:'Перевод' },
+  'از حساب':                  { en:'From account',  fr:'Du compte',       ru:'Со счёта' },
+  'به حساب':                  { en:'To account',    fr:'Vers compte',     ru:'На счёт' },
+  'این تراکنش حذف شود؟':      { en:'Delete this transaction?',fr:'Supprimer ?',ru:'Удалить транзакцию?' },
+  'این برنامه حذف بشه؟':      { en:'Delete this plan?',fr:'Supprimer programme ?',ru:'Удалить план?' },
+  // Fitness
+  'تمرین':                    { en:'Workout',       fr:'Entraînement',    ru:'Тренировка' },
+  'تمرین‌ها':                 { en:'Exercises',     fr:'Exercices',       ru:'Упражнения' },
+  'تمرین آزاد':               { en:'Free workout',  fr:'Entraînement libre',ru:'Свободная тренировка' },
+  'جلسه':                     { en:'Session',       fr:'Séance',          ru:'Сессия' },
+  'جلسه تمرین':               { en:'Workout session',fr:"Séance d'entraînement",ru:'Тренировка' },
+  'ست':                       { en:'Set',           fr:'Série',           ru:'Подход' },
+  'تکرار':                    { en:'Reps',          fr:'Reps',            ru:'Повторы' },
+  'وزنه':                     { en:'Weight',        fr:'Poids',           ru:'Вес' },
+  'وزن':                      { en:'Weight',        fr:'Poids',           ru:'Вес' },
+  'استراحت':                  { en:'Rest',          fr:'Repos',           ru:'Отдых' },
+  'استراحت تمام شد':          { en:'Rest done',     fr:'Repos terminé',   ru:'Отдых окончен' },
+  'استریک':                   { en:'Streak',        fr:'Série',           ru:'Серия' },
+  'استریک تمرین':             { en:'Workout streak',fr:"Série d'entraînement",ru:'Серия тренировок' },
+  'استریک عادت':              { en:'Habit streak',  fr:"Série d'habitude",ru:'Серия привычек' },
+  'استریک فعلی':              { en:'Current streak',fr:'Série actuelle',  ru:'Текущая серия' },
+  'استریک:':                  { en:'Streak:',       fr:'Série :',         ru:'Серия:' },
+  'پیشرفت':                   { en:'Progress',      fr:'Progrès',         ru:'Прогресс' },
+  'سینه':                     { en:'Chest',         fr:'Pectoraux',       ru:'Грудь' },
+  'پشت':                      { en:'Back',          fr:'Dos',             ru:'Спина' },
+  'پا':                       { en:'Legs',          fr:'Jambes',          ru:'Ноги' },
+  'بازو':                     { en:'Arms',          fr:'Bras',            ru:'Руки' },
+  'سرشانه':                   { en:'Shoulders',     fr:'Épaules',         ru:'Плечи' },
+  'شکم':                      { en:'Abs',           fr:'Abdominaux',      ru:'Пресс' },
+  'باسن':                     { en:'Glutes',        fr:'Fessiers',        ru:'Ягодицы' },
+  'انعطاف':                   { en:'Flexibility',   fr:'Flexibilité',     ru:'Гибкость' },
+  'هوازی':                    { en:'Cardio',        fr:'Cardio',          ru:'Кардио' },
+  'بدنی':                     { en:'Bodyweight',    fr:'Poids du corps',  ru:'Собственный вес' },
+  'گرم':                      { en:'Warm-up',       fr:'Échauffement',    ru:'Разминка' },
+  // Nutrition
+  'تغذیه':                    { en:'Nutrition',     fr:'Nutrition',       ru:'Питание' },
+  'وعده':                     { en:'Meal',          fr:'Repas',           ru:'Приём пищи' },
+  'وعده‌ها':                  { en:'Meals',         fr:'Repas',           ru:'Приёмы пищи' },
+  'صبحانه':                   { en:'Breakfast',     fr:'Petit-déjeuner',  ru:'Завтрак' },
+  'ناهار':                    { en:'Lunch',         fr:'Déjeuner',        ru:'Обед' },
+  'شام':                      { en:'Dinner',        fr:'Dîner',           ru:'Ужин' },
+  'میان‌وعده':                { en:'Snack',         fr:'Collation',       ru:'Перекус' },
+  'کالری':                    { en:'Calories',      fr:'Calories',        ru:'Калории' },
+  'پروتئین':                  { en:'Protein',       fr:'Protéines',       ru:'Белки' },
+  'کربو':                     { en:'Carbs',         fr:'Glucides',        ru:'Углеводы' },
+  'کربوهیدرات':               { en:'Carbohydrates', fr:'Glucides',        ru:'Углеводы' },
+  'چربی':                     { en:'Fat',           fr:'Lipides',         ru:'Жиры' },
+  'فیبر':                     { en:'Fiber',         fr:'Fibres',          ru:'Клетчатка' },
+  'آب':                       { en:'Water',         fr:'Eau',             ru:'Вода' },
+  'لیوان':                    { en:'glass',         fr:'verre',           ru:'стакан' },
+  'گرم (مقدار)':              { en:'Grams',         fr:'Grammes',         ru:'Граммы' },
+  // Habits / planner
+  'عادت':                     { en:'Habit',         fr:'Habitude',        ru:'Привычка' },
+  'عادت جدید':                { en:'New habit',     fr:'Nouvelle habitude',ru:'Новая привычка' },
+  'هدف':                      { en:'Goal',          fr:'Objectif',        ru:'Цель' },
+  'اهداف':                    { en:'Goals',         fr:'Objectifs',       ru:'Цели' },
+  'یادداشت‌ها':               { en:'Notes',         fr:'Notes',           ru:'Заметки' },
+  'تیک امروز':                { en:'Check today',   fr:"Cocher aujourd'hui",ru:'Отметить сегодня' },
+  // Insight
+  'الگوها':                   { en:'Patterns',      fr:'Tendances',       ru:'Шаблоны' },
+  'پیشنهادها':                { en:'Suggestions',   fr:'Suggestions',     ru:'Предложения' },
+  'بدون بینش جدید':           { en:'No new insights',fr:'Aucun aperçu',   ru:'Нет новых данных' },
+  'بدون پیشنهاد':             { en:'No suggestions',fr:'Aucune suggestion',ru:'Нет предложений' },
+  'دقیقه تمرکز':              { en:'Focus minutes', fr:'Minutes de focus',ru:'Минут фокуса' },
+  'تسک تمام‌شده':             { en:'Completed tasks',fr:'Tâches terminées',ru:'Выполнено задач' },
+  'بهترین ساعت تمرین':        { en:'Best workout hour',fr:'Meilleure heure',ru:'Лучший час' },
+  'میانگین ریکاوری':          { en:'Avg recovery',  fr:'Récupération moy.',ru:'Сред. восстановление' },
+  'میانگین پروتئین':          { en:'Avg protein',   fr:'Protéines moy.',  ru:'Сред. белок' },
+  'تالار افتخار':             { en:'Hall of Fame',  fr:'Panthéon',        ru:'Зал славы' },
+  'رکوردهای شخصی':            { en:'Personal records',fr:'Records perso', ru:'Личные рекорды' },
+  'نشان':                     { en:'Badge',         fr:'Badge',           ru:'Значок' },
+  'نشان‌ها':                  { en:'Badges',        fr:'Badges',          ru:'Значки' },
+  'نشان باز شده':             { en:'Badge unlocked',fr:'Badge débloqué',  ru:'Значок открыт' },
+  'سطح':                      { en:'Level',         fr:'Niveau',          ru:'Уровень' },
+  'XP و نشان‌ها':             { en:'XP & Badges',   fr:'XP & Badges',     ru:'XP и значки' },
+  // Misc UI
+  'تعیین نشده':               { en:'Not set',       fr:'Non défini',      ru:'Не задано' },
+  'هشدار':                    { en:'Warning',       fr:'Attention',       ru:'Внимание' },
+  'بحرانی':                   { en:'Critical',      fr:'Critique',        ru:'Критично' },
+  'باگ':                      { en:'Bug',           fr:'Bug',             ru:'Баг' },
+  'همه':                      { en:'All',           fr:'Tous',            ru:'Все' },
+  'بدون مبلغ':                { en:'No amount',     fr:'Sans montant',    ru:'Без суммы' },
+  'با چیزای کوچک شروع کن':    { en:'Start small',   fr:'Commence petit',  ru:'Начни с малого' },
+  'آماده‌ای؟ بریم!':          { en:"Ready? Let's go!",fr:'Prêt ? On y va !',ru:'Готов? Поехали!' },
+  'هنوز اجرا نشده':           { en:'Not run yet',   fr:'Pas encore lancé',ru:'Ещё не запущено' },
+  'هنوز عملیاتی وجود ندارد. روی «+ عملیات جدید» بزن.':
+    { en:'No operations yet. Click "+ New operation".',fr:'Aucune opération. Cliquez "+ Nouvelle".',ru:'Нет операций. Нажмите "+ Новая".' },
+  'هیچ تمرینی نیست — می‌تونی الان اضافه کنی:':
+    { en:'No exercises — add one now:',fr:'Aucun exercice — ajoutez :',ru:'Нет упражнений — добавьте:' },
+  // Profile / settings
+  'پروفایل':                  { en:'Profile',       fr:'Profil',          ru:'Профиль' },
+  'حساب کاربری':              { en:'Account',       fr:'Compte',          ru:'Аккаунт' },
+  'تنظیمات':                  { en:'Settings',      fr:'Paramètres',      ru:'Настройки' },
+  'راهنما':                   { en:'Help',          fr:'Aide',            ru:'Помощь' },
+  'راهنما و میانبرها':        { en:'Help & shortcuts',fr:'Aide & raccourcis',ru:'Помощь' },
+  'ظاهر':                     { en:'Appearance',    fr:'Apparence',       ru:'Внешний вид' },
+  'تم رنگی':                  { en:'Color theme',   fr:'Thème',           ru:'Тема' },
+  'پس‌زمینه':                 { en:'Background',    fr:'Arrière-plan',    ru:'Фон' },
+  'اندازه متن':               { en:'Font size',     fr:'Taille du texte', ru:'Размер шрифта' },
+  'حالت تاریک':               { en:'Dark mode',     fr:'Mode sombre',     ru:'Тёмная тема' },
+  'حالت روشن':                { en:'Light mode',    fr:'Mode clair',      ru:'Светлая тема' },
+  'حالت فشرده':               { en:'Compact mode',  fr:'Mode compact',    ru:'Компактный' },
+  'تمرکز و صدا':              { en:'Focus & sound', fr:'Focus & son',     ru:'Фокус и звук' },
+  'پومودورو':                 { en:'Pomodoro',      fr:'Pomodoro',        ru:'Помодоро' },
+  'صدای محیطی':               { en:'Ambient sound', fr:'Son ambiant',     ru:'Фоновый звук' },
+  'صدای اعلان':               { en:'Notification sound',fr:'Son de notif',ru:'Звук уведомления' },
+  'نوتیفیکیشن':               { en:'Notifications', fr:'Notifications',   ru:'Уведомления' },
+  'دانلود پشتیبان':           { en:'Download backup',fr:'Sauvegarde',     ru:'Сохранить копию' },
+  'بارگذاری پشتیبان':         { en:'Restore backup',fr:'Restaurer',       ru:'Восстановить' },
+  'آواتار':                   { en:'Avatar',        fr:'Avatar',          ru:'Аватар' },
+  'ایمیل':                    { en:'Email',         fr:'E-mail',          ru:'E-mail' },
+  'زبان':                     { en:'Language',      fr:'Langue',          ru:'Язык' },
+  'روشن':                     { en:'On',            fr:'Activé',          ru:'Вкл' },
+  'خاموش':                    { en:'Off',           fr:'Désactivé',       ru:'Выкл' },
+  // Form labels
+  'سن':                       { en:'Age',           fr:'Âge',             ru:'Возраст' },
+  'قد (cm)':                  { en:'Height (cm)',   fr:'Taille (cm)',     ru:'Рост (см)' },
+  'وزن (kg)':                 { en:'Weight (kg)',   fr:'Poids (kg)',      ru:'Вес (кг)' },
+  'جنسیت':                    { en:'Gender',        fr:'Genre',           ru:'Пол' },
+  'مرد':                      { en:'Male',          fr:'Homme',           ru:'Муж' },
+  'زن':                       { en:'Female',        fr:'Femme',           ru:'Жен' },
+  'سطح فعالیت':               { en:'Activity level',fr:"Niveau d'activité",ru:'Уровень активности' },
+  'نام برنامه':               { en:'Plan name',     fr:'Nom du programme',ru:'Название плана' },
+  'روز هفته':                 { en:'Day of week',   fr:'Jour de semaine', ru:'День недели' },
+  // Recovery / mood
+  'خسته':                     { en:'Tired',         fr:'Fatigué',         ru:'Устал' },
+  'عالی':                     { en:'Great',         fr:'Excellent',       ru:'Отлично' },
+  'کم':                       { en:'Low',           fr:'Faible',          ru:'Низко' },
+  'متوسط':                    { en:'Medium',        fr:'Moyen',           ru:'Средне' },
+  'زیاد':                     { en:'High',          fr:'Élevé',           ru:'Высоко' },
+  // Common phrases
+  'استفاده':                  { en:'Use',           fr:'Utiliser',        ru:'Использовать' },
+  'بررسی وضعیت...':           { en:'Checking…',     fr:'Vérification…',   ru:'Проверка…' },
+  'ایمیل و رمز رو وارد کن':   { en:'Enter email and password',fr:'Email et mot de passe',ru:'Введите e-mail и пароль' },
+  'ایمیل یا رمز نادرسته':     { en:'Wrong email or password',fr:'Identifiants invalides',ru:'Неверный e-mail или пароль' },
+  'اسمت رو بنویس...':         { en:'Type your name…',fr:'Votre nom…',     ru:'Имя…' },
+  // Folder names
+  'کار های شخصی':             { en:'Personal',      fr:'Personnel',       ru:'Личное' },
+  'کار های روزانه':           { en:'Daily',         fr:'Quotidien',       ru:'Ежедневное' },
+  'کار های شغل':              { en:'Work',          fr:'Travail',         ru:'Работа' },
+  // Operation timer states
+  'شروع':                     { en:'Start',         fr:'Démarrer',        ru:'Старт' },
+  'مکث':                      { en:'Pause',         fr:'Pause',           ru:'Пауза' },
+  'ادامه':                    { en:'Resume',        fr:'Reprendre',       ru:'Продолжить' },
+  'ریست':                     { en:'Reset',         fr:'Réinitialiser',   ru:'Сброс' },
+};
+
 let FA_MAP = null;  // lazily built fa → {en,fr,ru}
 function buildFaMap() {
   if (FA_MAP) return FA_MAP;
   FA_MAP = Object.create(null);
+  // 1) entries from I18N
   for (const key in I18N) {
     const e = I18N[key];
     if (!e || !e.fa) continue;
-    // Skip very short strings (1-2 chars) to avoid false positives like "از", "به"
     if (e.fa.length < 3) continue;
     FA_MAP[e.fa] = { en: e.en || e.fa, fr: e.fr || e.fa, ru: e.ru || e.fa };
+  }
+  // 2) entries from EXTRA_FA (overrides if duplicate)
+  for (const fa in EXTRA_FA) {
+    if (fa.length < 2) continue;
+    const e = EXTRA_FA[fa];
+    FA_MAP[fa] = { en: e.en || fa, fr: e.fr || fa, ru: e.ru || fa };
   }
   return FA_MAP;
 }
@@ -8003,7 +8279,9 @@ function translateRendered() {
   const lang = getLang();
   if (lang === 'fa') return;  // no-op for fa
   const map = buildFaMap();
-  // Walk all text nodes, swap exact matches
+  // Emoji/symbol prefix matcher: emoji range + variation selectors + ZWJ
+  const PREFIX_RE = /^([\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\u{2600}-\u{27BF}\u{1F300}-\u{1FAFF}✓✔✕✖×↺↻▶⏸⏹⏱⏰⏳⚡⭐🔔💰💧🍅🎯🏆🎖🥇🥈🥉]+\s*)/u;
+  const SUFFIX_RE = /([\s:،.,؟?!]+)$/;
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
   let n;
   const nodes = [];
@@ -8013,12 +8291,32 @@ function translateRendered() {
     if (!raw) continue;
     const trimmed = raw.trim();
     if (!trimmed) continue;
-    const hit = map[trimmed];
+    // Skip if parent is <script>, <style>, <code> or contentEditable
+    const p = node.parentNode;
+    if (p && (p.tagName === 'SCRIPT' || p.tagName === 'STYLE' || p.tagName === 'CODE' || p.isContentEditable)) continue;
+    // 1) exact full-string match
+    let hit = map[trimmed];
+    let replacement = null;
     if (hit && hit[lang]) {
-      // Preserve surrounding whitespace
+      replacement = hit[lang];
+    } else {
+      // 2) try stripping leading emoji / trailing punctuation
+      let core = trimmed;
+      let prefix = '', suffix = '';
+      const pm = core.match(PREFIX_RE);
+      if (pm) { prefix = pm[1]; core = core.slice(pm[1].length); }
+      const sm = core.match(SUFFIX_RE);
+      if (sm) { suffix = sm[1]; core = core.slice(0, -sm[1].length); }
+      core = core.trim();
+      if (core && core !== trimmed) {
+        hit = map[core];
+        if (hit && hit[lang]) replacement = prefix + hit[lang] + suffix;
+      }
+    }
+    if (replacement != null) {
       const leading = raw.match(/^\s*/)[0];
       const trailing = raw.match(/\s*$/)[0];
-      node.nodeValue = leading + hit[lang] + trailing;
+      node.nodeValue = leading + replacement + trailing;
     }
   }
 }
