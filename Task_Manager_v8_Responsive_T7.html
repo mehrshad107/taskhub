@@ -7767,6 +7767,16 @@ function plannerMonthKey(date) {
 }
 
 const FA_WEEKDAYS = ['یک‌شنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
+const WEEKDAYS_I18N = {
+  fa: ['یک‌شنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'],
+  en: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+  fr: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+  ru: ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],
+};
+function weekdayName(idx) {
+  const a = WEEKDAYS_I18N[getLang()] || WEEKDAYS_I18N.fa;
+  return a[idx] || '';
+}
 const FA_MONTHS   = ['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'];
 
 /* ════════════════════════════════════════════════
@@ -7935,6 +7945,51 @@ const I18N = {
   'time.month':       { fa:'ماه',   en:'month',  fr:'mois',      ru:'месяц' },
   'time.year':        { fa:'سال',   en:'year',   fr:'année',     ru:'год' },
   'time.ago':         { fa:'پیش',   en:'ago',    fr:'il y a',    ru:'назад' },
+  // Insight rule messages (templated, use ti())
+  'ins.r1.title':  { fa:'ساعت {peak} اوج تمرکزته',                    en:'{peak}:00 is your peak focus hour',                    fr:'{peak}h est votre pic de focus',                    ru:'{peak}:00 — ваш пик фокуса' },
+  'ins.r1.detail': { fa:'{share}٪ از کل تمرکزت در این ساعت بوده — تسک‌های سخت رو همین ساعت بذار.', en:'{share}% of your total focus happens at this hour — schedule hard tasks here.', fr:'{share}% de votre focus à cette heure — placez-y vos tâches difficiles.', ru:'{share}% всего фокуса в этот час — ставьте сложные задачи на это время.' },
+  'ins.r2a.title': { fa:'{day}ها پربازده‌ترین روز هفته‌ته',            en:'{day}s are your most productive day',                  fr:'Les {day}s sont vos plus productifs',               ru:'{day} — самый продуктивный день' },
+  'ins.r2a.detail':{ fa:'{lift}٪ بالاتر از میانگین سایر روزها (~{avg} دقیقه)', en:'{lift}% above average of other days (~{avg} min)',       fr:'{lift}% au-dessus de la moyenne (~{avg} min)',       ru:'{lift}% выше среднего (~{avg} мин)' },
+  'ins.r2b.title': { fa:'{day}ها معمولاً استراحت می‌کنی',              en:'You usually rest on {day}s',                            fr:'Vous vous reposez les {day}s',                       ru:'Обычно вы отдыхаете в {day}' },
+  'ins.r2b.detail':{ fa:'میانگین فقط {avg} دقیقه — اگه عمدیه، عالیه!', en:'Average only {avg} min — if intentional, great!',       fr:'Moyenne seulement {avg} min — si voulu, parfait !',  ru:'В среднем {avg} мин — если осознанно, отлично!' },
+  'ins.r3up.title':  { fa:'این هفته {pct}٪ بیشتر از هفتهٔ قبل تمرکز کردی!', en:'{pct}% more focus than last week!',                  fr:'{pct}% de focus en plus que la semaine dernière !',  ru:'{pct}% больше фокуса чем на прошлой неделе!' },
+  'ins.r3up.detail': { fa:'{this} دقیقه vs {prev} دقیقه — حرف نداره.',  en:'{this} min vs {prev} min — outstanding.',                fr:'{this} min vs {prev} min — excellent.',              ru:'{this} мин против {prev} мин — отлично.' },
+  'ins.r3dn.title':  { fa:'این هفته {pct}٪ کمتر از هفتهٔ قبل تمرکز کردی', en:'{pct}% less focus than last week',                   fr:'{pct}% de focus en moins',                            ru:'{pct}% меньше фокуса чем на прошлой неделе' },
+  'ins.r3dn.detail': { fa:'{this} دقیقه vs {prev} دقیقه — اگه عمدی نیست، کمی جدی‌تر؟', en:'{this} min vs {prev} min — if unintentional, push a bit?', fr:'{this} min vs {prev} min — si involontaire, un peu plus ?', ru:'{this} мин против {prev} мин — поднажмём?' },
+  'ins.r4.title':  { fa:'{n} روزه که تمرکز جدی نکردی',                 en:"It's been {n} days without serious focus",              fr:'Cela fait {n} jours sans focus sérieux',            ru:'{n} дней без серьёзного фокуса' },
+  'ins.r4.detail': { fa:'حتی یک سشن ۲۵ دقیقه‌ای برای شکستن این چرخه کافیه.', en:'Even one 25-min session breaks the cycle.',         fr:'Même une session de 25 min suffit à briser le cycle.', ru:'Достаточно одной 25-минутной сессии чтобы разорвать круг.' },
+  'ins.r5lo.title': { fa:'هدف روزانه‌ت {goal} دقیقه‌ست، فقط {pct}٪ مواقع می‌زنی', en:'Your daily goal is {goal} min, you hit it only {pct}% of the time', fr:'Objectif quotidien {goal} min, atteint {pct}% du temps', ru:'Дневная цель {goal} мин — попадаете {pct}% времени' },
+  'ins.r5lo.detail':{ fa:'بازنگری به ~{suggested} دقیقه؟ هدف قابل‌دسترس انگیزه می‌سازه.', en:'Lower to ~{suggested} min? Reachable goals motivate.', fr:'Réduire à ~{suggested} min ? Un objectif atteignable motive.', ru:'Снизить до ~{suggested} мин? Достижимая цель мотивирует.' },
+  'ins.r5hi.title': { fa:'{pct}٪ از دوهفتهٔ اخیر، هدف روزانه‌ت رو زدی',  en:'You hit your daily goal {pct}% in the last 2 weeks',   fr:'Vous avez atteint l\'objectif {pct}% des 2 dernières semaines', ru:'Цель достигнута {pct}% за последние 2 недели' },
+  'ins.r5hi.detail':{ fa:'اگه راحته، هدف رو {next} دقیقه کن.',          en:'If easy, bump the goal to {next} min.',                 fr:'Si facile, montez à {next} min.',                    ru:'Если легко, поднимите цель до {next} мин.' },
+  'ins.r6slip.title': { fa:'{days} روزه عادت «{name}» رو نزدی',         en:"{days} days since you did the habit «{name}»",           fr:'{days} jours sans l\'habitude « {name} »',           ru:'{days} дней без привычки «{name}»' },
+  'ins.r6slip.detail':{ fa:'بهترین استریک قبلی‌ت {best} روز بود. {emoji} الان دوباره شروع کن.', en:'Your best streak was {best} days. {emoji} Restart now.', fr:'Votre meilleure série : {best} jours. {emoji} Recommencez.', ru:'Лучшая серия — {best} дней. {emoji} Начните снова.' },
+  'ins.r6mile.title':{ fa:'{streak} روز پشت سر هم «{name}»!',           en:'{streak} days in a row of «{name}»!',                    fr:'{streak} jours d\'affilée de « {name} » !',          ru:'{streak} дней подряд «{name}»!' },
+  'ins.r6mile.detail':{ fa:'جشن بگیر — این یه نقطهٔ عطف واقعیه.',       en:'Celebrate — this is a real milestone.',                  fr:'Célébrez — c\'est un vrai jalon.',                   ru:'Празднуйте — это настоящая веха.' },
+  'ins.r7cat.title':{ fa:'{emoji} هزینهٔ {cat} این ماه {pct}٪ افزایش',  en:'{emoji} {cat} expenses up {pct}% this month',           fr:'{emoji} Dépenses {cat} +{pct}% ce mois',             ru:'{emoji} Расходы на {cat} выросли на {pct}%' },
+  'ins.r7cat.detail':{fa:'از {prev} به {cur} رفته — اگه نمی‌خواستی، یه بازبینی لازمه.', en:'From {prev} to {cur} — review if unintended.',       fr:'De {prev} à {cur} — à revoir si involontaire.',      ru:'С {prev} до {cur} — стоит пересмотреть.' },
+  'ins.r7proj.title':{fa:'با این روند، این ماه {pct}٪ بیشتر از ماه قبل خرج می‌کنی', en:'At this rate, you\'ll spend {pct}% more than last month', fr:'À ce rythme, vous dépenserez {pct}% de plus',       ru:'При таком темпе вы потратите на {pct}% больше' },
+  'ins.r7proj.detail':{fa:'پیش‌بینی پایان ماه: {proj} — vs {prev} ماه قبل.', en:'Month-end projection: {proj} — vs {prev} last month.', fr:'Projection : {proj} — vs {prev} mois dernier.',      ru:'Прогноз: {proj} — против {prev} в прошлом месяце.' },
+  'ins.r7save.title':{fa:'این ماه {pct}٪ کمتر از ماه قبل خرج می‌کنی',   en:'Spending {pct}% less than last month',                  fr:'Vous dépensez {pct}% de moins',                      ru:'Тратите на {pct}% меньше чем в прошлом месяце' },
+  'ins.r7save.detail':{fa:'پس‌انداز بیشتر در راهه — احسنت.',            en:'More savings on the way — well done.',                  fr:'Plus d\'économies en vue — bravo.',                   ru:'Больше сбережений впереди — отлично.' },
+  'ins.r8hi.title': { fa:'نرخ پس‌انداز این ماه: {rate}٪',               en:'Savings rate this month: {rate}%',                      fr:'Taux d\'épargne ce mois : {rate}%',                  ru:'Уровень сбережений: {rate}%' },
+  'ins.r8hi.detail':{ fa:'بالاتر از میانگین جهانی (~۱۵٪) — عالی.',      en:'Above global average (~15%) — excellent.',              fr:'Au-dessus de la moyenne mondiale (~15%) — excellent.', ru:'Выше мирового среднего (~15%) — отлично.' },
+  'ins.r8lo.title': { fa:'هزینه‌ها از درآمد بیشتره — کسری {rate}٪',     en:'Expenses exceed income — deficit {rate}%',              fr:'Dépenses > revenus — déficit {rate}%',               ru:'Расходы больше доходов — дефицит {rate}%' },
+  'ins.r8lo.detail':{ fa:'{amt} منفی این ماه. اولویت بازنگری بودجه.',   en:'{amt} negative this month. Budget review needed.',      fr:'{amt} négatif ce mois. Revoir le budget.',           ru:'{amt} в минус. Нужен пересмотр бюджета.' },
+  'ins.r8med.title':{ fa:'نرخ پس‌انداز این ماه فقط {rate}٪',            en:'Savings rate this month only {rate}%',                  fr:'Taux d\'épargne seulement {rate}%',                  ru:'Уровень сбережений всего {rate}%' },
+  'ins.r8med.detail':{fa:'هدف معقول: ۲۰٪+. می‌تونی بزرگ‌ترین دستهٔ هزینه رو تو تب مالی پیدا کنی.', en:'Reasonable target: 20%+. Find your biggest expense category in Money tab.', fr:'Cible raisonnable : 20%+. Trouvez votre plus grosse catégorie.', ru:'Цель: 20%+. Найдите самую большую категорию расходов.' },
+  'ins.r9over.title':{fa:'بودجهٔ {cat} {pct}٪ سرریز شده',               en:'{cat} budget over by {pct}%',                           fr:'Budget {cat} dépassé de {pct}%',                     ru:'Бюджет {cat} превышен на {pct}%' },
+  'ins.r9over.detail':{fa:'خرج: {spent} / بودجه: {budget} — حدود {over} اضافه.', en:'Spent: {spent} / budget: {budget} — about {over} over.', fr:'Dépensé : {spent} / budget : {budget} — env. {over} de trop.', ru:'Потрачено: {spent} / бюджет: {budget} — около {over} сверх.' },
+  'ins.r9near.title':{fa:'بودجهٔ {cat} نزدیک سقفه ({pct}٪)',            en:'{cat} budget near limit ({pct}%)',                      fr:'Budget {cat} proche de la limite ({pct}%)',          ru:'Бюджет {cat} близко к лимиту ({pct}%)' },
+  'ins.r9near.detail':{fa:'فقط {left} مونده تا پایان ماه.',             en:'Only {left} left until month end.',                     fr:'Plus que {left} jusqu\'à la fin du mois.',           ru:'Осталось всего {left} до конца месяца.' },
+  'ins.r10.title':  { fa:'{n} روز پشت سر هم اهداف پلنر!',               en:'{n} days in a row of planner goals!',                   fr:'{n} jours d\'affilée d\'objectifs !',                ru:'{n} дней подряд целей планера!' },
+  'ins.r10.detail': { fa:'این یه نقطهٔ عطفه. ادامه بده.',                en:'A real milestone. Keep going.',                         fr:'Un vrai jalon. Continuez.',                          ru:'Настоящая веха. Продолжайте.' },
+  'ins.r11.title':  { fa:'تسک‌های کوتاه‌ت {s}٪ تموم می‌شن، طولانی‌ها فقط {l}٪', en:'Short tasks complete {s}%, long only {l}%',         fr:'Tâches courtes : {s}%, longues : {l}%',              ru:'Короткие задачи: {s}%, длинные: {l}%' },
+  'ins.r11.detail': { fa:'تسک‌های بزرگ‌تر از یک ساعت رو به چند تسک کوچک تقسیم کن.', en:'Break tasks over 1 hour into smaller chunks.',     fr:'Découpez les tâches > 1h en plus petites.',          ru:'Дробите задачи дольше часа на мелкие.' },
+  'ins.r12.title':  { fa:'{cat} {share}٪ هزینه‌های ماه',                en:'{cat} = {share}% of monthly expenses',                  fr:'{cat} = {share}% des dépenses du mois',              ru:'{cat} — {share}% месячных расходов' },
+  'ins.r12.detail': { fa:'{amt} از {total} کل خرج این ماه.',            en:'{amt} of {total} total this month.',                    fr:'{amt} sur {total} ce mois.',                         ru:'{amt} из {total} в этом месяце.' },
+  'ins.r13.title':  { fa:'{n} مورد توی صندوق ثبت سریع داری',            en:'You have {n} items in quick-capture inbox',             fr:'{n} éléments dans la boîte de capture',              ru:'{n} элементов в быстрой записи' },
+  'ins.r13.detail': { fa:'یه چند دقیقه وقت بذار و تبدیلشون کن به تسک، هدف یا تراکنش.', en:'Spend a few minutes converting them into tasks, goals, or transactions.', fr:'Quelques minutes pour les convertir.',               ru:'Уделите пару минут и превратите их в задачи.' },
 };
 
 function getLang() { return (state && state.lang && LANGS[state.lang]) ? state.lang : 'fa'; }
@@ -7942,6 +7997,13 @@ function t(key, fallback) {
   const entry = I18N[key];
   if (!entry) return fallback != null ? fallback : key;
   return entry[getLang()] || entry.fa || key;
+}
+
+/* ti — t with interpolation. Replaces {name} placeholders with vars[name]. */
+function ti(key, vars, fallback) {
+  let s = t(key, fallback);
+  if (vars) for (const k in vars) s = s.split('{' + k + '}').join(String(vars[k]));
+  return s;
 }
 
 /* Apply translations to any element with data-i18n="key" attribute.
@@ -14251,8 +14313,8 @@ function generateInsights() {
       if (peakShare >= 15) {
         out.push({
           severity: 'info', icon: '⏰', score: 70,
-          title: `ساعت ${toFaDigits(peak)} اوج تمرکزته`,
-          detail: `${Math.round(peakShare)}٪ از کل تمرکزت در این ساعت بوده — تسک‌های سخت رو همین ساعت بذار.`
+          title:  ti('ins.r1.title',  { peak: toFaDigits(peak) }),
+          detail: ti('ins.r1.detail', { share: toFaDigits(Math.round(peakShare)) })
         });
       }
     }
@@ -14272,8 +14334,8 @@ function generateInsights() {
       if (lift >= 25) {
         out.push({
           severity: 'info', icon: '📅', score: 65,
-          title: `${FA_WEEKDAYS[bestIdx]}ها پربازده‌ترین روز هفته‌ته`,
-          detail: `${toFaDigits(lift)}٪ بالاتر از میانگین سایر روزها (~${toFaDigits(Math.round(bestAvg))} دقیقه)`
+          title:  ti('ins.r2a.title',  { day: weekdayName(bestIdx) }),
+          detail: ti('ins.r2a.detail', { lift: toFaDigits(lift), avg: toFaDigits(Math.round(bestAvg)) })
         });
       }
       // Inactive day pattern
@@ -14282,8 +14344,8 @@ function generateInsights() {
       if (totalAvg > 30 && lowestAvg < totalAvg * 0.3 && wdCnt[lowestIdx] >= 2) {
         out.push({
           severity: 'info', icon: '🌙', score: 50,
-          title: `${FA_WEEKDAYS[lowestIdx]}ها معمولاً استراحت می‌کنی`,
-          detail: `میانگین فقط ${toFaDigits(Math.round(lowestAvg))} دقیقه — اگه عمدیه، عالیه!`
+          title:  ti('ins.r2b.title',  { day: weekdayName(lowestIdx) }),
+          detail: ti('ins.r2b.detail', { avg: toFaDigits(Math.round(lowestAvg)) })
         });
       }
     }
@@ -14301,14 +14363,14 @@ function generateInsights() {
       if (pct >= 25) {
         out.push({
           severity: 'success', icon: '🚀', score: 90,
-          title: `این هفته ${toFaDigits(pct)}٪ بیشتر از هفتهٔ قبل تمرکز کردی!`,
-          detail: `${toFaDigits(thisWeek)} دقیقه vs ${toFaDigits(prevWeek)} دقیقه — حرف نداره.`
+          title:  ti('ins.r3up.title',  { pct: toFaDigits(pct) }),
+          detail: ti('ins.r3up.detail', { this: toFaDigits(thisWeek), prev: toFaDigits(prevWeek) })
         });
       } else if (pct <= -25) {
         out.push({
           severity: 'warn', icon: '📉', score: 85,
-          title: `این هفته ${toFaDigits(Math.abs(pct))}٪ کمتر از هفتهٔ قبل تمرکز کردی`,
-          detail: `${toFaDigits(thisWeek)} دقیقه vs ${toFaDigits(prevWeek)} دقیقه — اگه عمدی نیست، کمی جدی‌تر؟`
+          title:  ti('ins.r3dn.title',  { pct: toFaDigits(Math.abs(pct)) }),
+          detail: ti('ins.r3dn.detail', { this: toFaDigits(thisWeek), prev: toFaDigits(prevWeek) })
         });
       }
     }
@@ -14329,8 +14391,8 @@ function generateInsights() {
     if (inactiveStreak >= 3) {
       out.push({
         severity: 'alert', icon: '⚠️', score: 95,
-        title: `${toFaDigits(inactiveStreak)} روزه که تمرکز جدی نکردی`,
-        detail: `حتی یک سشن ۲۵ دقیقه‌ای برای شکستن این چرخه کافیه.`
+        title:  ti('ins.r4.title',  { n: toFaDigits(inactiveStreak) }),
+        detail: ti('ins.r4.detail')
       });
     }
   } catch {}
@@ -14354,14 +14416,14 @@ function generateInsights() {
           const suggested = Math.max(15, Math.round(avgFocus * 1.1 / 5) * 5);
           out.push({
             severity: 'action', icon: '🎯', score: 80,
-            title: `هدف روزانه‌ت ${toFaDigits(goalMin)} دقیقه‌ست، فقط ${toFaDigits(pct)}٪ مواقع می‌زنی`,
-            detail: `بازنگری به ~${toFaDigits(suggested)} دقیقه؟ هدف قابل‌دسترس انگیزه می‌سازه.`
+            title:  ti('ins.r5lo.title',  { goal: toFaDigits(goalMin), pct: toFaDigits(pct) }),
+            detail: ti('ins.r5lo.detail', { suggested: toFaDigits(suggested) })
           });
         } else if (pct >= 80) {
           out.push({
             severity: 'success', icon: '🏆', score: 75,
-            title: `${toFaDigits(pct)}٪ از دوهفتهٔ اخیر، هدف روزانه‌ت رو زدی`,
-            detail: `اگه راحته، هدف رو ${toFaDigits(Math.round(goalMin * 1.2))} دقیقه کن.`
+            title:  ti('ins.r5hi.title',  { pct: toFaDigits(pct) }),
+            detail: ti('ins.r5hi.detail', { next: toFaDigits(Math.round(goalMin * 1.2)) })
           });
         }
       }
@@ -14393,8 +14455,8 @@ function generateInsights() {
         if (bestStreak >= 3) {
           out.push({
             severity: 'warn', icon: '🔥', score: 70 + (daysSince > 7 ? 10 : 0),
-            title: `${toFaDigits(daysSince)} روزه عادت «${e(h.name)}» رو نزدی`,
-            detail: `بهترین استریک قبلی‌ت ${toFaDigits(bestStreak)} روز بود. ${h.emoji||''} الان دوباره شروع کن.`
+            title:  ti('ins.r6slip.title',  { days: toFaDigits(daysSince), name: e(h.name) }),
+            detail: ti('ins.r6slip.detail', { best: toFaDigits(bestStreak), emoji: h.emoji||'' })
           });
         }
       } else if (daysSince === 0) {
@@ -14403,8 +14465,8 @@ function generateInsights() {
         if ([7, 14, 21, 30, 50, 100].includes(streak)) {
           out.push({
             severity: 'success', icon: '🎉', score: 85,
-            title: `${toFaDigits(streak)} روز پشت سر هم «${e(h.name)}»!`,
-            detail: `جشن بگیر — این یه نقطهٔ عطف واقعیه.`
+            title:  ti('ins.r6mile.title',  { streak: toFaDigits(streak), name: e(h.name) }),
+            detail: ti('ins.r6mile.detail')
           });
         }
       }
@@ -14438,21 +14500,21 @@ function generateInsights() {
         const cat = getMoneyCategory(worst.c, 'expense');
         out.push({
           severity: 'warn', icon: '📈', score: 75,
-          title: `${cat.emoji} هزینهٔ ${cat.label} این ماه ${toFaDigits(worst.growthPct)}٪ افزایش`,
-          detail: `از ${formatMoney(worst.prev)} به ${formatMoney(worst.cur)} رفته — اگه نمی‌خواستی، یه بازبینی لازمه.`
+          title:  ti('ins.r7cat.title',  { emoji: cat.emoji, cat: cat.label, pct: toFaDigits(worst.growthPct) }),
+          detail: ti('ins.r7cat.detail', { prev: formatMoney(worst.prev), cur: formatMoney(worst.cur) })
         });
       }
       if (projPct >= 25 && dayOfMonth >= 7) {
         out.push({
           severity: 'warn', icon: '🔭', score: 70,
-          title: `با این روند، این ماه ${toFaDigits(projPct)}٪ بیشتر از ماه قبل خرج می‌کنی`,
-          detail: `پیش‌بینی پایان ماه: ${formatMoney(projThis)} — vs ${formatMoney(prevM.expense)} ماه قبل.`
+          title:  ti('ins.r7proj.title',  { pct: toFaDigits(projPct) }),
+          detail: ti('ins.r7proj.detail', { proj: formatMoney(projThis), prev: formatMoney(prevM.expense) })
         });
       } else if (projPct <= -20 && dayOfMonth >= 7) {
         out.push({
           severity: 'success', icon: '💰', score: 75,
-          title: `این ماه ${toFaDigits(Math.abs(projPct))}٪ کمتر از ماه قبل خرج می‌کنی`,
-          detail: `پس‌انداز بیشتر در راهه — احسنت.`
+          title:  ti('ins.r7save.title',  { pct: toFaDigits(Math.abs(projPct)) }),
+          detail: ti('ins.r7save.detail')
         });
       }
     }
@@ -14467,20 +14529,20 @@ function generateInsights() {
       if (rate >= 30) {
         out.push({
           severity: 'success', icon: '💎', score: 65,
-          title: `نرخ پس‌انداز این ماه: ${toFaDigits(rate)}٪`,
-          detail: `بالاتر از میانگین جهانی (~۱۵٪) — عالی.`
+          title:  ti('ins.r8hi.title',  { rate: toFaDigits(rate) }),
+          detail: ti('ins.r8hi.detail')
         });
       } else if (rate < 0) {
         out.push({
           severity: 'alert', icon: '🚨', score: 90,
-          title: `هزینه‌ها از درآمد بیشتره — کسری ${toFaDigits(Math.abs(rate))}٪`,
-          detail: `${formatMoney(thisM.expense - thisM.income)} منفی این ماه. اولویت بازنگری بودجه.`
+          title:  ti('ins.r8lo.title',  { rate: toFaDigits(Math.abs(rate)) }),
+          detail: ti('ins.r8lo.detail', { amt: formatMoney(thisM.expense - thisM.income) })
         });
       } else if (rate < 10) {
         out.push({
           severity: 'warn', icon: '⚠️', score: 65,
-          title: `نرخ پس‌انداز این ماه فقط ${toFaDigits(rate)}٪`,
-          detail: `هدف معقول: ۲۰٪+. می‌تونی بزرگ‌ترین دستهٔ هزینه رو تو تب مالی پیدا کنی.`
+          title:  ti('ins.r8med.title',  { rate: toFaDigits(rate) }),
+          detail: ti('ins.r8med.detail')
         });
       }
     }
@@ -14497,15 +14559,15 @@ function generateInsights() {
         const cat = getMoneyCategory(catId, 'expense');
         out.push({
           severity: 'alert', icon: '🔴', score: 92,
-          title: `بودجهٔ ${cat.label} ${toFaDigits(Math.round(pct - 100))}٪ سرریز شده`,
-          detail: `خرج: ${formatMoney(spent)} / بودجه: ${formatMoney(budget)} — حدود ${formatMoney(spent - budget)} اضافه.`
+          title:  ti('ins.r9over.title',  { cat: cat.label, pct: toFaDigits(Math.round(pct - 100)) }),
+          detail: ti('ins.r9over.detail', { spent: formatMoney(spent), budget: formatMoney(budget), over: formatMoney(spent - budget) })
         });
       } else if (pct >= 85) {
         const cat = getMoneyCategory(catId, 'expense');
         out.push({
           severity: 'warn', icon: '🟡', score: 78,
-          title: `بودجهٔ ${cat.label} نزدیک سقفه (${toFaDigits(Math.round(pct))}٪)`,
-          detail: `فقط ${formatMoney(budget - spent)} مونده تا پایان ماه.`
+          title:  ti('ins.r9near.title',  { cat: cat.label, pct: toFaDigits(Math.round(pct)) }),
+          detail: ti('ins.r9near.detail', { left: formatMoney(budget - spent) })
         });
       }
     });
@@ -14517,8 +14579,8 @@ function generateInsights() {
     if ([7, 14, 30, 60, 100].includes(ps)) {
       out.push({
         severity: 'success', icon: '⭐', score: 88,
-        title: `${toFaDigits(ps)} روز پشت سر هم اهداف پلنر!`,
-        detail: `این یه نقطهٔ عطفه. ادامه بده.`
+        title:  ti('ins.r10.title',  { n: toFaDigits(ps) }),
+        detail: ti('ins.r10.detail')
       });
     }
   } catch {}
@@ -14535,8 +14597,8 @@ function generateInsights() {
         if (sRate > 0.6 && lRate < 0.3) {
           out.push({
             severity: 'action', icon: '✂️', score: 72,
-            title: `تسک‌های کوتاه‌ت ${toFaDigits(Math.round(sRate*100))}٪ تموم می‌شن، طولانی‌ها فقط ${toFaDigits(Math.round(lRate*100))}٪`,
-            detail: `تسک‌های بزرگ‌تر از یک ساعت رو به چند تسک کوچک تقسیم کن.`
+            title:  ti('ins.r11.title',  { s: toFaDigits(Math.round(sRate*100)), l: toFaDigits(Math.round(lRate*100)) }),
+            detail: ti('ins.r11.detail')
           });
         }
       }
@@ -14556,8 +14618,8 @@ function generateInsights() {
           const cat = getMoneyCategory(topId, 'expense');
           out.push({
             severity: 'info', icon: cat.emoji, score: 55,
-            title: `${cat.label} ${toFaDigits(Math.round(share))}٪ هزینه‌های ماه`,
-            detail: `${formatMoney(topAmt)} از ${formatMoney(thisM.expense)} کل خرج این ماه.`
+            title:  ti('ins.r12.title',  { cat: cat.label, share: toFaDigits(Math.round(share)) }),
+            detail: ti('ins.r12.detail', { amt: formatMoney(topAmt), total: formatMoney(thisM.expense) })
           });
         }
       }
@@ -14570,8 +14632,8 @@ function generateInsights() {
     if (inboxCount >= 5) {
       out.push({
         severity: 'action', icon: '📥', score: 60,
-        title: `${toFaDigits(inboxCount)} مورد توی صندوق ثبت سریع داری`,
-        detail: `یه چند دقیقه وقت بذار و تبدیلشون کن به تسک، هدف یا تراکنش.`
+        title:  ti('ins.r13.title',  { n: toFaDigits(inboxCount) }),
+        detail: ti('ins.r13.detail')
       });
     }
   } catch {}
